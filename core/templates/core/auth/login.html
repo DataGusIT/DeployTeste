@@ -1,0 +1,527 @@
+<!-- core/templates/core/auth/login.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card shadow-lg border-0 overflow-hidden card-login">
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <!-- Lado esquerdo simplificado e moderno -->
+                        <div class="col-lg-6 position-relative d-none d-lg-block">
+                            <div class="h-100 login-left-panel">
+                                <!-- Padrão de fundo minimalista -->
+                                <div class="position-absolute geometric-patterns"></div>
+
+                                <!-- Conteúdo do lado esquerdo modernizado -->
+                                <div class="d-flex flex-column justify-content-center h-100 position-relative z-index-1 p-5 text-center text-white">
+                                    <!-- Ícone principal limpo -->
+                                    <div class="mb-4">
+                                        <div class="brand-icon mx-auto mb-4">
+                                            <i class="fas fa-rocket fa-3x"></i>
+                                        </div>
+                                        <div class="display-4 fw-bold mb-3 welcome-text">Bem-vindo!</div>
+                                        <p class="lead opacity-85 mb-0">Acesse sua conta e continue sua jornada</p>
+                                    </div>
+
+                                    
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lado direito com formulário modernizado -->
+                        <div class="col-lg-6">
+                            <div class="p-5 form-container">
+                                <!-- Header para mobile -->
+                                <div class="d-lg-none text-center mb-5">
+                                    <div class="brand-icon-mobile mx-auto mb-3">
+                                        <i class="fas fa-rocket fa-2x text-white"></i>
+                                    </div>
+                                    <h3 class="mt-3 fw-bold text-dark">Bem-vindo!</h3>
+                                    <p class="text-muted">Faça login para continuar</p>
+                                </div>
+
+                                <!-- Header para Desktop -->
+                                <div class="d-none d-lg-block mb-4">
+                                    <h3 class="fw-bold mb-2 text-dark">Fazer Login</h3>
+                                    <p class="text-muted mb-0">Entre com suas credenciais para continuar</p>
+                                </div>
+
+                                {% if messages %}
+                                <div class="mb-4">
+                                    {% for message in messages %}
+                                    <div class="alert alert-modern {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} d-flex align-items-center">
+                                        <i class="{% if message.tags == 'error' %}fas fa-exclamation-circle text-danger{% elif message.tags == 'success' %}fas fa-check-circle text-success{% else %}fas fa-info-circle text-info{% endif %} me-3"></i>
+                                        <div>{{ message }}</div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+
+                                <form method="post" novalidate class="modern-form">
+                                    {% csrf_token %}
+
+                                    <div class="mb-4">
+                                        <label for="{{ form.username.id_for_label }}" class="form-label fw-semibold mb-2 text-dark">
+                                            Nome de usuário
+                                        </label>
+                                        <div class="input-group-modern">
+                                            <div class="input-icon">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            {{ form.username }}
+                                        </div>
+                                        {% if form.username.errors %}
+                                        <div class="error-message">
+                                            {% for error in form.username.errors %}
+                                            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="{{ form.password.id_for_label }}" class="form-label fw-semibold mb-2 text-dark">
+                                            Senha
+                                        </label>
+                                        <div class="input-group-modern">
+                                            <div class="input-icon">
+                                                <i class="fas fa-lock"></i>
+                                            </div>
+                                            {{ form.password }}
+                                            <button class="password-toggle" type="button" id="togglePassword">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        {% if form.password.errors %}
+                                        <div class="error-message">
+                                            {% for error in form.password.errors %}
+                                            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
+                                        <div class="form-check modern-checkbox">
+                                            <input class="form-check-input" type="checkbox" id="rememberMe">
+                                            <label class="form-check-label ms-2" for="rememberMe">
+                                                Lembrar de mim
+                                            </label>
+                                        </div>
+                                        <a href="#" class="forgot-link">Esqueceu a senha?</a>
+                                    </div>
+
+                                    <div class="d-grid mt-5 mb-4">
+                                        <button type="submit" class="btn btn-primary btn-modern">
+                                            <span class="d-flex align-items-center justify-content-center">
+                                                <span>Entrar agora</span>
+                                                <i class="fas fa-arrow-right ms-2"></i>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </form>
+
+                                <div class="text-center">
+                                    <!-- Separador moderno -->
+                                    <div class="divider-modern">
+                                        <span>ou continue com</span>
+                                    </div>
+
+                                    <!-- Botões de login social modernizados -->
+                                    <div class="social-buttons-modern mb-4">
+                                        <a href="#" class="social-btn-modern">
+                                            <i class="fab fa-google"></i>
+                                        </a>
+                                        <a href="#" class="social-btn-modern">
+                                            <i class="fab fa-facebook-f"></i>
+                                        </a>
+                                        <a href="#" class="social-btn-modern">
+                                            <i class="fab fa-apple"></i>
+                                        </a>
+                                    </div>
+
+                                    <p class="mb-0 signup-text">
+                                        Não tem uma conta?
+                                        <a href="{% url 'register' %}" class="signup-link">
+                                            Cadastre-se
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Variáveis CSS modernas */
+    :root {
+        --primary: #6a3ea1;
+        --primary-dark: #4a2c75;
+        --primary-light: #8e5bb8;
+        --secondary: #f8f9fa;
+        --accent: #e3f2fd;
+        --text-dark: #2c3e50;
+        --text-muted: #6c757d;
+        --border-color: #e9ecef;
+        --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.05);
+        --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --shadow-strong: 0 8px 30px rgba(106, 62, 161, 0.15);
+    }
+
+    /* Container principal */
+    .card-login {
+        border-radius: 24px;
+        background: white;
+        box-shadow: var(--shadow-strong);
+    }
+
+    /* Painel esquerdo modernizado */
+    .login-left-panel {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        position: relative;
+    }
+
+    .geometric-patterns {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+    }
+
+    .brand-icon {
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .brand-icon i {
+        color: white;
+    }
+
+    .welcome-text {
+        text-shadow: none;
+    }
+
+    .feature-benefits {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+        max-width: 280px;
+        margin: 0 auto;
+    }
+
+    .benefit-item {
+        display: flex;
+        align-items: center;
+        opacity: 0.9;
+        font-size: 0.95rem;
+    }
+
+    /* Ícone para mobile */
+    .brand-icon-mobile {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Container do formulário */
+    .form-container {
+        padding: 60px 50px !important;
+    }
+
+    /* Inputs modernos */
+    .input-group-modern {
+        position: relative;
+        margin-bottom: 4px;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        z-index: 3;
+        font-size: 18px;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        z-index: 3;
+        font-size: 16px;
+        padding: 0;
+    }
+
+    .password-toggle:hover {
+        color: var(--primary);
+    }
+
+    /* Mensagens de erro */
+    .error-message {
+        color: #dc3545;
+        margin-top: 8px;
+        padding-left: 4px;
+    }
+
+    /* Alertas modernos */
+    .alert-modern {
+        border: none;
+        border-radius: 12px;
+        padding: 16px 20px;
+        font-size: 14px;
+    }
+
+    /* Checkbox moderno */
+    .modern-checkbox .form-check-input {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        border: 2px solid var(--border-color);
+    }
+
+    .modern-checkbox .form-check-input:checked {
+        background-color: var(--primary);
+        border-color: var(--primary);
+    }
+
+    /* Link esqueceu senha */
+    .forgot-link {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .forgot-link:hover {
+        color: var(--primary-dark);
+        text-decoration: none;
+    }
+
+    /* Botão principal modernizado */
+    .btn-modern {
+        padding: 16px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 16px;
+        border: none;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        box-shadow: var(--shadow-medium);
+        transition: all 0.3s ease;
+    }
+
+    .btn-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-strong);
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+    }
+
+    .btn-modern:active {
+        transform: translateY(0);
+    }
+
+    /* Divisor moderno */
+    .divider-modern {
+        position: relative;
+        text-align: center;
+        margin: 32px 0;
+        color: var(--text-muted);
+        font-size: 14px;
+    }
+
+    .divider-modern::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: var(--border-color);
+    }
+
+    .divider-modern span {
+        background: white;
+        padding: 0 20px;
+    }
+
+    /* Botões sociais modernos */
+    .social-buttons-modern {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .social-btn-modern {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        border: 2px solid var(--border-color);
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: var(--text-muted);
+        transition: all 0.3s ease;
+        font-size: 18px;
+    }
+
+    .social-btn-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-medium);
+        border-color: var(--primary);
+    }
+
+    .social-btn-modern:nth-child(1):hover {
+        color: #db4437;
+    }
+
+    .social-btn-modern:nth-child(2):hover {
+        color: #4267B2;
+    }
+
+    .social-btn-modern:nth-child(3):hover {
+        color: #000;
+    }
+
+    /* Link de cadastro */
+    .signup-text {
+        color: var(--text-muted);
+        font-size: 14px;
+    }
+
+    .signup-link {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .signup-link:hover {
+        color: var(--primary-dark);
+        text-decoration: none;
+    }
+
+    /* Responsividade aprimorada */
+    @media (max-width: 992px) {
+        .form-container {
+            padding: 40px 30px !important;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .form-container {
+            padding: 30px 20px !important;
+        }
+        
+        .card-login {
+            border-radius: 16px;
+        }
+    }
+
+    /* Animação de entrada */
+    .card-login {
+        animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Adicionar classes e atributos aos inputs do Django
+        const usernameInput = document.getElementById('{{ form.username.id_for_label }}');
+        const passwordInput = document.getElementById('{{ form.password.id_for_label }}');
+
+        if (usernameInput) {
+            usernameInput.classList.add('form-control');
+            usernameInput.setAttribute('placeholder', 'Digite seu nome de usuário');
+            usernameInput.style.cssText = `
+                width: 100%;
+                padding: 16px 20px 16px 55px;
+                border: 2px solid var(--border-color);
+                border-radius: 12px;
+                font-size: 16px;
+                transition: all 0.3s ease;
+                background: white;
+            `;
+        }
+
+        if (passwordInput) {
+            passwordInput.classList.add('form-control');
+            passwordInput.setAttribute('placeholder', 'Digite sua senha');
+            passwordInput.style.cssText = `
+                width: 100%;
+                padding: 16px 55px 16px 55px;
+                border: 2px solid var(--border-color);
+                border-radius: 12px;
+                font-size: 16px;
+                transition: all 0.3s ease;
+                background: white;
+            `;
+        }
+
+        // Adicionar eventos de foco
+        [usernameInput, passwordInput].forEach(input => {
+            if (input) {
+                input.addEventListener('focus', function() {
+                    this.style.borderColor = 'var(--primary)';
+                    this.style.boxShadow = '0 0 0 3px rgba(106, 62, 161, 0.1)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.style.borderColor = 'var(--border-color)';
+                    this.style.boxShadow = 'none';
+                });
+            }
+        });
+
+        // Toggle para mostrar/esconder senha
+        const togglePassword = document.getElementById('togglePassword');
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', function () {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+
+                const icon = this.querySelector('i');
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            });
+        }
+    });
+</script>
+{% endblock %}

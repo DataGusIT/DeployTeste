@@ -1,0 +1,1342 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dúvidas Frequentes sobre Autismo{% endblock %}
+
+{% block content %}
+
+<!-- =============================================================================
+   SEÇÃO HERO - CABEÇALHO DA PÁGINA
+   ============================================================================= -->
+<section class="hero-section" style="padding: 4rem 0;">
+    <div class="hero-overlay"></div>
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-12 text-center">
+                <h1 class="display-4 fw-bold mb-4 animate__animated animate__fadeInUp">
+                    Dúvidas Frequentes
+                </h1>
+                <p class="lead mb-4 animate__animated animate__fadeInUp animate__delay-1s">
+                    Aqui você encontra respostas para as perguntas mais comuns sobre o Transtorno do Espectro Autista
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- =============================================================================
+   SEÇÃO PRINCIPAL - CONTEÚDO FAQ
+   ============================================================================= #} -->
+<section class="py-5">
+    <div class="container">
+        
+        {# Cabeçalho da seção com formulário de pesquisa #}
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8 text-center">
+                <div class="section-subtitle">Encontre respostas</div>
+                <h2 class="section-title">O que você precisa saber sobre o autismo</h2>
+                <div class="section-divider"></div>
+                <p class="section-description mb-5">
+                    Explore nossas respostas para as dúvidas mais frequentes sobre o Transtorno do Espectro Autista. 
+                    Se você não encontrar o que procura, entre em contato conosco.
+                </p>
+
+                {# Formulário de pesquisa #}
+                <div class="row justify-content-center mb-5">
+                    <div class="col-md-8">
+                        <form action="{% url 'pesquisar_faqs' %}" method="post" class="d-flex">
+                            {% csrf_token %}
+                            <div class="input-group">
+                                <input type="text" 
+                                       name="termo" 
+                                       class="form-control"
+                                       placeholder="O que você quer saber?" 
+                                       value="{{ termo_pesquisa }}"
+                                       aria-label="Termo de pesquisa">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search me-2"></i> Pesquisar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Verificação se existem FAQs para exibir #}
+        {% if faqs_por_categoria %}
+            
+            <!-- =============================================================================
+               NAVEGAÇÃO POR CATEGORIAS
+               ============================================================================= -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <nav class="faq-nav d-flex justify-content-center flex-wrap">
+                        {% for categoria in faqs_por_categoria.keys %}
+                            <a href="#{{ categoria|lower|slugify }}" class="btn btn-sm btn-outline-primary m-1">
+                                {{ categoria }}
+                            </a>
+                        {% endfor %}
+                    </nav>
+                </div>
+            </div>
+
+            <!-- =============================================================================
+               ACORDEÕES DE FAQ POR CATEGORIA
+               ============================================================================= -->
+            <div class="row">
+                <div class="col-lg-10 mx-auto">
+                    {% for categoria, faqs in faqs_por_categoria.items %}
+                        <div class="mb-5" id="{{ categoria|lower|slugify }}">
+                            
+                            {# Cabeçalho da categoria com ícone #}
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="feature-icon me-3">
+                                    {% if categoria == "Geral" %}
+                                        <i class="fas fa-info-circle"></i>
+                                    {% elif categoria == "Diagnóstico" %}
+                                        <i class="fas fa-stethoscope"></i>
+                                    {% elif categoria == "Tratamento" %}
+                                        <i class="fas fa-heartbeat"></i>
+                                    {% elif categoria == "Apoio" %}
+                                        <i class="fas fa-hands-helping"></i>
+                                    {% elif categoria == "Conceitos" %}
+                                        <i class="fas fa-book"></i>
+                                    {% else %}
+                                        <i class="fas fa-question-circle"></i>
+                                    {% endif %}
+                                </div>
+                                <h3 class="feature-title mb-0">{{ categoria }}</h3>
+                            </div>
+
+                            {# Acordeão com as FAQs da categoria #}
+                            <div class="accordion shadow-sm" id="accordion{{ categoria|slugify }}">
+                                {% for faq in faqs %}
+                                    <div class="accordion-item border-0 mb-3 rounded-3 overflow-hidden">
+                                        
+                                        {# Cabeçalho do item FAQ com botão de salvar #}
+                                        <h2 class="accordion-header" id="heading{{ faq.id }}">
+                                            <div class="d-flex align-items-center">
+                                                
+                                                {# Botão de expansão da FAQ #}
+                                                <button class="accordion-button collapsed fw-medium flex-grow-1" 
+                                                        type="button"
+                                                        data-bs-toggle="collapse" 
+                                                        data-bs-target="#collapse{{ faq.id }}"
+                                                        aria-expanded="false" 
+                                                        aria-controls="collapse{{ faq.id }}">
+                                                    {{ faq.pergunta }}
+                                                </button>
+
+                                                {# Botão de salvar FAQ #}
+                                                <div class="faq-save-button ms-3 me-3">
+                                                    {% if user.is_authenticated %}
+                                                        {% if faq.id in faqs_salvas_ids %}
+                                                            {# FAQ já salva - botão para remover #}
+                                                            <button class="btn btn-primary btn-icon" 
+                                                                    onclick="removerFAQ({{ faq.id }}, this)">
+                                                                <i class="fas fa-bookmark"></i>
+                                                            </button>
+                                                        {% else %}
+                                                            {# FAQ não salva - botão para salvar #}
+                                                            <button class="btn btn-outline-primary btn-icon" 
+                                                                    onclick="salvarFAQ({{ faq.id }}, this)">
+                                                                <i class="far fa-bookmark"></i>
+                                                            </button>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {# Usuário não autenticado - mostrar alerta #}
+                                                        <button class="btn btn-outline-primary btn-icon" 
+                                                                onclick="mostrarLoginAlert()">
+                                                            <i class="far fa-bookmark"></i>
+                                                        </button>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </h2>
+                                        
+                                        {# Conteúdo da resposta FAQ #}
+                                        <div id="collapse{{ faq.id }}" 
+                                             class="accordion-collapse collapse"
+                                             aria-labelledby="heading{{ faq.id }}"
+                                             data-bs-parent="#accordion{{ categoria|slugify }}">
+                                            <div class="accordion-body">
+                                                <div class="faq-content">{{ faq.resposta|linebreaksbr|safe }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        
+        {% else %}
+            <!-- =============================================================================
+               MENSAGEM QUANDO NÃO HÁ RESULTADOS
+               ============================================================================= -->
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <div class="alert alert-info p-4 shadow-sm rounded-3">
+                        <i class="fas fa-info-circle fa-2x mb-3"></i>
+                        <h4>Nenhuma informação encontrada</h4>
+                        <p class="mb-0">
+                            {% if termo_pesquisa %}
+                                <span>Não encontramos resultados para "{{ termo_pesquisa }}". </span>
+                            {% endif %}
+                            Tente usar termos diferentes ou entre em contato conosco para mais informações.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- =============================================================================
+           CALL TO ACTION - AINDA TEM DÚVIDAS?
+           ============================================================================= -->
+        <div class="row mt-5">
+            <div class="col-lg-10 mx-auto">
+                <div class="card border-0 shadow-sm"
+                     style="background: linear-gradient(45deg, var(--primary) 0%, var(--primary-light) 100%); border-radius: 16px;">
+                    <div class="card-body p-5 text-white">
+                        <div class="row align-items-center">
+                            <div class="col-lg-8">
+                                <h3 class="mb-3">Ainda tem dúvidas?</h3>
+                                <p class="mb-lg-0">
+                                    Se você não encontrou a resposta que procura, entre em contato com nossa equipe.
+                                    Estamos aqui para ajudar.
+                                </p>
+                            </div>
+                            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                                <a href="{% url 'contatos' %}" class="btn btn-light btn-lg">
+                                    <i class="fas fa-envelope me-2"></i> Fale Conosco
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- =============================================================================
+   SEÇÃO DE RECURSOS ADICIONAIS
+   ============================================================================= -->
+<section class="py-5 bg-light">
+    <div class="container">
+        
+        {# Cabeçalho da seção #}
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8 text-center">
+                <div class="section-subtitle">Explore</div>
+                <h2 class="section-title">O que você pode encontrar aqui</h2>
+                <div class="section-divider"></div>
+                <p class="section-description">
+                    Um espaço simples para conhecer mais sobre o autismo e encontrar informações úteis
+                </p>
+            </div>
+        </div>
+
+        {# Cards de recursos #}
+        <div class="row">
+            
+            {# Card 1 - Informações básicas #}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm feature-card">
+                    <div class="card-body p-4 text-center">
+                        <div class="feature-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <h4 class="feature-title">Informações básicas</h4>
+                        <p class="feature-description">
+                            Conteúdo introdutório sobre autismo, características e dicas simples do dia a dia
+                        </p>
+                        <a href="#" class="feature-link">
+                            Saiba mais <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# Card 2 - Atividades práticas #}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm feature-card">
+                    <div class="card-body p-4 text-center">
+                        <div class="feature-icon">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <h4 class="feature-title">Atividades práticas</h4>
+                        <p class="feature-description">
+                            Ideias de jogos, brincadeiras e exercícios que podem ajudar no desenvolvimento
+                        </p>
+                        <a href="{% url 'ferramentas' %}" class="feature-link">
+                            Ver atividades <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# Card 3 - Apoio e orientação #}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm feature-card">
+                    <div class="card-body p-4 text-center">
+                        <div class="feature-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h4 class="feature-title">Apoio e orientação</h4>
+                        <p class="feature-description">
+                            Dicas para funcionários e informações sobre onde buscar ajuda profissional
+                        </p>
+                        <a href="#" class="feature-link">
+                            Acessar <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- =============================================================================
+   MODAL DE LOGIN MODERNO - VERSÃO REFATORADA
+   ============================================================================= -->
+<div class="modal fade login-modal" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content login-modal-content">
+            <!-- Header com botão de fechar -->
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close-modern" data-bs-dismiss="modal" aria-label="Fechar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Corpo do modal -->
+            <div class="modal-body px-4 pb-4">
+                <div class="text-center">
+                    <!-- Ícone animado -->
+                    <div class="login-icon-wrapper mb-4">
+                        <div class="login-icon">
+                            <i class="fas fa-bookmark"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Título e descrição -->
+                    <h3 class="login-title mb-3" id="loginModalLabel">
+                        Acesse sua conta
+                    </h3>
+                    <p class="login-description mb-4">
+                        Para salvar suas dúvidas favoritas e personalizar sua experiência, 
+                        faça login ou crie uma conta gratuita.
+                    </p>
+                    
+                    <!-- Lista de benefícios -->
+                    <div class="benefits-list mb-4">
+                        <div class="benefit-item">
+                            <i class="fas fa-bookmark"></i>
+                            <span>Salve dúvidas favoritas</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-history"></i>
+                            <span>Histórico personalizado</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-sync"></i>
+                            <span>Sincronize dispositivos</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Botões de ação -->
+                    <div class="login-actions d-grid gap-3 mb-3">
+                        <a href="{% url 'login' %}" class="btn btn-primary btn-lg btn-login">
+                            <i class="fas fa-sign-in-alt me-2"></i>
+                            Entrar
+                        </a>
+                        <a href="{% url 'register' %}" class="btn btn-outline-primary btn-lg btn-register">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Criar conta grátis
+                        </a>
+                    </div>
+                    
+                    <!-- Link alternativo -->
+                    <div class="login-footer">
+                        <button type="button" class="btn-link-modern" data-bs-dismiss="modal">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Continuar sem salvar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =============================================================================
+   CONTAINER DE NOTIFICAÇÕES TOAST
+   ============================================================================= -->
+
+{# Toast para notificações #}
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="toastMessage" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto" id="toastTitle">Notificação</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="toastBody">
+            Mensagem aqui
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+<!-- =============================================================================
+   JAVASCRIPT CUSTOMIZADO
+   ============================================================================= -->
+
+{% block extra_js %}
+<script>
+    // =============================================================================
+    // FUNCIONALIDADES DE NAVEGAÇÃO E INTERFACE
+    // =============================================================================
+    
+    /**
+     * Implementa scroll suave para navegação entre categorias
+     */
+    function initSmoothScrolling() {
+        document.querySelectorAll('.faq-nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    }
+
+    /**
+     * Melhora a animação dos acordeões com efeitos visuais
+     */
+    function enhanceAccordionAnimations() {
+        const accordionButtons = document.querySelectorAll('.accordion-button');
+        accordionButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                setTimeout(() => {
+                    const isExpanded = this.getAttribute('aria-expanded') === 'true';
+                    if (isExpanded) {
+                        const collapseElement = this.closest('.accordion-header').nextElementSibling;
+                        if (collapseElement) {
+                            collapseElement.querySelector('.accordion-body')
+                                         .classList.add('animate__animated', 'animate__fadeIn');
+                        }
+                    }
+                }, 100);
+            });
+        });
+    }
+
+    // =============================================================================
+    // FUNCIONALIDADES DE PESQUISA E DESTAQUE
+    // =============================================================================
+    
+    /**
+     * Destaca termos pesquisados no conteúdo das FAQs
+     */
+    function highlightSearchTerms() {
+        const searchTerm = '{{ termo_pesquisa }}';
+        if (searchTerm && searchTerm.length > 2) {
+            
+            // Destacar no conteúdo das respostas
+            const accordionItems = document.querySelectorAll('.accordion-body');
+            accordionItems.forEach(item => {
+                const content = item.innerHTML;
+                const highlightedContent = content.replace(
+                    new RegExp(searchTerm, 'gi'),
+                    match => `<mark class="bg-warning">${match}</mark>`
+                );
+                item.innerHTML = highlightedContent;
+            });
+
+            // Destacar nas perguntas
+            const accordionButtons = document.querySelectorAll('.accordion-button');
+            accordionButtons.forEach(button => {
+                const content = button.innerHTML;
+                const highlightedContent = content.replace(
+                    new RegExp(searchTerm, 'gi'),
+                    match => `<mark class="bg-warning">${match}</mark>`
+                );
+                button.innerHTML = highlightedContent;
+            });
+
+            // Expandir automaticamente acordeões que contêm o termo pesquisado
+            document.querySelectorAll('.accordion-button mark').forEach(mark => {
+                const button = mark.closest('.accordion-button');
+                if (button && button.classList.contains('collapsed')) {
+                    button.click();
+                }
+            });
+        }
+    }
+
+    /**
+     * Melhora a formatação do conteúdo das FAQs
+     */
+    function enhanceFAQContent() {
+        document.querySelectorAll('.faq-content').forEach(content => {
+            let html = content.innerHTML;
+            
+            // Estilizar listas
+            if (html.includes('<ul>') || html.includes('<ol>')) {
+                html = html.replace(/<ul>/g, '<ul class="faq-list">');
+                html = html.replace(/<ol>/g, '<ol class="faq-list">');
+            }
+            
+            // Destaque para texto em negrito
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="text-primary">$1</strong>');
+            
+            // Formatação de títulos
+            html = html.replace(/^#\s(.*?)$/gm, '<h5 class="mt-3 mb-2 text-primary">$1</h5>');
+            
+            content.innerHTML = html;
+        });
+    }
+
+    // =============================================================================
+    // FUNCIONALIDADES DE SALVAMENTO DE FAQ
+    // =============================================================================
+    
+    /**
+     * Salva uma FAQ para o usuário logado
+     * @param {number} faqId - ID da FAQ a ser salva
+     * @param {HTMLElement} element - Elemento botão que foi clicado
+     */
+    function salvarFAQ(faqId, element) {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch(`/salvar-faq/${faqId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                'faq_id': faqId
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                if (data.action === 'saved') {
+                    // Atualizar interface para estado "salvo"
+                    element.classList.remove('btn-outline-primary');
+                    element.classList.add('btn-primary');
+                    element.innerHTML = '<i class="fas fa-bookmark"></i>';
+                    element.setAttribute('onclick', `removerFAQ(${faqId}, this)`);
+                    
+                    showToast('success', 'Dúvida salva com sucesso!');
+                } else if (data.action === 'already_saved') {
+                    showToast('info', 'Esta dúvida já foi salva anteriormente.');
+                }
+            } else {
+                showToast('error', data.message || 'Erro ao salvar dúvida');
+            }
+        })
+        .catch(error => {
+            console.error('Erro completo:', error);
+            showToast('error', 'Erro de conexão. Verifique sua internet e tente novamente.');
+        });
+    }
+
+    /**
+     * Remove uma FAQ salva do usuário
+     * @param {number} faqId - ID da FAQ a ser removida
+     * @param {HTMLElement} element - Elemento botão que foi clicado
+     */
+    function removerFAQ(faqId, element) {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch(`/remover-faq/${faqId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                'faq_id': faqId
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Atualizar interface para estado "não salvo"
+                element.classList.remove('btn-primary');
+                element.classList.add('btn-outline-primary');
+                element.innerHTML = '<i class="far fa-bookmark"></i>';
+                element.setAttribute('onclick', `salvarFAQ(${faqId}, this)`);
+                
+                showToast('success', 'Dúvida removida com sucesso!');
+            } else {
+                showToast('error', data.message || 'Erro ao remover dúvida');
+            }
+        })
+        .catch(error => {
+            console.error('Erro completo:', error);
+            showToast('error', 'Erro de conexão. Verifique sua internet e tente novamente.');
+        });
+    }
+
+    // =============================================================================
+    // MODAL DE LOGIN MODERNO - VERSÃO SIMPLIFICADA
+    // =============================================================================
+
+    let loginModalInstance = null;
+
+    function mostrarLoginAlert() {
+        if (!loginModalInstance) {
+            const modalElement = document.getElementById('loginModal');
+            if (!modalElement) {
+                mostrarLoginAlertFallback();
+                return;
+            }
+            loginModalInstance = new bootstrap.Modal(modalElement, {
+                backdrop: 'static',
+                keyboard: true
+            });
+        }
+        
+        // Aplicar blur
+        document.body.classList.add('modal-blur-active');
+        
+        // Mostrar modal
+        loginModalInstance.show();
+        
+        // Configurar eventos
+        document.getElementById('loginModal').addEventListener('hidden.bs.modal', function () {
+            document.body.classList.remove('modal-blur-active');
+        }, { once: true });
+    }
+
+    function mostrarLoginAlertFallback() {
+        if (confirm('Você precisa estar logado para salvar FAQs.\n\nDeseja ir para a página de login?')) {
+            window.location.href = '/login/';
+        }
+    }
+
+    // Função melhorada para toast
+    function showToast(type, message) {
+        const toastElement = document.getElementById('toastMessage');
+        const toastIcon = toastElement.querySelector('.toast-icon i');
+        const toastTitle = toastElement.querySelector('.toast-title');
+        const toastBody = toastElement.querySelector('.toast-body');
+        
+        // Remover classes anteriores
+        toastElement.className = 'toast modern-toast';
+        
+        // Configurar por tipo
+        const config = {
+            success: { icon: 'fas fa-check-circle', title: 'Sucesso', class: 'toast-success' },
+            error: { icon: 'fas fa-exclamation-circle', title: 'Erro', class: 'toast-error' },
+            warning: { icon: 'fas fa-exclamation-triangle', title: 'Atenção', class: 'toast-warning' },
+            info: { icon: 'fas fa-info-circle', title: 'Informação', class: 'toast-info' }
+        };
+        
+        const typeConfig = config[type] || config.info;
+        
+        toastElement.classList.add(typeConfig.class);
+        toastIcon.className = typeConfig.icon;
+        toastTitle.textContent = typeConfig.title;
+        toastBody.textContent = message;
+        
+        // Mostrar toast
+        const toast = new bootstrap.Toast(toastElement, { delay: 4000 });
+        toast.show();
+    }
+
+    // =============================================================================
+    // SISTEMA DE NOTIFICAÇÕES TOAST
+    // =============================================================================
+    
+    /**
+     * Exibe notificação toast para o usuário
+     * @param {string} type - Tipo da notificação (success, error, warning, info)
+     * @param {string} message - Mensagem a ser exibida
+     */
+    function showToast(type, message) {
+        const toastElement = document.getElementById('toastMessage');
+        const toastTitle = document.getElementById('toastTitle');
+        const toastBody = document.getElementById('toastBody');
+        
+        // Resetar classes
+        toastElement.className = 'toast';
+        const toastHeader = toastElement.querySelector('.toast-header');
+        
+        // Definir estilo baseado no tipo
+        switch(type) {
+            case 'success':
+                toastHeader.className = 'toast-header bg-success text-white';
+                toastTitle.textContent = 'Sucesso';
+                break;
+            case 'error':
+                toastHeader.className = 'toast-header bg-danger text-white';
+                toastTitle.textContent = 'Erro';
+                break;
+            case 'warning':
+                toastHeader.className = 'toast-header bg-warning text-dark';
+                toastTitle.textContent = 'Atenção';
+                break;
+            case 'info':
+                toastHeader.className = 'toast-header bg-info text-white';
+                toastTitle.textContent = 'Informação';
+                break;
+            default:
+                toastHeader.className = 'toast-header';
+                toastTitle.textContent = 'Notificação';
+        }
+        
+        toastBody.textContent = message;
+        
+        // Exibir toast
+        const toast = new bootstrap.Toast(toastElement, {
+            delay: 4000
+        });
+        toast.show();
+    }
+
+    // =============================================================================
+    // INICIALIZAÇÃO DA PÁGINA
+    // =============================================================================
+    
+    /**
+     * Inicializa todas as funcionalidades quando a página carrega
+     */
+    document.addEventListener('DOMContentLoaded', function () {
+        // Inicializar funcionalidades principais
+        initSmoothScrolling();
+        enhanceAccordionAnimations();
+        highlightSearchTerms();
+        enhanceFAQContent();
+
+        // Adicionar animações aos elementos FAQ
+        document.querySelectorAll('.accordion-item').forEach((item, index) => {
+            item.classList.add('animate__animated', 'animate__fadeInUp');
+            item.style.animationDelay = `${index * 0.1}s`;
+        });
+    });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    /* =============================================================================
+    * MODAL DE LOGIN MODERNO - ESTILOS REFATORADOS
+    * ============================================================================= */
+
+    /* Backdrop com desfoque */
+    .modal-backdrop.show {
+        backdrop-filter: blur(10px);
+        background-color: rgba(0, 0, 0, 0.3); /* escurece um pouco o fundo */
+    }
+
+    /* =============================================================================
+    * ESTRUTURA DO MODAL
+    * ============================================================================= */
+
+    .login-modal .modal-dialog {
+        max-width: 440px;
+        margin: 1rem auto;
+        /* Remova o border-radius e overflow daqui */
+    }
+
+    .login-modal-content {
+        border: 2px solid #ccc;
+        border-radius: 24px; /* Aumentado de var(--border-radius) para mais redondo */
+        box-shadow: var(--shadow-modern);
+        background: white;
+        overflow: hidden; /* Mantenha aqui para que o conteúdo siga o arredondamento */
+    }
+
+
+    /* =============================================================================
+    * HEADER DO MODAL
+    * ============================================================================= */
+
+    .modal-header {
+        position: relative;
+        padding: 1rem 1rem 0;
+    }
+
+    .btn-close-modern {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(0, 0, 0, 0.05);
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+    }
+
+    .btn-close-modern:hover {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        transform: rotate(90deg);
+    }
+
+    /* =============================================================================
+    * ÍCONE PRINCIPAL
+    * ============================================================================= */
+
+    .login-icon-wrapper {
+        position: relative;
+    }
+
+    .login-icon {
+        width: 70px;
+        height: 70px;
+        background: var(--gradient-modern);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        animation: pulse-modern 2s infinite;
+    }
+
+    .login-icon i {
+        font-size: 1.8rem;
+        color: white;
+    }
+
+    @keyframes pulse-modern {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    /* =============================================================================
+    * TEXTOS E CONTEÚDO
+    * ============================================================================= */
+
+    .login-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+
+    .login-description {
+        font-size: 1rem;
+        color: #6c757d;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+
+    /* =============================================================================
+    * LISTA DE BENEFÍCIOS
+    * ============================================================================= */
+
+    .benefits-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        margin-bottom: 2rem;
+    }
+
+    .benefit-item {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 0.5rem 1rem;
+        background: rgba(106, 62, 161, 0.05);
+        border-radius: 16px; /* Aumentado de 12px para mais redondo */
+        transition: all 0.3s ease;
+    }
+
+    .benefit-item:hover {
+        background: rgba(106, 62, 161, 0.1);
+        transform: translateX(5px);
+    }
+
+    .benefit-item i {
+        color: var(--primary);
+        margin-right: 12px;
+        width: 16px;
+        font-size: 0.9rem;
+    }
+
+    .benefit-item span {
+        font-size: 0.9rem;
+        color: #495057;
+        font-weight: 500;
+    }
+
+    /* =============================================================================
+    * FOOTER DO MODAL
+    * ============================================================================= */
+
+    .login-footer {
+        border-top: 1px solid #e9ecef;
+        padding-top: 1rem;
+    }
+
+    .btn-link-modern {
+        background: none;
+        border: none;
+        color: #6c757d;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        padding: 0.5rem 1rem;
+        border-radius: 30px; /* Aumentado de 25px para mais redondo */
+    }
+
+    .btn-link-modern:hover {
+        color: var(--primary);
+        background: rgba(106, 62, 161, 0.05);
+    }
+
+    /* =============================================================================
+    * TOAST NOTIFICATIONS
+    * ============================================================================= */
+
+    .modern-toast {
+        border: none;
+        border-radius: 16px; /* Aumentado de 12px para mais redondo */
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .toast-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .toast-success .toast-icon {
+        background: #28a745;
+        color: white;
+    }
+
+    .toast-error .toast-icon {
+        background: #dc3545;
+        color: white;
+    }
+
+    .toast-warning .toast-icon {
+        background: #ffc107;
+        color: #212529;
+    }
+
+    .toast-info .toast-icon {
+        background: #17a2b8;
+        color: white;
+    }
+
+    /* =============================================================================
+    * RESPONSIVIDADE
+    * ============================================================================= */
+
+    @media (max-width: 576px) {
+        .login-modal .modal-dialog {
+            margin: 1rem;
+            max-width: none;
+        }
+        
+        .modal-body {
+            padding: 1.5rem !important;
+        }
+        
+        .login-icon {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .login-icon i {
+            font-size: 1.5rem;
+        }
+        
+        .login-title {
+            font-size: 1.3rem;
+        }
+        
+        .login-description {
+            font-size: 0.9rem;
+        }
+        
+        .benefit-item {
+            padding: 0.4rem 0.8rem;
+        }
+        
+        .benefit-item span {
+            font-size: 0.85rem;
+        }
+        
+        .btn-login, .btn-register {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+    }
+
+    /* =============================================================================
+     * BOTÕES DO ACCORDION - CABEÇALHO DAS PERGUNTAS
+     * ============================================================================= */
+
+    .accordion-button {
+        /* Layout e espaçamento */
+        padding: 1.5rem 2rem;
+        border-radius: 15px !important;
+        
+        /* Aparência visual */
+        background-color: #fff;
+        color: var(--gray-800);
+        font-weight: 600;
+        box-shadow: none;
+        
+        /* Animações e transições */
+        transition: all 0.4s ease;
+        
+        /* Posicionamento para pseudo-elementos */
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Indicador lateral esquerdo (barra colorida) */
+    .accordion-button::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 4px;
+        background: linear-gradient(to bottom, var(--primary), var(--primary-light));
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    /* Estado expandido do botão */
+    .accordion-button:not(.collapsed) {
+        background: linear-gradient(135deg, var(--primary-very-light) 0%, rgba(255, 255, 255, 0.95) 100%);
+        color: var(--primary-dark);
+        box-shadow: 0 10px 20px rgba(106, 62, 161, 0.05);
+        transform: translateY(-2px);
+    }
+
+    /* Mostrar indicador lateral quando expandido */
+    .accordion-button:not(.collapsed)::before {
+        opacity: 1;
+    }
+
+    /* Ícone de seta quando expandido */
+    .accordion-button:not(.collapsed)::after {
+        color: var(--primary);
+        transform: rotate(180deg) scale(1.2);
+        filter: none;
+    }
+
+    /* Estado de foco para acessibilidade */
+    .accordion-button:focus {
+        box-shadow: 0 0 0 2px rgba(106, 62, 161, 0.1);
+        border-color: transparent;
+    }
+
+    /* Efeito hover */
+    .accordion-button:hover {
+        background-color: var(--primary-very-light);
+        transform: translateY(-2px);
+    }
+
+    /* =============================================================================
+     * CORPO DO ACCORDION - CONTEÚDO DAS RESPOSTAS
+     * ============================================================================= */
+
+    .accordion-body {
+        /* Layout e espaçamento */
+        padding: 2rem;
+        border-radius: 0 0 15px 15px;
+        
+        /* Aparência visual */
+        background-color: #fff;
+        color: var(--gray-700);
+        font-size: 1.05rem;
+        line-height: 1.8;
+        box-shadow: 0 10px 20px rgba(106, 62, 161, 0.03);
+        
+        /* Posicionamento */
+        position: relative;
+    }
+
+    /* Espaçamento entre parágrafos */
+    .accordion-body p {
+        margin-bottom: 1.2rem;
+        text-align: justify;
+    }
+
+    .accordion-body p:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Formatação de listas */
+    .accordion-body ul,
+    .accordion-body ol {
+        padding-left: 1.5rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .accordion-body ul li,
+    .accordion-body ol li {
+        margin-bottom: 0.5rem;
+    }
+
+    /* Destaque para texto em negrito */
+    .accordion-body strong,
+    .accordion-body b {
+        color: var(--primary-dark);
+        font-weight: 600;
+    }
+
+    /* =============================================================================
+     * LINKS DENTRO DO CONTEÚDO
+     * ============================================================================= */
+
+    .accordion-body a {
+        color: var(--primary);
+        text-decoration: none;
+        position: relative;
+        display: inline-block;
+    }
+
+    /* Efeito de sublinhado animado */
+    .accordion-body a::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(to right, var(--primary), var(--primary-light));
+        transform: scaleX(0);
+        transform-origin: right;
+        transition: transform 0.3s ease;
+    }
+
+    .accordion-body a:hover::after {
+        transform: scaleX(1);
+        transform-origin: left;
+    }
+
+    /* =============================================================================
+     * NAVEGAÇÃO E BOTÕES DE AÇÃO
+     * ============================================================================= */
+
+    /* Botões de navegação das categorias */
+    .faq-nav .btn {
+        border-radius: 30px;
+        margin: 0 4px;
+        font-size: 0.9rem;
+        padding: 0.6rem 1.5rem;
+        box-shadow: 0 5px 10px rgba(106, 62, 161, 0.1);
+        transition: all 0.4s ease;
+    }
+
+    .faq-nav .btn:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 15px rgba(106, 62, 161, 0.15);
+    }
+
+    .faq-nav .btn:active {
+        transform: translateY(-1px);
+    }
+
+    /* Botões de ação (ícones) */
+    .faq-actions .btn-icon {
+        padding: 0.4rem;
+        font-size: 1rem;
+        border-radius: 50%;
+        line-height: 1;
+    }
+
+    /* Remover bordas padrão dos botões outline */
+    .faq-actions .btn-outline-primary {
+        border: none;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    /* Efeito hover para botões de ação */
+    .faq-actions .btn-icon:hover {
+        transform: translateY(-2px);
+        background-color: rgba(106, 62, 161, 0.1);
+        box-shadow: none;
+    }
+
+    /* =============================================================================
+     * ITENS DO ACCORDION - CONTAINER PRINCIPAL
+     * ============================================================================= */
+
+    .accordion-item {
+        margin-bottom: 1.5rem !important;
+        transition: all 0.4s ease;
+    }
+
+    .accordion-item:hover {
+        transform: translateY(-3px);
+    }
+
+    /* =============================================================================
+     * ANIMAÇÕES E EFEITOS ESPECIAIS
+     * ============================================================================= */
+
+    /* Animação de fade-in para conteúdo */
+    .accordion-body.animate__fadeIn {
+        animation-duration: 0.6s;
+    }
+
+    /* Efeito de destaque quando FAQ é aberta */
+    .accordion-collapse.show .accordion-body {
+        animation: highlightFaq 1.5s ease;
+    }
+
+    @keyframes highlightFaq {
+        0% {
+            background-color: var(--primary-very-light);
+        }
+        100% {
+            background-color: #fff;
+        }
+    }
+
+    /* Efeito Ripple para botões */
+    .ripple-effect {
+        position: absolute;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.7);
+        width: 100px;
+        height: 100px;
+        margin-top: -50px;
+        margin-left: -50px;
+        animation: ripple 1s;
+        opacity: 0;
+    }
+
+    @keyframes ripple {
+        from {
+            opacity: 1;
+            transform: scale(0);
+        }
+        to {
+            opacity: 0;
+            transform: scale(10);
+        }
+    }
+
+    /* =============================================================================
+     * ELEMENTOS DE DESTAQUE E FORMATAÇÃO
+     * ============================================================================= */
+
+    /* Texto destacado/marcado */
+    mark {
+        padding: 0.2em 0.4em;
+        border-radius: 4px;
+        background-color: rgba(255, 214, 10, 0.3);
+    }
+
+    /* Ícones de categoria */
+    .feature-icon {
+        /* Dimensões e posicionamento */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        
+        /* Aparência visual */
+        font-size: 1.5rem;
+        color: var(--primary);
+        background: linear-gradient(135deg, rgba(106, 62, 161, 0.1) 0%, rgba(154, 109, 215, 0.1) 100%);
+        border-radius: 50%;
+        box-shadow: 0 5px 15px rgba(106, 62, 161, 0.1);
+        
+        /* Espaçamento e animações */
+        margin-bottom: 1.5rem;
+        transition: all 0.4s ease;
+    }
+
+    .feature-icon:hover {
+        transform: rotateY(180deg);
+        background-color: var(--primary);
+        color: white;
+    }
+
+    /* =============================================================================
+     * LISTAS ESPECIALIZADAS
+     * ============================================================================= */
+
+    /* Container para listas dentro de FAQs */
+    .faq-list {
+        background-color: var(--primary-very-light);
+        border-radius: 10px;
+        padding: 1.2rem 1.2rem 1.2rem 2.5rem;
+    }
+
+    .faq-list li {
+        padding: 0.3rem 0;
+    }
+
+    /* =============================================================================
+     * RESPONSIVIDADE - DISPOSITIVOS MÓVEIS
+     * ============================================================================= */
+
+    @media (max-width: 768px) {
+        /* Ajustes para botões do accordion */
+        .accordion-button {
+            padding: 1.2rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        /* Ajustes para corpo do accordion */
+        .accordion-body {
+            padding: 1.5rem;
+            font-size: 1rem;
+        }
+
+        /* Ajustes para ícones de categoria */
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+    }
+
+    /* =============================================================================
+     * FIM DOS ESTILOS FAQ
+     * ============================================================================= */
+</style>
+{% endblock %}

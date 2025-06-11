@@ -1,0 +1,420 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ contato.nome }} - Detalhes{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5" style="background: linear-gradient(135deg, var(--primary-very-light) 0%, var(--body-bg) 100%);">
+    
+    <!-- Breadcrumb -->
+    <div class="container mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb bg-transparent p-0">
+                <li class="breadcrumb-item"><a href="/" class="text-primary">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'contatos' %}" class="text-primary">Contatos</a></li>
+                <li class="breadcrumb-item active">{{ contato.nome }}</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="container">
+        <!-- Cabeçalho do contato -->
+        <div class="row mb-5">
+            <div class="col-lg-4 text-center mb-4 mb-lg-0">
+                <div class="contact-header-image">
+                    {% if contato.imagem %}
+                        <img src="{{ contato.imagem.url }}" 
+                             alt="{{ contato.nome }}" 
+                             class="img-fluid rounded-3 shadow-lg"
+                             style="max-height: 300px; width: 100%; object-fit: cover;">
+                    {% else %}
+                        <img src="{% static 'img/default-contact.jpg' %}" 
+                             alt="{{ contato.nome }}"
+                             class="img-fluid rounded-3 shadow-lg" 
+                             style="max-height: 300px; width: 100%; object-fit: cover;">
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-lg-8">
+                <div class="contact-header-info">
+                    <span class="badge bg-primary mb-3 fs-6">{{ contato.categoria.nome }}</span>
+                    <h1 class="display-4 text-primary mb-3">{{ contato.nome }}</h1>
+                    <p class="lead text-muted mb-4">{{ contato.descricao }}</p>
+                    
+                    <!-- Tipos de atendimento -->
+                    <div class="mb-4">
+                        {% if contato.atendimento_presencial %}
+                            <span class="badge bg-success me-2 p-2">
+                                <i class="fas fa-building me-1"></i>Atendimento Presencial
+                            </span>
+                        {% endif %}
+                        {% if contato.atendimento_online %}
+                            <span class="badge bg-info p-2">
+                                <i class="fas fa-laptop me-1"></i>Atendimento Online
+                            </span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Botões de ação rápida -->
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="tel:{{ contato.telefone }}" class="btn btn-primary">
+                            <i class="fas fa-phone me-2"></i>Ligar agora
+                        </a>
+                        {% if contato.whatsapp %}
+                            <a href="https://wa.me/{{ contato.whatsapp }}" target="_blank" class="btn btn-success">
+                                <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                            </a>
+                        {% endif %}
+                        {% if contato.email %}
+                            <a href="mailto:{{ contato.email }}" class="btn btn-secondary">
+                                <i class="fas fa-envelope me-2"></i>E-mail
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Coluna principal -->
+            <div class="col-lg-8">
+                
+                <!-- Informações detalhadas -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h4 class="card-title text-primary mb-4">
+                            <i class="fas fa-info-circle me-2"></i>Informações Detalhadas
+                        </h4>
+                        
+                        {% if contato.especialidades %}
+                            <div class="mb-4">
+                                <h6 class="fw-bold text-dark">Especialidades:</h6>
+                                <p class="text-muted">{{ contato.especialidades }}</p>
+                            </div>
+                        {% endif %}
+                        
+                        {% if contato.convenios %}
+                            <div class="mb-4">
+                                <h6 class="fw-bold text-dark">Convênios Aceitos:</h6>
+                                <p class="text-muted">{{ contato.convenios }}</p>
+                            </div>
+                        {% endif %}
+                        
+                        {% if contato.observacoes %}
+                            <div class="mb-4">
+                                <h6 class="fw-bold text-dark">Observações:</h6>
+                                <p class="text-muted">{{ contato.observacoes|linebreaksbr }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Galeria de fotos -->
+                {% if contato.fotos.all %}
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h4 class="card-title text-primary mb-4">
+                                <i class="fas fa-images me-2"></i>Galeria
+                            </h4>
+                            <div class="row g-3">
+                                {% for foto in contato.fotos.all %}
+                                    <div class="col-md-4">
+                                        <img src="{{ foto.imagem.url }}" 
+                                             alt="{{ foto.legenda }}" 
+                                             class="img-fluid rounded hover-zoom"
+                                             data-bs-toggle="modal" 
+                                             data-bs-target="#imageModal{{ foto.id }}"
+                                             style="cursor: pointer; height: 200px; width: 100%; object-fit: cover;">
+                                    </div>
+                                    
+                                    <!-- Modal para imagem ampliada -->
+                                    <div class="modal fade" id="imageModal{{ foto.id }}" tabindex="-1">
+                                        <div class="modal-dialog modal-lg modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-body p-0">
+                                                    <img src="{{ foto.imagem.url }}" 
+                                                         alt="{{ foto.legenda }}" 
+                                                         class="img-fluid">
+                                                    {% if foto.legenda %}
+                                                        <div class="p-3">
+                                                            <p class="mb-0">{{ foto.legenda }}</p>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Mapa -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h4 class="card-title text-primary mb-4">
+                            <i class="fas fa-map-marked-alt me-2"></i>Localização
+                        </h4>
+                        <div class="map-container mb-3">
+                            <iframe 
+                                src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBokTpGg0E16-NMOa-UJqVJ_EaJFQRN7xE&q={{ contato.endereco_para_maps|urlencode }}"
+                                width="100%" 
+                                height="300" 
+                                style="border:0; border-radius: 10px;" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-map-marker-alt me-2 text-primary"></i>
+                            {{ contato.endereco_completo }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                
+                <!-- Informações de contato -->
+                <div class="card border-0 shadow-sm mb-4 sticky-top" style="top: 20px;">
+                    <div class="card-body p-4">
+                        <h5 class="card-title text-primary mb-4">
+                            <i class="fas fa-address-book me-2"></i>Contato
+                        </h5>
+                        
+                        <!-- Telefone -->
+                        <div class="contact-item mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-phone text-primary me-3"></i>
+                                <div>
+                                    <strong>Telefone:</strong><br>
+                                    <a href="tel:{{ contato.telefone }}" class="text-decoration-none">
+                                        {{ contato.telefone }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- E-mail -->
+                        {% if contato.email %}
+                            <div class="contact-item mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-envelope text-primary me-3"></i>
+                                    <div>
+                                        <strong>E-mail:</strong><br>
+                                        <a href="mailto:{{ contato.email }}" class="text-decoration-none">
+                                            {{ contato.email }}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Site -->
+                        {% if contato.site %}
+                            <div class="contact-item mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-globe text-primary me-3"></i>
+                                    <div>
+                                        <strong>Site:</strong><br>
+                                        <a href="{{ contato.site }}" target="_blank" class="text-decoration-none">
+                                            Visitar site
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Horário -->
+                        <div class="contact-item mb-4">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-clock text-primary me-3"></i>
+                                <div>
+                                    <strong>Horário:</strong><br>
+                                    {{ contato.horario_funcionamento }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Redes sociais -->
+                        <div class="social-links">
+                            <h6 class="fw-bold mb-3">Redes Sociais:</h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% if contato.facebook %}
+                                    <a href="{{ contato.facebook }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                        <i class="fab fa-facebook-f"></i>
+                                    </a>
+                                {% endif %}
+                                {% if contato.instagram %}
+                                    <a href="{{ contato.instagram }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                        <i class="fab fa-instagram"></i>
+                                    </a>
+                                {% endif %}
+                                {% if contato.linkedin %}
+                                    <a href="{{ contato.linkedin }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                        <i class="fab fa-linkedin-in"></i>
+                                    </a>
+                                {% endif %}
+                                {% if contato.youtube %}
+                                    <a href="{{ contato.youtube }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                        <i class="fab fa-youtube"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botão voltar -->
+                <div class="text-center">
+                    <a href="{% url 'contatos' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Voltar aos contatos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+
+/* CSS adicional para página de detalhes do contato */
+
+/* Animações e transições */
+.hover-card {
+    transition: var(--transition);
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilização dos cards de informação */
+.contact-item {
+    background: linear-gradient(135deg, var(--primary-very-light), white);
+    border: 1px solid var(--gray-200);
+    transition: var(--transition);
+}
+
+.contact-item:hover {
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-very-light));
+    color: white;
+}
+
+.contact-item:hover i {
+    color: white !important;
+}
+
+/* Botões de redes sociais */
+.social-links .btn {
+    transition: var(--transition);
+}
+
+.social-links .btn:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Galeria de fotos */
+.hover-zoom {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+}
+
+/* Responsividade aprimorada */
+@media (max-width: 992px) {
+    .contact-header-info h1 {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .contact-header-info h1 {
+        font-size: 2rem;
+    }
+    
+    .contact-header-info .lead {
+        font-size: 1rem;
+    }
+    
+    .d-flex.gap-2 {
+        flex-direction: column;
+    }
+    
+    .d-flex.gap-2 .btn {
+        margin-bottom: 10px;
+    }
+}
+
+/* Mapa responsivo */
+.map-container iframe {
+    border-radius: 10px;
+    box-shadow: var(--card-shadow);
+}
+
+/* Breadcrumb personalizado */
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+    color: var(--primary);
+    font-weight: bold;
+}
+
+.breadcrumb-item a {
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.breadcrumb-item a:hover {
+    color: var(--primary-dark) !important;
+}
+
+.hover-zoom {
+    transition: transform 0.3s ease;
+}
+
+.hover-zoom:hover {
+    transform: scale(1.05);
+}
+
+.contact-item {
+    padding: 15px;
+    background: var(--gray-100);
+    border-radius: 10px;
+    border-left: 4px solid var(--primary);
+}
+
+.social-links .btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.map-container {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+}
+
+.contact-header-image img {
+    border: 4px solid white;
+}
+
+@media (max-width: 768px) {
+    .sticky-top {
+        position: relative !important;
+        top: auto !important;
+    }
+}
+</style>
+{% endblock %}

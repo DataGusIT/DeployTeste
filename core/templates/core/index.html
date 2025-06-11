@@ -1,0 +1,338 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section - Presumindo que você tenha essa seção em seu template original -->
+<section class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="container position-relative">
+        <div class="row min-vh-75 align-items-center py-5">
+            <div class="col-lg-6 animate__animated" data-animation="animate__fadeInLeft">
+                <span class="badge bg-white text-primary fs-6 mb-3 px-3 py-2">Projeto TCC</span>
+                <h1 class="display-4 fw-bold text-white mb-4">Apoio e informação para <span
+                        class="highlight-text">Transtorno do Espectro Autista</span></h1>
+                <p class="lead text-white mb-4">Dicas práticas, informações simples e recursos para ajudar os funcionários da nossa escola a entender melhor o autismo.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="#recursos" class="btn btn-primary btn-lg">
+                        Explorar recursos
+                    </a>
+                    <a href="{% url 'sobre' %}" class="btn btn-outline-light btn-lg">
+                        Conhecer projeto
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 d-flex justify-content-center animate__animated" data-animation="animate__fadeInRight">
+                <div class="hero-image-container">
+                    <img src="{% static 'img/foto.png' %}"
+                        alt="Crianças e professores em ambiente inclusivo" class="hero-image img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics -->
+<section class="stats-section py-5">
+    <div class="container">
+        <div class="stats-cards row justify-content-center">
+            <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h2 class="stat-number">20+</h2>
+                        <p class="stat-label">Funcionários da escola</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-school"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h2 class="stat-number">1</h2>
+                        <p class="stat-label">Escola participante</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h2 class="stat-number">15+</h2>
+                        <p class="stat-label">Dicas disponíveis</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-child"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h2 class="stat-number">10+</h2>
+                        <p class="stat-label">Alunos que podem ser ajudados</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="recursos" class="features-section py-5">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <span class="section-subtitle">O que você vai encontrar aqui</span>
+            <h2 class="section-title">Recursos para te ajudar no dia a dia</h2>
+            <div class="section-divider"></div>
+            <p class="section-description">
+                Criamos este espaço pensando em vocês, funcionários da escola, para facilitar o apoio aos nossos alunos autistas.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Feature Card 1 -->
+            <div class="col-lg-4 col-md-6 animate__animated" data-animation="animate__fadeInUp">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <h3 class="feature-title">Dicas e Estratégias</h3>
+                    <p class="feature-description">
+                        Dicas simples e práticas para o dia a dia, como lidar com situações específicas e apoiar melhor nossos alunos.
+                    </p>
+                    <a href="#" class="feature-link">
+                        Ver dicas <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Feature Card 2 -->
+            <div class="col-lg-4 col-md-6 animate__animated" data-animation="animate__fadeInUp" data-delay="200">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-book-reader"></i>
+                    </div>
+                    <h3 class="feature-title">Informações Básicas</h3>
+                    <p class="feature-description">
+                        Informações simples sobre o autismo, características principais e como identificar quando um aluno precisa de apoio.
+                    </p>
+                    <a href="#" class="feature-link">
+                        Ler mais <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Feature Card 3 -->
+            <div class="col-lg-4 col-md-6 animate__animated" data-animation="animate__fadeInUp" data-delay="400">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <h3 class="feature-title">Dúvidas Comuns</h3>
+                    <p class="feature-description">
+                        Respostas para as perguntas que mais aparecem sobre autismo, comportamentos e como agir em diferentes situações.
+                    </p>
+                    <a href="#" class="feature-link">
+                        Ver perguntas <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Feature Card 4 -->
+            <div class="col-lg-4 col-md-6 animate__animated" data-animation="animate__fadeInUp">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3 class="feature-title">Comunicação</h3>
+                    <p class="feature-description">
+                        Como se comunicar melhor com alunos autistas, usando gestos, imagens e palavras que funcionam.
+                    </p>
+                    <a href="#" class="feature-link">
+                        Ver dicas <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Feature Card 5 -->
+            <div class="col-lg-4 col-md-6 animate__animated" data-animation="animate__fadeInUp" data-delay="200">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-address-book"></i>
+                    </div>
+                    <h3 class="feature-title">Quando Pedir Ajuda</h3>
+                    <p class="feature-description">
+                        Orientações sobre quando chamar a coordenação, professores ou outros profissionais para ajudar.
+                    </p>
+                    <a href="#" class="feature-link">
+                        Ver orientações <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+             <!-- Feature Card 6 -->
+            <div class="col-lg-4 col-md-6 animate__animated" data-animation="animate__fadeInUp" data-delay="200">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-address-book"></i>
+                    </div>
+                    <h3 class="feature-title">Rede de Contatos</h3>
+                    <p class="feature-description">
+                        Diretório completo com profissionais especializados, clínicas, ONGs e instituições de apoio ao
+                        autismo na região.
+                    </p>
+                    <a href="#" class="feature-link">
+                        Ver contatos <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="about-section py-5 mt-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0 order-lg-2 animate__animated" data-animation="animate__fadeInRight">
+                <div class="section-header mb-4">
+                    <span class="section-subtitle">Sobre este projeto</span>
+                    <h2 class="section-title">Feito pensando em vocês</h2>
+                    <div class="section-divider"></div>
+                </div>
+                <p>Este projeto de TCC foi criado para ajudar os funcionários da nossa escola a entender melhor o autismo e saber como apoiar nossos alunos.</p>
+                <p>A ideia surgiu da necessidade de ter um local onde todos pudessem encontrar informações práticas e simples sobre o tema, sem complicações.</p>
+                <p>Aqui você encontra dicas de quem já trabalha na área e orientações baseadas em experiências reais de outros funcionários de escola.</p>
+                <div class="mt-4">
+                    <a href="{% url 'sobre' %}" class="btn btn-primary">
+                        Conhecer mais sobre o projeto
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center order-lg-1 animate__animated" data-animation="animate__fadeInLeft">
+                <div class="about-image-container">
+                    <img src="{% static 'img/placeholder-600x400.jpg' %}" alt="Equipe da escola trabalhando juntos"
+                        class="about-image img-fluid">
+                    <div class="about-image-dots"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-wrapper">
+            <div class="row align-items-center">
+                <div class="col-lg-7 mb-4 mb-lg-0">
+                    <h2 class="cta-title">Vamos trabalhar juntos por uma escola mais inclusiva</h2>
+                    <p class="cta-text">Explore as dicas e informações que preparamos para ajudar vocês no dia a dia com nossos alunos autistas.</p>
+                </div>
+                <div class="col-lg-5 text-lg-end text-center">
+                    <a href="{% url 'ferramentas' %}" class="btn btn-light btn-lg">Ver dicas agora</a>
+                    <a href="{% url 'contatos' %}" class="btn btn-outline-light btn-lg ms-2">Preciso de ajuda</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Updates -->
+<section class="updates-section py-5">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <span class="section-subtitle">Novidades</span>
+            <h2 class="section-title">Últimas informações adicionadas</h2>
+            <div class="section-divider"></div>
+        </div>
+
+        <div class="row">
+            <!-- Update Card 1 -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="update-card">
+                    <div class="update-image">
+                        <img src="{% static 'img/foto1.jpg' %}" alt="Imagem do artigo" class="img-fluid">
+                        <div class="update-category">Dica</div>
+                    </div>
+                    <div class="update-content">
+                        <span class="update-date"><i class="far fa-calendar-alt"></i> 12 de junho, 2025</span>
+                        <h3 class="update-title">Como ajudar quando o aluno está agitado</h3>
+                        <p class="update-excerpt">Dicas simples para lidar com momentos de agitação e ajudar o aluno a se acalmar...</p>
+                        <a href="#" class="update-link">Ler dica <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Update Card 2 -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="update-card">
+                    <div class="update-image">
+                        <img src="{% static 'img/placeholder-400x200.jpg' %}" alt="Imagem do recurso" class="img-fluid">
+                        <div class="update-category">Informação</div>
+                    </div>
+                    <div class="update-content">
+                        <span class="update-date"><i class="far fa-calendar-alt"></i> 5 de junho, 2025</span>
+                        <h3 class="update-title">Sinais de que o aluno precisa de ajuda</h3>
+                        <p class="update-excerpt">Aprenda a identificar quando um aluno autista está desconfortável ou precisando de apoio...</p>
+                        <a href="#" class="update-link">Ver informação <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Update Card 3 -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="update-card">
+                    <div class="update-image">
+                        <img src="{% static 'img/placeholder-400x200.jpg' %}" alt="Imagem do evento" class="img-fluid">
+                        <div class="update-category">Novidade</div>
+                    </div>
+                    <div class="update-content">
+                        <span class="update-date"><i class="far fa-calendar-alt"></i> 1 de junho, 2025</span>
+                        <h3 class="update-title">Nova seção: Perguntas e Respostas</h3>
+                        <p class="update-excerpt">Adicionamos uma nova seção com as dúvidas mais comuns sobre autismo na escola...</p>
+                        <a href="#" class="update-link">Ver novidade <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="#" class="btn btn-outline-primary">Ver todas as informações</a>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter -->
+<section class="newsletter-section py-5">
+    <div class="container">
+        <div class="newsletter-wrapper">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h3 class="newsletter-title">Quer receber as novidades?</h3>
+                    <p class="newsletter-text">Se cadastre para receber novas dicas e informações sobre autismo direto no seu e-mail.</p>
+                </div>
+                <div class="col-lg-6">
+                    <form class="newsletter-form" method="post" action="{% url 'newsletter_signup' %}">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <input type="email" name="email" class="form-control" placeholder="Seu e-mail"
+                                aria-label="Seu e-mail" required>
+                            <button class="btn btn-primary" type="submit">Me cadastrar</button>
+                        </div>
+                        <div class="form-text text-white mt-2">
+                            <i class="fas fa-lock me-1"></i> Seus dados estão seguros conosco.
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

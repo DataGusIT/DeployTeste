@@ -1,0 +1,932 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- ================================== -->
+<!-- SEÇÃO HERO - Banner Principal     -->
+<!-- ================================== -->
+<section class="hero-section py-5">
+    <div class="hero-overlay"></div>
+    <div class="container py-4">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center">
+                <!-- Título principal com animação -->
+                <h1 class="fw-bold display-5 mb-3 animate__animated animate__fadeInUp">
+                    Rede de Apoio Especializada em Autismo
+                </h1>
+                
+                <!-- Subtítulo descritivo -->
+                <p class="lead mb-4 animate__animated animate__fadeInUp animate__delay-1s">
+                    Conecte-se com profissionais, instituições e grupos de apoio dedicados ao atendimento e suporte para
+                    pessoas com TEA e suas famílias.
+                </p>
+                
+                <!-- Botões de ação principais -->
+                <div class="d-flex justify-content-center gap-3 animate__animated animate__fadeInUp animate__delay-2s">
+                    <a href="#contatos-section" class="btn btn-light btn-lg px-4">
+                        <i class="fas fa-address-book me-2"></i>Ver contatos
+                    </a>
+                    <a href="#filtro-section" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fas fa-filter me-2"></i>Filtrar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================================== -->
+<!-- SEÇÃO FILTROS - Sistema de busca  -->
+<!-- ================================== -->
+<section id="filtro-section" class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <!-- Título da seção de filtros -->
+                        <h4 class="card-title mb-4 text-primary">
+                            <i class="fas fa-filter me-2"></i>Encontre o apoio que você precisa
+                        </h4>
+                        
+                        <!-- Formulário de filtros -->
+                        <div class="row g-3">
+                            <!-- Filtro por tipo de contato -->
+                            <div class="col-md-4">
+                                <label class="form-label">Tipo de contato</label>
+                                <select class="form-select" id="filtroTipo">
+                                    <option value="todos">Todos os tipos</option>
+                                    <option value="clinica">Clínicas</option>
+                                    <option value="profissional">Profissionais</option>
+                                    <option value="associacao">Associações</option>
+                                    <option value="escola">Escolas</option>
+                                    <option value="apoio">Grupos de Apoio</option>
+                                    <option value="emergencia">Emergência</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Filtro por tipo de atendimento -->
+                            <div class="col-md-4">
+                                <label class="form-label">Atendimento</label>
+                                <select class="form-select" id="filtroAtendimento">
+                                    <option value="todos">Todos os tipos</option>
+                                    <option value="presencial">Presencial</option>
+                                    <option value="online">Online</option>
+                                    <option value="ambos">Ambos</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Filtro por localização -->
+                            <div class="col-md-4">
+                                <label class="form-label">Localização</label>
+                                <select class="form-select" id="filtroLocalizacao">
+                                    <option value="todos">Todas as localidades</option>
+                                    <option value="SP">São Paulo</option>
+                                    <option value="RJ">Rio de Janeiro</option>
+                                    <option value="MG">Minas Gerais</option>
+                                    <option value="outros">Outros estados</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Botões de ação dos filtros -->
+                            <div class="col-12 text-end">
+                                <button type="button" class="btn btn-primary px-4" id="btnFiltrar">
+                                    <i class="fas fa-search me-2"></i>Filtrar resultados
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary px-4" id="btnLimpar">
+                                    <i class="fas fa-times me-2"></i>Limpar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================================== -->
+<!-- SEÇÃO CONTATOS - Lista principal  -->
+<!-- ================================== -->
+<section id="contatos-section" class="py-5">
+    <div class="container">
+        <!-- Cabeçalho da seção -->
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto text-center">
+                <div class="section-subtitle">Nossa rede de apoio</div>
+                <h2 class="section-title">Contatos Especializados</h2>
+                <div class="section-divider"></div>
+                <p class="section-description">
+                    Uma rede completa de profissionais, instituições e serviços especializados no atendimento
+                    de pessoas com Transtorno do Espectro Autista e suporte às suas famílias.
+                </p>
+            </div>
+        </div>
+
+        <!-- Verificação se existem contatos cadastrados -->
+        {% if contatos_por_categoria %}
+            
+            <!-- Navegação por categorias -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <nav class="contact-nav d-flex justify-content-center flex-wrap">
+                        {% for categoria_nome in contatos_por_categoria.keys %}
+                            <a href="#{{ categoria_nome|lower|slugify }}" class="btn btn-sm btn-outline-primary m-1">
+                                {{ categoria_nome }}
+                            </a>
+                        {% endfor %}
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Loop através das categorias de contatos -->
+            {% for categoria_nome, contatos_list in contatos_por_categoria.items %}
+                <div class="contato-category mb-5" id="{{ categoria_nome|lower|slugify }}">
+                    
+                    <!-- Cabeçalho da categoria -->
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fas fa-building text-primary fs-3"></i>
+                        </div>
+                        <h3 class="mb-0">{{ categoria_nome }}</h3>
+                    </div>
+
+                    <!-- Grid de contatos da categoria -->
+                    <div class="row g-4">
+                        {% for contato in contatos_list %}
+                            <div class="col-md-6 col-lg-4 contato-item">
+                                
+                                <!-- Card do contato -->
+                                <div class="card h-100 border-0 shadow-sm hover-card">
+                                    
+                                    <!-- Imagem do contato -->
+                                    <div class="card-img-top position-relative">
+                                        {% if contato.imagem %}
+                                            <img src="{{ contato.imagem.url }}" 
+                                                 alt="{{ contato.nome }}" 
+                                                 class="img-fluid rounded-top"
+                                                 style="height: 200px; width: 100%; object-fit: cover;">
+                                        {% else %}
+                                            <img src="{% static 'img/default-contact.jpg' %}" 
+                                                 alt="{{ contato.nome }}"
+                                                 class="img-fluid rounded-top" 
+                                                 style="height: 200px; width: 100%; object-fit: cover;">
+                                        {% endif %}
+                                        
+                                        <!-- Badge da categoria -->
+                                        <div class="position-absolute bottom-0 start-0 p-3">
+                                            <span class="badge bg-primary">{{ contato.categoria.nome }}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Conteúdo do card -->
+                                    <div class="card-body">
+                                        <!-- Nome e título -->
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5 class="card-title mb-0">{{ contato.nome }}</h5>
+                                        </div>
+                                        
+                                        <!-- Descrição resumida -->
+                                        <p class="card-text text-muted mb-3">
+                                            {{ contato.descricao|truncatechars:80 }}
+                                        </p>
+
+                                        <!-- Informações de contato -->
+                                        
+                                        <!-- Endereço -->
+                                        <div class="contact-info-item mb-2">
+                                            <div class="contact-info-icon">
+                                                <i class="fas fa-map-marker-alt text-primary"></i>
+                                            </div>
+                                            <small>
+                                                {% if contato.rua %}
+                                                    {{ contato.rua }}{% if contato.numero %}, {{ contato.numero }}{% endif %}
+                                                    {% if contato.bairro %} - {{ contato.bairro }}{% endif %}<br>
+                                                {% endif %}
+                                                {{ contato.cidade }}, {{ contato.estado }}
+                                                {% if contato.cep %}<br>CEP: {{ contato.cep }}{% endif %}
+                                            </small>
+                                        </div>
+
+                                        <!-- Telefone -->
+                                        <div class="contact-info-item mb-2">
+                                            <div class="contact-info-icon">
+                                                <i class="fas fa-phone text-primary"></i>
+                                            </div>
+                                            <small>{{ contato.telefone }}</small>
+                                        </div>
+
+                                        <!-- Horário de funcionamento -->
+                                        <div class="contact-info-item mb-3">
+                                            <div class="contact-info-icon">
+                                                <i class="fas fa-clock text-primary"></i>
+                                            </div>
+                                            <small>{{ contato.horario_funcionamento }}</small>
+                                        </div>
+
+                                        <!-- Área de ações do card -->
+                                        <div class="card-action-area">
+                                            <!-- Badges de tipo de atendimento -->
+                                            <span>
+                                                {% if contato.atendimento_presencial %}
+                                                    <span class="badge bg-success me-1">
+                                                        <i class="fas fa-building me-1"></i>Presencial
+                                                    </span>
+                                                {% endif %}
+                                                {% if contato.atendimento_online %}
+                                                    <span class="badge bg-info">
+                                                        <i class="fas fa-laptop me-1"></i>Online
+                                                    </span>
+                                                {% endif %}
+                                            </span>
+                                            
+                                            <!-- Botão para ver detalhes -->
+                                            <!-- Substituir o botão atual "Ver detalhes" por este: -->
+                                            <a href="{% url 'detalhes_contato' contato.id %}" 
+                                            class="btn btn-sm btn-outline-primary btn-ver-detalhes">
+                                                Ver detalhes
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+
+        {% else %}
+            <!-- Mensagem quando não há contatos cadastrados -->
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <div class="alert alert-info p-4 shadow-sm rounded-3">
+                        <i class="fas fa-info-circle fa-2x mb-3"></i>
+                        <h4>Nenhum contato encontrado</h4>
+                        <p class="mb-0">
+                            Não há contatos cadastrados no momento. Entre em contato com o administrador para mais
+                            informações.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- ================================== -->
+        <!-- CALL TO ACTION - Sugerir contato  -->
+        <!-- ================================== -->
+        <div class="row mt-5">
+            <div class="col-lg-8 mx-auto">
+                <div class="card cta-card border-0 shadow">
+                    <div class="card-body p-5 text-center text-white">
+                        <h4 class="mb-3">Conhece algum profissional ou instituição especializada?</h4>
+                        <p class="mb-4">
+                            Ajude a ampliar nossa rede de apoio indicando contatos que possam auxiliar
+                            famílias e pessoas com TEA.
+                        </p>
+                        <button type="button" 
+                                class="btn cta-btn" 
+                                data-bs-toggle="modal"
+                                data-bs-target="#sugerirContatoModal">
+                            <i class="fas fa-plus-circle me-2"></i>Sugerir contato
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+<!-- ================================== -->
+<!-- MODAL SUGERIR CONTATO             -->
+<!-- ================================== -->
+{% block modals %}
+<div class="modal fade" 
+     id="sugerirContatoModal" 
+     tabindex="-1" 
+     aria-labelledby="sugerirContatoModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            
+            <!-- Cabeçalho do modal -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="sugerirContatoModalLabel">Sugerir um contato</h5>
+                <button type="button" 
+                        class="btn-close btn-close-white" 
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            
+            <!-- Conteúdo do modal -->
+            <div class="modal-body p-4">
+                <p class="text-muted mb-4">
+                    Preencha os dados do contato que você deseja sugerir para nossa rede
+                    de apoio. Após análise, o contato poderá ser adicionado à nossa base de dados.
+                </p>
+                
+                <!-- Formulário de sugestão -->
+                <form id="formSugerirContato" method="post" action="{% url 'sugerir_contato' %}">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        
+                        <!-- Nome do contato -->
+                        <div class="col-md-6">
+                            <label class="form-label">Nome do contato</label>
+                            <input type="text" 
+                                   name="nome" 
+                                   class="form-control"
+                                   placeholder="Nome da instituição ou profissional" 
+                                   required>
+                        </div>
+                        
+                        <!-- Tipo do contato -->
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo do contato</label>
+                            <select name="tipo" class="form-select" required>
+                                <option value="">Selecione o tipo</option>
+                                <option value="clinica">Clínica</option>
+                                <option value="profissional">Profissional</option>
+                                <option value="associacao">Associação</option>
+                                <option value="escola">Escola</option>
+                                <option value="apoio">Grupo de Apoio</option>
+                                <option value="emergencia">Serviço de Emergência</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Descrição -->
+                        <div class="col-12">
+                            <label class="form-label">Descrição</label>
+                            <textarea name="descricao" 
+                                      class="form-control" 
+                                      rows="3"
+                                      placeholder="Descreva brevemente os serviços oferecidos" 
+                                      required></textarea>
+                        </div>
+                        
+                        <!-- Telefone e Email -->
+                        <div class="col-md-6">
+                            <label class="form-label">Telefone</label>
+                            <input type="tel" 
+                                   name="telefone" 
+                                   class="form-control" 
+                                   placeholder="(00) 00000-0000">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">E-mail</label>
+                            <input type="email" 
+                                   name="email" 
+                                   class="form-control" 
+                                   placeholder="contato@exemplo.com">
+                        </div>
+                        
+                        <!-- Website -->
+                        <div class="col-12">
+                            <label class="form-label">Website</label>
+                            <input type="url" 
+                                   name="website" 
+                                   class="form-control"
+                                   placeholder="https://www.exemplo.com.br">
+                        </div>
+                        
+                        <!-- Cidade e Estado -->
+                        <div class="col-md-6">
+                            <label class="form-label">Cidade</label>
+                            <input type="text" 
+                                   name="cidade" 
+                                   class="form-control" 
+                                   placeholder="Cidade">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Estado</label>
+                            <select name="estado" class="form-select">
+                                <option value="">Selecione o estado</option>
+                                <option value="AC">Acre</option>
+                                <option value="AL">Alagoas</option>
+                                <option value="AP">Amapá</option>
+                                <option value="AM">Amazonas</option>
+                                <option value="BA">Bahia</option>
+                                <option value="CE">Ceará</option>
+                                <option value="DF">Distrito Federal</option>
+                                <option value="ES">Espírito Santo</option>
+                                <option value="GO">Goiás</option>
+                                <option value="MA">Maranhão</option>
+                                <option value="MT">Mato Grosso</option>
+                                <option value="MS">Mato Grosso do Sul</option>
+                                <option value="MG">Minas Gerais</option>
+                                <option value="PA">Pará</option>
+                                <option value="PB">Paraíba</option>
+                                <option value="PR">Paraná</option>
+                                <option value="PE">Pernambuco</option>
+                                <option value="PI">Piauí</option>
+                                <option value="RJ">Rio de Janeiro</option>
+                                <option value="RN">Rio Grande do Norte</option>
+                                <option value="RS">Rio Grande do Sul</option>
+                                <option value="RO">Rondônia</option>
+                                <option value="RR">Roraima</option>
+                                <option value="SC">Santa Catarina</option>
+                                <option value="SP">São Paulo</option>
+                                <option value="SE">Sergipe</option>
+                                <option value="TO">Tocantins</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Endereço -->
+                        <div class="col-12">
+                            <label class="form-label">Endereço</label>
+                            <input type="text" 
+                                   name="endereco" 
+                                   class="form-control" 
+                                   placeholder="Rua, número, bairro">
+                        </div>
+                        
+                        <!-- Horário de funcionamento -->
+                        <div class="col-12">
+                            <label class="form-label">Horário de funcionamento</label>
+                            <input type="text" 
+                                   name="horario_funcionamento" 
+                                   class="form-control"
+                                   placeholder="Ex: Segunda a Sexta: 8h às 18h">
+                        </div>
+                        
+                        <!-- Tipos de atendimento -->
+                        <div class="col-12">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       name="atendimento_presencial"
+                                       id="atendimentoPresencial">
+                                <label class="form-check-label" for="atendimentoPresencial">
+                                    Atendimento Presencial
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       name="atendimento_online"
+                                       id="atendimentoOnline">
+                                <label class="form-check-label" for="atendimentoOnline">
+                                    Atendimento Online
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Dados do usuário que está sugerindo -->
+                        <div class="col-12">
+                            <label class="form-label">Seu nome</label>
+                            <input type="text" 
+                                   name="seu_nome" 
+                                   class="form-control" 
+                                   placeholder="Seu nome completo"
+                                   required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Seu e-mail</label>
+                            <input type="email" 
+                                   name="seu_email" 
+                                   class="form-control"
+                                   placeholder="seu.email@exemplo.com" 
+                                   required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Rodapé do modal -->
+            <div class="modal-footer">
+                <button type="button" 
+                        class="btn btn-secondary" 
+                        data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" 
+                        class="btn btn-primary" 
+                        id="btnEnviarSugestao">
+                    <i class="fas fa-paper-plane me-2"></i>Enviar sugestão
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- ================================== -->
+<!-- SCRIPTS JAVASCRIPT               -->
+<!-- ================================== -->
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        // =============================================================================
+        // SISTEMA DE FILTROS DE CONTATOS
+        // =============================================================================
+        
+        // Aplicar filtros baseado nos critérios selecionados
+        $("#btnFiltrar").click(function () {
+            const tipoFiltro = $("#filtroTipo").val();
+            const atendimentoFiltro = $("#filtroAtendimento").val();
+            const localizacaoFiltro = $("#filtroLocalizacao").val();
+
+            // Construir a URL com parâmetros de filtro
+            let url = "{% url 'contatos' %}?";
+            
+            if (tipoFiltro && tipoFiltro !== "todos") {
+                url += `tipo=${tipoFiltro}&`;
+            }
+            if (atendimentoFiltro && atendimentoFiltro !== "todos") {
+                url += `atendimento=${atendimentoFiltro}&`;
+            }
+            if (localizacaoFiltro && localizacaoFiltro !== "todos") {
+                url += `localizacao=${localizacaoFiltro}&`;
+            }
+
+            // Redirecionar para a URL com filtros aplicados
+            window.location.href = url;
+        });
+
+        // Limpar todos os filtros aplicados
+        $("#btnLimpar").click(function () {
+            window.location.href = "{% url 'contatos' %}";
+        });
+
+        // =============================================================================
+        // SISTEMA DE SUGESTÃO DE CONTATOS
+        // =============================================================================
+        
+        // Enviar sugestão de novo contato
+        $("#btnEnviarSugestao").click(function () {
+            // Validar se todos os campos obrigatórios estão preenchidos
+            if ($("#formSugerirContato")[0].checkValidity()) {
+                // Submeter o formulário
+                $("#formSugerirContato").submit();
+
+                // Fechar o modal após envio
+                $("#sugerirContatoModal").modal('hide');
+
+                // Exibir notificação de sucesso
+                if (typeof Swal !== 'undefined') {
+                    // Usar SweetAlert2 se disponível
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sugestão enviada!',
+                        text: 'Agradecemos sua contribuição para nossa rede de apoio.',
+                        confirmButtonColor: '#3085d6'
+                    });
+                } else {
+                    // Fallback para alert nativo
+                    alert('Sugestão enviada! Agradecemos sua contribuição para nossa rede de apoio.');
+                }
+
+                // Limpar todos os campos do formulário
+                $("#formSugerirContato")[0].reset();
+            } else {
+                // Mostrar erros de validação visualmente
+                $("#formSugerirContato")[0].reportValidity();
+            }
+        });
+
+        // =============================================================================
+        // EFEITOS VISUAIS E ANIMAÇÕES
+        // =============================================================================
+        
+        // Efeito hover nos cards de contato
+        $(".hover-card").hover(
+            function () {
+                // Ao passar o mouse por cima
+                $(this).addClass("shadow");
+                $(this).css("transform", "translateY(-5px)");
+                $(this).css("transition", "all 0.3s ease");
+            },
+            function () {
+                // Ao tirar o mouse
+                $(this).removeClass("shadow");
+                $(this).css("transform", "translateY(0)");
+            }
+        );
+    });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    /* =============================================================================
+     * SISTEMA DE NAVEGAÇÃO E FILTROS
+     * ============================================================================= */
+    
+    /* Estilo para a navegação por categorias */
+    .contact-nav {
+        margin-bottom: 2rem;
+        padding: 0.8rem;
+    }
+
+    .contact-nav .btn {
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+        transition: all 0.4s ease;
+        border-radius: 20px;
+    }
+
+    /* Efeito shimmer nos botões de navegação */
+    .contact-nav .btn:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: all 0.6s ease;
+        z-index: -1;
+    }
+
+    .contact-nav .btn:hover:before {
+        left: 100%;
+    }
+
+    /* =============================================================================
+     * CARDS DE CONTATO - ESTILO E ANIMAÇÕES
+     * ============================================================================= */
+    
+    /* Estilo base dos cards com hover */
+    .hover-card {
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        z-index: 1;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Efeito de elevação no hover */
+    .hover-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(106, 62, 161, 0.15);
+    }
+
+    /* Barra superior colorida que aparece no hover */
+    .hover-card:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+        z-index: 2;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s ease;
+    }
+
+    .hover-card:hover:before {
+        transform: scaleX(1);
+    }
+
+    /* Efeito zoom na imagem do card */
+    .hover-card .card-img-top {
+        transition: all 0.5s ease;
+    }
+
+    .hover-card:hover .card-img-top {
+        transform: scale(1.05);
+    }
+
+    /* Layout flexível do corpo do card */
+    .hover-card .card-body {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 1.5rem;
+    }
+
+    /* Animação das badges/etiquetas */
+    .hover-card .badge {
+        transform: translateY(0);
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(106, 62, 161, 0.2);
+    }
+
+    .hover-card:hover .badge {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(106, 62, 161, 0.3);
+    }
+
+    /* =============================================================================
+     * ÁREA DE AÇÕES DO CARD
+     * ============================================================================= */
+    
+    /* Container para ações na parte inferior do card */
+    .card-action-area {
+        margin-top: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1rem;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    /* Botão "Ver detalhes" estilizado */
+    .btn-ver-detalhes {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .btn-ver-detalhes:hover {
+        background-color: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(106, 62, 161, 0.3);
+    }
+
+    /* =============================================================================
+     * ÍCONES E INFORMAÇÕES DE CONTATO
+     * ============================================================================= */
+    
+    /* Layout para itens de informação com ícones */
+    .contact-info-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.8rem;
+        position: relative;
+        padding-left: 2rem;
+    }
+
+    /* Estilo e posicionamento dos ícones */
+    .contact-info-icon {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.5rem;
+        height: 1.5rem;
+        color: var(--primary);
+        transition: all 0.3s ease;
+    }
+
+    /* Animação de escala nos ícones durante hover */
+    .hover-card:hover .contact-info-icon {
+        transform: translateY(-50%) scale(1.2);
+    }
+
+    /* =============================================================================
+     * ANIMAÇÕES DE ENTRADA DOS ELEMENTOS
+     * ============================================================================= */
+    
+    /* Keyframe para animação de entrada dos cards */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Aplicação da animação com delays escalonados */
+    .contato-item {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+
+    .contato-item:nth-child(2) { animation-delay: 0.1s; }
+    .contato-item:nth-child(3) { animation-delay: 0.2s; }
+    .contato-item:nth-child(4) { animation-delay: 0.3s; }
+    .contato-item:nth-child(5) { animation-delay: 0.4s; }
+    .contato-item:nth-child(6) { animation-delay: 0.5s; }
+
+    /* =============================================================================
+     * CABEÇALHOS DE CATEGORIA
+     * ============================================================================= */
+    
+    /* Estilo para cabeçalhos de seção de categoria */
+    .category-header {
+        display: flex;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 1.5rem;
+        transform: translateY(0);
+        transition: all 0.3s ease;
+    }
+
+    .category-header:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(106, 62, 161, 0.15);
+    }
+
+    /* Ícone circular para categorias */
+    .category-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        background-color: white;
+        border-radius: 50%;
+        box-shadow: 0 5px 15px rgba(106, 62, 161, 0.15);
+        margin-right: 1.5rem;
+    }
+
+    /* =============================================================================
+     * MODAL DE DETALHES DO CONTATO
+     * ============================================================================= */
+    
+    /* Estilo principal do modal */
+    .contato-modal .modal-content {
+        border-radius: 20px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Cabeçalho do modal com gradiente */
+    .contato-modal .modal-header {
+        background: linear-gradient(45deg, var(--primary), var(--primary-light));
+        color: white;
+        border-bottom: none;
+        padding: 1.5rem;
+    }
+
+    .contato-modal .modal-title {
+        font-weight: 600;
+    }
+
+    /* Corpo e rodapé do modal */
+    .contato-modal .modal-body {
+        padding: 2rem;
+    }
+
+    .contato-modal .modal-footer {
+        border-top: none;
+        padding: 1rem 2rem 2rem;
+    }
+
+    /* Botão de fechar personalizado */
+    .contato-modal .btn-close {
+        color: white;
+        opacity: 1;
+        text-shadow: none;
+    }
+
+    /* Detalhes de contato com separadores */
+    .contato-modal .contact-details div {
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .contato-modal .contact-details div:last-child {
+        border-bottom: none;
+    }
+
+    /* =============================================================================
+     * CALL TO ACTION (CTA) - SEÇÃO DE DESTAQUE
+     * ============================================================================= */
+    
+    /* Card de call-to-action com gradiente */
+    .cta-card {
+        border-radius: 20px;
+        overflow: hidden;
+        background: linear-gradient(45deg, var(--primary), var(--primary-light));
+        position: relative;
+        z-index: 1;
+    }
+
+    .cta-card:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+
+    /* Botão principal do CTA */
+    .cta-btn {
+        background-color: white;
+        color: var(--primary);
+        font-weight: 600;
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .cta-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+</style>
+{% endblock %}
