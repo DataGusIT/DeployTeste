@@ -40,6 +40,8 @@ urlpatterns += [
 urlpatterns += [
     path('contatos/', views.contatos, name='contatos'),
     path('contatos/<int:id>/', views.detalhes_contato, name='detalhes_contato'),
+    path('salvar-contato/<int:contato_id>/', views.salvar_contato, name='salvar_contato'),
+    path('remover-contato/<int:contato_id>/', views.remover_contato_salvo, name='remover_contato_salvo'),
 ]
 
 # =============================================================================
@@ -134,3 +136,6 @@ urlpatterns += [
     path('administracao/ferramentas/editar/<int:id>/', views.admin_ferramenta_editar, name='admin_ferramenta_editar'),
     path('administracao/ferramentas/excluir/<int:id>/', views.admin_ferramenta_excluir, name='admin_ferramenta_excluir'),
 ]
+
+
+

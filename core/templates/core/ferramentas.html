@@ -1,976 +1,407 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block styles %}
+{{ block.super }}
+<style>
+    /* --- Estilos do Portal de Notícias --- */
+
+    /* Navegação por Categorias */
+    .category-nav-section {
+        background-color: var(--primary-very-light, #f3effa);
+        border-top: 1px solid var(--gray-200, #e9ecef);
+        border-bottom: 1px solid var(--gray-200, #e9ecef);
+    }
+
+    .category-nav-section .btn-outline-primary {
+        border-width: 1px;
+        font-weight: 500;
+        color: var(--primary, #6a3ea1);
+        border-color: var(--primary, #6a3ea1);
+    }
+
+    .category-nav-section .btn-outline-primary:hover,
+    .category-nav-section .btn-outline-primary.active {
+        background-color: var(--primary, #6a3ea1);
+        color: #fff;
+    }
+
+
+    /* Card de Destaque Principal */
+    .featured-article-card {
+        background: #fff;
+        border-radius: var(--border-radius, 12px);
+        overflow: hidden;
+        transition: var(--transition, all 0.3s ease-in-out);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    .featured-article-card:hover {
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        transform: translateY(-5px);
+    }
+
+    .featured-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .featured-article-card .card-title {
+        color: var(--dark, #343a40);
+    }
+
+    .featured-article-card .article-meta {
+        font-size: 0.9rem;
+        color: var(--gray-600, #6c757d);
+    }
+    .featured-article-card .article-meta span {
+        display: inline-flex;
+        align-items: center;
+    }
+
+
+    /* Cards de Artigos Secundários */
+    .article-card {
+        background: #fff;
+        border-radius: var(--border-radius, 12px);
+        box-shadow: var(--card-shadow, 0 10px 30px rgba(0, 0, 0, 0.05));
+        transition: var(--transition, all 0.3s ease-in-out);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .article-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--card-hover-shadow, 0 15px 40px rgba(0, 0, 0, 0.1));
+    }
+
+    .article-image {
+        position: relative;
+    }
+
+    .article-image img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: var(--border-radius, 12px) var(--border-radius, 12px) 0 0;
+    }
+
+    .article-image .badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #fff;
+    }
+
+    .article-content {
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .article-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--dark, #343a40);
+        margin-bottom: 0.75rem;
+    }
+
+    .article-meta {
+        font-size: 0.9rem;
+        color: var(--gray-600, #6c757d);
+        margin-bottom: 1rem;
+    }
+     .article-meta span {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .article-excerpt {
+        color: var(--gray-700, #495057);
+        flex-grow: 1;
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+    }
+
+    .read-more-link {
+        font-weight: 600;
+        color: var(--primary, #6a3ea1);
+    }
+
+    .read-more-link:hover {
+        color: var(--primary-dark, #5b2e92);
+    }
+
+    /* Animações */
+    [data-animation] {
+        opacity: 0;
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    }
+    
+    .animate__fadeInUp {
+        transform: translateY(30px);
+    }
+
+    [data-animation].is-visible {
+        opacity: 1;
+        transform: translateX(0) translateY(0);
+    }
+
+
+    /* Responsividade */
+    @media (max-width: 991.98px) {
+        .featured-image {
+            max-height: 400px;
+            border-radius: var(--border-radius, 12px) var(--border-radius, 12px) 0 0;
+        }
+    }
+</style>
+{% endblock %}
+
+
 {% block content %}
 <!-- Hero Section -->
 <section class="hero-section">
     <div class="hero-overlay"></div>
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
+    <div class="container position-relative">
+        <div class="row min-vh-50 align-items-center py-5">
+            <div class="col-lg-7">
                 <div class="animate__animated animate__fadeInLeft">
-                    <div class="section-subtitle">Recursos Especializados</div>
-                    <h1 class="section-title text-white mb-4">Ferramentas de Apoio para TEA</h1>
-                    <p class="text-white mb-4">
-                        Explore nossa coleção de ferramentas e recursos especializados para auxiliar
-                        no desenvolvimento, aprendizado e comunicação de pessoas com Transtorno do
-                        Espectro Autista.
+                    <span class="badge bg-white text-primary fs-6 mb-3 px-3 py-2">Informação de Confiança</span>
+                    <h1 class="display-5 fw-bold text-white mb-4">Portal de Notícias sobre o Espectro Autista</h1>
+                    <p class="lead text-white mb-4">
+                        Mantenha-se atualizado com as últimas pesquisas, reportagens, dicas e histórias inspiradoras do universo do autismo.
                     </p>
                     <div class="d-flex flex-wrap gap-3">
-                        <a href="#ferramentas-comunicacao" class="btn btn-light">Explorar ferramentas</a>
-                        <a href="#filtros" class="btn btn-outline-light">Filtrar recursos</a>
+                        <a href="#destaque-principal" class="btn btn-light btn-lg">Ver Destaque Principal</a>
+                        <a href="#mais-noticias" class="btn btn-outline-light btn-lg">Explorar Matérias</a>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-5 d-none d-lg-block">
                 <div class="hero-image-container text-center animate__animated animate__fadeInRight">
-                    <img src="/img/ferramentas-hero.svg" alt="Ferramentas de Apoio" class="img-fluid hero-image"
-                        style="max-width: 90%;">
+                    <!-- Substitua pelo caminho de uma imagem sua -->
+                    <img src="{% static 'img/noticias-hero.svg' %}" alt="Portal de Notícias" class="img-fluid hero-image" style="max-width: 90%;">
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Filtros Section -->
-<section id="filtros" class="py-5 bg-light">
+<!-- Navegação por Categorias -->
+<section class="category-nav-section py-4">
     <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="filter-container p-4 bg-white rounded-3 shadow-sm">
-                    <h3 class="mb-3 text-primary"><i class="fas fa-filter me-2"></i>Filtre os recursos</h3>
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <select id="tipo-filtro" class="form-select">
-                                <option value="todos">Todos os tipos</option>
-                                <option value="comunicacao">Comunicação</option>
-                                <option value="comportamental">Comportamental</option>
-                                <option value="educacional">Educacional</option>
-                                <option value="organizacao">Organização</option>
-                                <option value="sensorial">Sensorial</option>
-                                <option value="tecnologia">Tecnologia Assistiva</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <select id="publico-filtro" class="form-select">
-                                <option value="todos">Todos os públicos</option>
-                                <option value="criancas">Crianças</option>
-                                <option value="adolescentes">Adolescentes</option>
-                                <option value="adultos">Adultos</option>
-                                <option value="educadores">Educadores</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="gratuitas-filtro">
-                                <label class="form-check-label" for="gratuitas-filtro">Apenas gratuitas</label>
-                            </div>
-                        </div>
-                        <div class="col-12 text-center">
-                            <button id="aplicar-filtro" class="btn btn-primary mt-2">
-                                <i class="fas fa-search me-2"></i>Aplicar filtros
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+            <a href="#" class="btn btn-outline-primary active">Todos</a>
+            <a href="#" class="btn btn-outline-primary">Ciência</a>
+            <a href="#" class="btn btn-outline-primary">Inclusão</a>
+            <a href="#" class="btn btn-outline-primary">Educação</a>
+            <a href="#" class="btn btn-outline-primary">Tecnologia</a>
+            <a href="#" class="btn btn-outline-primary">Direitos</a>
+            <a href="#" class="btn btn-outline-primary">Relatos</a>
         </div>
     </div>
 </section>
 
-<!-- Stats Section -->
-<section class="stats-section">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="stat-card animate__animated" data-animation="animate__fadeInUp">
-                    <div class="stat-icon">
-                        <i class="fas fa-puzzle-piece"></i>
-                    </div>
-                    <h3 class="stat-number">20+</h3>
-                    <p class="stat-label">Ferramentas disponíveis</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stat-card animate__animated" data-animation="animate__fadeInUp" data-delay="200">
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h3 class="stat-number">500+</h3>
-                    <p class="stat-label">Usuários beneficiados</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stat-card animate__animated" data-animation="animate__fadeInUp" data-delay="400">
-                    <div class="stat-icon">
-                        <i class="fas fa-download"></i>
-                    </div>
-                    <h3 class="stat-number">1500+</h3>
-                    <p class="stat-label">Downloads de recursos</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Ferramentas de Comunicação -->
-<section id="ferramentas-comunicacao" class="py-5">
+<!-- Destaque Principal -->
+<section id="destaque-principal" class="py-5">
     <div class="container">
         <div class="section-header text-center mb-5">
-            <div class="section-subtitle">Suporte à Comunicação</div>
-            <h2 class="section-title">Ferramentas de Comunicação</h2>
+            <h2 class="section-title">Em Destaque</h2>
             <div class="section-divider"></div>
-            <p class="section-description">
-                Recursos que auxiliam no desenvolvimento da comunicação verbal e não-verbal
-                para pessoas com TEA.
-            </p>
+        </div>
+        <div class="featured-article-card">
+            <div class="row g-0">
+                <div class="col-lg-6">
+                    <!-- Substitua pela imagem da sua matéria de destaque -->
+                    <img src="{% static 'img/destaque-pesquisa.jpg' %}" class="img-fluid featured-image" alt="Pesquisadores em laboratório">
+                </div>
+                <div class="col-lg-6 d-flex align-items-center">
+                    <div class="card-body p-4 p-lg-5">
+                        <span class="badge bg-primary mb-2">Ciência e Pesquisa</span>
+                        <h3 class="card-title h2 mb-3">Nova pesquisa revela avanços na identificação precoce de sinais do TEA em bebês</h3>
+                        <p class="card-text text-muted mb-3">Um estudo inovador publicado na revista "Nature Medicine" demonstra como a tecnologia de rastreamento ocular pode ajudar a identificar sinais de autismo em crianças com menos de 12 meses de idade, abrindo portas para intervenções mais cedo.</p>
+                        <div class="article-meta mb-4">
+                            <span><i class="far fa-user me-1"></i> Por Dr. Helena Costa</span>
+                            <span class="ms-3"><i class="far fa-calendar-alt me-1"></i> 12 de Julho, 2025</span>
+                        </div>
+                        <a href="#" class="btn btn-primary">Ler matéria completa <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Mais Notícias -->
+<section id="mais-noticias" class="py-5 bg-light">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <h2 class="section-title">Mais Matérias</h2>
+            <div class="section-divider"></div>
         </div>
 
         <div class="row g-4">
-            {% for ferramenta in ferramentas_comunicacao %}
+            <!-- Artigo 1 -->
             <div class="col-lg-4 col-md-6">
-                <div class="feature-card animate__animated" data-animation="animate__fadeInUp">
-                    <div class="feature-icon">
-                        <i class="{{ ferramenta.icone_classe }}"></i>
+                <div class="article-card h-100" data-animation="animate__fadeInUp">
+                    <div class="article-image">
+                        <img src="{% static 'img/noticia-inclusao.jpg' %}" alt="Crianças brincando juntas">
+                        <span class="badge bg-success">Inclusão Social</span>
                     </div>
-                    <h3 class="feature-title">{{ ferramenta.nome }}</h3>
-                    <p class="feature-description">{{ ferramenta.descricao }}</p>
-                    <div class="mb-3">
-                        <span class="badge bg-primary">{{ ferramenta.tipo }}</span>
-                        {% if ferramenta.eh_gratuita %}
-                        <span class="badge bg-success ms-2">Gratuito</span>
-                        {% else %}
-                        <span class="badge bg-secondary ms-2">Pago</span>
-                        {% endif %}
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="ratings">
-                            {% for i in "12345" %}
-                            {% if forloop.counter <= ferramenta.classificacao|floatformat:"0" %} <i
-                                class="fas fa-star text-warning"></i>
-                                {% elif forloop.counter|add:"-1" < ferramenta.classificacao and forloop.counter>
-                                    ferramenta.classificacao %}
-                                    <i class="fas fa-star-half-alt text-warning"></i>
-                                    {% else %}
-                                    <i class="far fa-star text-warning"></i>
-                                    {% endif %}
-                                    {% endfor %}
-                                    <span class="ms-1">({{ ferramenta.classificacao }})</span>
+                    <div class="article-content">
+                        <h4 class="article-title">Como as escolas podem criar ambientes verdadeiramente inclusivos para alunos autistas</h4>
+                        <div class="article-meta">
+                            <span><i class="far fa-calendar-alt me-1"></i> 10 de Julho, 2025</span>
                         </div>
-                        <a href="{% url 'detalhes_ferramenta' ferramenta.id %}" class="feature-link">
-                            Saiba mais <i class="fas fa-arrow-right ms-2"></i>
-                        </a>
+                        <p class="article-excerpt">Especialistas compartilham estratégias práticas, desde a adaptação de salas de aula até a formação de professores...</p>
+                        <a href="#" class="read-more-link">Ler mais <i class="fas fa-arrow-right ms-1"></i></a>
                     </div>
                 </div>
             </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
 
-<!-- Ferramentas Comportamentais -->
-<section id="ferramentas-comportamentais" class="py-5 bg-light">
-    <div class="container">
-        <div class="section-header text-center mb-5">
-            <div class="section-subtitle">Suporte Comportamental</div>
-            <h2 class="section-title">Ferramentas Comportamentais</h2>
-            <div class="section-divider"></div>
-            <p class="section-description">
-                Técnicas e abordagens focadas no desenvolvimento de habilidades comportamentais
-                e sociais para pessoas com TEA.
-            </p>
-        </div>
-
-        <div class="row g-4">
-            {% for ferramenta in ferramentas_comportamentais %}
+            <!-- Artigo 2 -->
             <div class="col-lg-4 col-md-6">
-                <div class="feature-card animate__animated" data-animation="animate__fadeInUp">
-                    <div class="feature-icon">
-                        <i class="{{ ferramenta.icone_classe }}"></i>
+                <div class="article-card h-100" data-animation="animate__fadeInUp" data-delay="200">
+                    <div class="article-image">
+                        <img src="{% static 'img/noticia-tecnologia.jpg' %}" alt="Pessoa usando um tablet">
+                        <span class="badge bg-info">Tecnologia</span>
                     </div>
-                    <h3 class="feature-title">{{ ferramenta.nome }}</h3>
-                    <p class="feature-description">{{ ferramenta.descricao }}</p>
-                    <div class="mb-3">
-                        <span class="badge bg-primary">{{ ferramenta.tipo }}</span>
-                        {% if ferramenta.eh_gratuita %}
-                        <span class="badge bg-success ms-2">Gratuito</span>
-                        {% else %}
-                        <span class="badge bg-secondary ms-2">Pago</span>
-                        {% endif %}
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="ratings">
-                            {% for i in "12345" %}
-                            {% if forloop.counter <= ferramenta.classificacao|floatformat:"0" %} <i
-                                class="fas fa-star text-warning"></i>
-                                {% elif forloop.counter|add:"-1" < ferramenta.classificacao and forloop.counter>
-                                    ferramenta.classificacao %}
-                                    <i class="fas fa-star-half-alt text-warning"></i>
-                                    {% else %}
-                                    <i class="far fa-star text-warning"></i>
-                                    {% endif %}
-                                    {% endfor %}
-                                    <span class="ms-1">({{ ferramenta.classificacao }})</span>
+                    <div class="article-content">
+                        <h4 class="article-title">Os 5 melhores aplicativos de comunicação alternativa para pessoas com TEA em 2025</h4>
+                        <div class="article-meta">
+                            <span><i class="far fa-calendar-alt me-1"></i> 8 de Julho, 2025</span>
                         </div>
-                        <a href="{% url 'detalhes_ferramenta' ferramenta.id %}" class="feature-link">
-                            Saiba mais <i class="fas fa-arrow-right ms-2"></i>
-                        </a>
+                        <p class="article-excerpt">Uma análise completa dos apps que estão revolucionando a forma como pessoas não-verbais se comunicam...</p>
+                        <a href="#" class="read-more-link">Ler mais <i class="fas fa-arrow-right ms-1"></i></a>
                     </div>
                 </div>
             </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
 
-<!-- Ferramentas Educacionais -->
-<section id="ferramentas-educacionais" class="py-5">
-    <div class="container">
-        <div class="section-header text-center mb-5">
-            <div class="section-subtitle">Suporte Educacional</div>
-            <h2 class="section-title">Ferramentas Educacionais</h2>
-            <div class="section-divider"></div>
-            <p class="section-description">
-                Recursos e metodologias para auxiliar no processo de aprendizagem e
-                desenvolvimento acadêmico de pessoas com TEA.
-            </p>
-        </div>
-
-        <div class="row g-4">
-            {% for ferramenta in ferramentas_educacionais %}
+            <!-- Artigo 3 -->
             <div class="col-lg-4 col-md-6">
-                <div class="feature-card animate__animated" data-animation="animate__fadeInUp">
-                    <div class="feature-icon">
-                        <i class="{{ ferramenta.icone_classe }}"></i>
+                <div class="article-card h-100" data-animation="animate__fadeInUp" data-delay="400">
+                    <div class="article-image">
+                        <img src="{% static 'img/noticia-direitos.jpg' %}" alt="Documento legal">
+                        <span class="badge bg-warning text-dark">Direitos</span>
                     </div>
-                    <h3 class="feature-title">{{ ferramenta.nome }}</h3>
-                    <p class="feature-description">{{ ferramenta.descricao }}</p>
-                    <div class="mb-3">
-                        <span class="badge bg-primary">{{ ferramenta.tipo }}</span>
-                        {% if ferramenta.eh_gratuita %}
-                        <span class="badge bg-success ms-2">Gratuito</span>
-                        {% else %}
-                        <span class="badge bg-secondary ms-2">Pago</span>
-                        {% endif %}
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="ratings">
-                            {% for i in "12345" %}
-                            {% if forloop.counter <= ferramenta.classificacao|floatformat:"0" %} <i
-                                class="fas fa-star text-warning"></i>
-                                {% elif forloop.counter|add:"-1" < ferramenta.classificacao and forloop.counter>
-                                    ferramenta.classificacao %}
-                                    <i class="fas fa-star-half-alt text-warning"></i>
-                                    {% else %}
-                                    <i class="far fa-star text-warning"></i>
-                                    {% endif %}
-                                    {% endfor %}
-                                    <span class="ms-1">({{ ferramenta.classificacao }})</span>
+                    <div class="article-content">
+                        <h4 class="article-title">Lei Berenice Piana: Você conhece todos os direitos garantidos às pessoas com autismo?</h4>
+                        <div class="article-meta">
+                            <span><i class="far fa-calendar-alt me-1"></i> 5 de Julho, 2025</span>
                         </div>
-                        <a href="{% url 'detalhes_ferramenta' ferramenta.id %}" class="feature-link">
-                            Saiba mais <i class="fas fa-arrow-right ms-2"></i>
-                        </a>
+                        <p class="article-excerpt">Um guia completo sobre a legislação que equipara o autismo às deficiências para efeitos legais e seus impactos...</p>
+                        <a href="#" class="read-more-link">Ler mais <i class="fas fa-arrow-right ms-1"></i></a>
                     </div>
                 </div>
             </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
 
-<!-- Ferramentas de Organização -->
-<section id="ferramentas-organizacao" class="py-5 bg-light">
-    <div class="container">
-        <div class="section-header text-center mb-5">
-            <div class="section-subtitle">Suporte à Organização</div>
-            <h2 class="section-title">Ferramentas de Organização</h2>
-            <div class="section-divider"></div>
-            <p class="section-description">
-                Recursos que auxiliam na organização de rotinas, tarefas e atividades diárias
-                para pessoas com TEA.
-            </p>
-        </div>
-
-        <div class="row g-4">
-            {% for ferramenta in ferramentas_organizacao %}
+            <!-- Artigo 4 -->
             <div class="col-lg-4 col-md-6">
-                <div class="feature-card animate__animated" data-animation="animate__fadeInUp">
-                    <div class="feature-icon">
-                        <i class="{{ ferramenta.icone_classe }}"></i>
+                <div class="article-card h-100" data-animation="animate__fadeInUp">
+                    <div class="article-image">
+                        <img src="{% static 'img/noticia-relato.jpg' %}" alt="Pai e filho">
+                        <span class="badge bg-secondary">Relatos</span>
                     </div>
-                    <h3 class="feature-title">{{ ferramenta.nome }}</h3>
-                    <p class="feature-description">{{ ferramenta.descricao }}</p>
-                    <div class="mb-3">
-                        <span class="badge bg-primary">{{ ferramenta.tipo }}</span>
-                        {% if ferramenta.eh_gratuita %}
-                        <span class="badge bg-success ms-2">Gratuito</span>
-                        {% else %}
-                        <span class="badge bg-secondary ms-2">Pago</span>
-                        {% endif %}
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="ratings">
-                            {% for i in "12345" %}
-                            {% if forloop.counter <= ferramenta.classificacao|floatformat:"0" %} <i
-                                class="fas fa-star text-warning"></i>
-                                {% elif forloop.counter|add:"-1" < ferramenta.classificacao and forloop.counter>
-                                    ferramenta.classificacao %}
-                                    <i class="fas fa-star-half-alt text-warning"></i>
-                                    {% else %}
-                                    <i class="far fa-star text-warning"></i>
-                                    {% endif %}
-                                    {% endfor %}
-                                    <span class="ms-1">({{ ferramenta.classificacao }})</span>
+                    <div class="article-content">
+                        <h4 class="article-title">"Descobri o autismo aos 40 anos": A jornada de um adulto em busca do autoconhecimento</h4>
+                        <div class="article-meta">
+                            <span><i class="far fa-calendar-alt me-1"></i> 2 de Julho, 2025</span>
                         </div>
-                        <a href="{% url 'detalhes_ferramenta' ferramenta.id %}" class="feature-link">
-                            Saiba mais <i class="fas fa-arrow-right ms-2"></i>
-                        </a>
+                        <p class="article-excerpt">Uma história inspiradora sobre diagnóstico tardio e como ele pode ressignificar uma vida inteira...</p>
+                        <a href="#" class="read-more-link">Ler mais <i class="fas fa-arrow-right ms-1"></i></a>
                     </div>
                 </div>
             </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
 
-<!-- Ferramentas Sensoriais -->
-<section id="ferramentas-sensoriais" class="py-5">
-    <div class="container">
-        <div class="section-header text-center mb-5">
-            <div class="section-subtitle">Suporte Sensorial</div>
-            <h2 class="section-title">Ferramentas Sensoriais</h2>
-            <div class="section-divider"></div>
-            <p class="section-description">
-                Recursos que auxiliam no processamento sensorial e no gerenciamento de
-                estímulos ambientais para pessoas com TEA.
-            </p>
-        </div>
-
-        <div class="row g-4">
-            {% for ferramenta in ferramentas_sensoriais %}
+            <!-- Artigo 5 -->
             <div class="col-lg-4 col-md-6">
-                <div class="feature-card animate__animated" data-animation="animate__fadeInUp">
-                    <div class="feature-icon">
-                        <i class="{{ ferramenta.icone_classe }}"></i>
+                <div class="article-card h-100" data-animation="animate__fadeInUp" data-delay="200">
+                    <div class="article-image">
+                        <img src="{% static 'img/noticia-educacao.jpg' %}" alt="Sala de aula adaptada">
+                        <span class="badge bg-danger">Educação</span>
                     </div>
-                    <h3 class="feature-title">{{ ferramenta.nome }}</h3>
-                    <p class="feature-description">{{ ferramenta.descricao }}</p>
-                    <div class="mb-3">
-                        <span class="badge bg-primary">{{ ferramenta.tipo }}</span>
-                        {% if ferramenta.eh_gratuita %}
-                        <span class="badge bg-success ms-2">Gratuito</span>
-                        {% else %}
-                        <span class="badge bg-secondary ms-2">Pago</span>
-                        {% endif %}
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="ratings">
-                            {% for i in "12345" %}
-                            {% if forloop.counter <= ferramenta.classificacao|floatformat:"0" %} <i
-                                class="fas fa-star text-warning"></i>
-                                {% elif forloop.counter|add:"-1" < ferramenta.classificacao and forloop.counter>
-                                    ferramenta.classificacao %}
-                                    <i class="fas fa-star-half-alt text-warning"></i>
-                                    {% else %}
-                                    <i class="far fa-star text-warning"></i>
-                                    {% endif %}
-                                    {% endfor %}
-                                    <span class="ms-1">({{ ferramenta.classificacao }})</span>
+                    <div class="article-content">
+                        <h4 class="article-title">Plano de Ensino Individualizado (PEI): Ferramenta essencial para o sucesso escolar</h4>
+                        <div class="article-meta">
+                            <span><i class="far fa-calendar-alt me-1"></i> 30 de Junho, 2025</span>
                         </div>
-                        <a href="{% url 'detalhes_ferramenta' ferramenta.id %}" class="feature-link">
-                            Saiba mais <i class="fas fa-arrow-right ms-2"></i>
-                        </a>
+                        <p class="article-excerpt">Entenda o que é o PEI, sua importância e como pais e escolas podem colaborar para criá-lo de forma eficaz...</p>
+                        <a href="#" class="read-more-link">Ler mais <i class="fas fa-arrow-right ms-1"></i></a>
                     </div>
                 </div>
             </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-
-<!-- Ferramentas de Tecnologia Assistiva -->
-<section id="ferramentas-tecnologicas" class="py-5 bg-light">
-    <div class="container">
-        <div class="section-header text-center mb-5">
-            <div class="section-subtitle">Suporte Tecnológico</div>
-            <h2 class="section-title">Ferramentas de Tecnologia Assistiva</h2>
-            <div class="section-divider"></div>
-            <p class="section-description">
-                Aplicativos, softwares e dispositivos tecnológicos que auxiliam no desenvolvimento
-                e na comunicação de pessoas com TEA.
-            </p>
-        </div>
-
-        <div class="row g-4">
-            {% for ferramenta in ferramentas_tecnologicas %}
+            
+            <!-- Artigo 6 -->
             <div class="col-lg-4 col-md-6">
-                <div class="feature-card animate__animated" data-animation="animate__fadeInUp">
-                    <div class="feature-icon">
-                        <i class="{{ ferramenta.icone_classe }}"></i>
+                 <div class="article-card h-100" data-animation="animate__fadeInUp" data-delay="400">
+                    <div class="article-image">
+                        <img src="{% static 'img/noticia-mercado.jpg' %}" alt="Pessoa trabalhando em um escritório">
+                        <span class="badge" style="background-color: var(--primary-dark, #5b2e92);">Mercado de Trabalho</span>
                     </div>
-                    <h3 class="feature-title">{{ ferramenta.nome }}</h3>
-                    <p class="feature-description">{{ ferramenta.descricao }}</p>
-                    <div class="mb-3">
-                        <span class="badge bg-primary">{{ ferramenta.tipo }}</span>
-                        {% if ferramenta.eh_gratuita %}
-                        <span class="badge bg-success ms-2">Gratuito</span>
-                        {% else %}
-                        <span class="badge bg-secondary ms-2">Pago</span>
-                        {% endif %}
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="ratings">
-                            {% for i in "12345" %}
-                            {% if forloop.counter <= ferramenta.classificacao|floatformat:"0" %} <i
-                                class="fas fa-star text-warning"></i>
-                                {% elif forloop.counter|add:"-1" < ferramenta.classificacao and forloop.counter>
-                                    ferramenta.classificacao %}
-                                    <i class="fas fa-star-half-alt text-warning"></i>
-                                    {% else %}
-                                    <i class="far fa-star text-warning"></i>
-                                    {% endif %}
-                                    {% endfor %}
-                                    <span class="ms-1">({{ ferramenta.classificacao }})</span>
+                    <div class="article-content">
+                        <h4 class="article-title">Inclusão no mercado de trabalho: Empresas que estão fazendo a diferença</h4>
+                        <div class="article-meta">
+                            <span><i class="far fa-calendar-alt me-1"></i> 28 de Junho, 2025</span>
                         </div>
-                        <a href="{% url 'detalhes_ferramenta' ferramenta.id %}" class="feature-link">
-                            Saiba mais <i class="fas fa-arrow-right ms-2"></i>
-                        </a>
+                        <p class="article-excerpt">Conheça as iniciativas de grandes companhias para contratar e reter talentos autistas, criando um ambiente diverso...</p>
+                        <a href="#" class="read-more-link">Ler mais <i class="fas fa-arrow-right ms-1"></i></a>
                     </div>
                 </div>
             </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-
-<!-- CTA Section -->
-<section class="cta-section py-5">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-7">
-                <div class="cta-content animate__animated" data-animation="animate__fadeInLeft">
-                    <h2 class="cta-title">Deseja sugerir uma nova ferramenta?</h2>
-                    <p class="cta-description">
-                        Você conhece alguma ferramenta que poderia auxiliar pessoas com TEA e
-                        não está em nossa lista? Compartilhe conosco para ampliarmos nossos recursos.
-                    </p>
-                </div>
-            </div>
-            <div class="col-lg-5 text-center text-lg-end">
-                <div class="animate__animated" data-animation="animate__fadeInRight">
-                    <a href="#" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#sugestaoModal">
-                        <i class="fas fa-plus-circle me-2"></i>Sugerir ferramenta
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Modal Sugestão -->
-<div class="modal fade" id="sugestaoModal" tabindex="-1" aria-labelledby="sugestaoModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="sugestaoModalLabel">Sugerir uma ferramenta</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="formSugestao">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="nomeFerramenta" class="form-label">Nome da ferramenta</label>
-                            <input type="text" class="form-control" id="nomeFerramenta" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="tipoFerramenta" class="form-label">Tipo</label>
-                            <select class="form-select" id="tipoFerramenta" required>
-                                <option value="">Selecione...</option>
-                                <option value="Comunicação">Comunicação</option>
-                                <option value="Comportamental">Comportamental</option>
-                                <option value="Educacional">Educacional</option>
-                                <option value="Organização">Organização</option>
-                                <option value="Sensorial">Sensorial</option>
-                                <option value="Tecnologia Assistiva">Tecnologia Assistiva</option>
-                            </select>
-                        </div>
-                        <div class="col-12">
-                            <label for="descricaoFerramenta" class="form-label">Descrição</label>
-                            <textarea class="form-control" id="descricaoFerramenta" rows="3" required></textarea>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="publicoAlvo" class="form-label">Público alvo</label>
-                            <input type="text" class="form-control" id="publicoAlvo">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="urlFerramenta" class="form-label">URL (se disponível)</label>
-                            <input type="url" class="form-control" id="urlFerramenta">
-                        </div>
-                        <div class="col-12">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="ehGratuita">
-                                <label class="form-check-label" for="ehGratuita">
-                                    A ferramenta é gratuita
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <label for="seuNome" class="form-label">Seu nome</label>
-                            <input type="text" class="form-control" id="seuNome" required>
-                        </div>
-                        <div class="col-12">
-                            <label for="seuEmail" class="form-label">Seu e-mail</label>
-                            <input type="email" class="form-control" id="seuEmail" required>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" form="formSugestao" class="btn btn-primary">Enviar sugestão</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- FAQ Section -->
-<section class="faq-section py-5">
-    <div class="container">
-        <div class="section-header text-center mb-5">
-            <div class="section-subtitle">Perguntas Frequentes</div>
-            <h2 class="section-title">Dúvidas sobre as ferramentas</h2>
-            <div class="section-divider"></div>
         </div>
 
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="accordion" id="accordionFAQ">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingOne">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                Como escolher a ferramenta mais adequada?
-                            </button>
-                        </h2>
-                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
-                            data-bs-parent="#accordionFAQ">
-                            <div class="accordion-body">
-                                A escolha da ferramenta mais adequada depende das necessidades específicas e do
-                                perfil da pessoa com TEA. Recomendamos considerar os interesses, habilidades,
-                                dificuldades e objetivos de desenvolvimento. Converse com profissionais que
-                                acompanham a pessoa para determinar quais ferramentas seriam mais benéficas.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingTwo">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                Posso utilizar várias ferramentas simultaneamente?
-                            </button>
-                        </h2>
-                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
-                            data-bs-parent="#accordionFAQ">
-                            <div class="accordion-body">
-                                Sim, muitas ferramentas são complementares e podem ser utilizadas em conjunto.
-                                No entanto, é importante não sobrecarregar a pessoa com muitas intervenções
-                                diferentes ao mesmo tempo. Introduza as ferramentas gradualmente e observe como
-                                cada uma afeta o desenvolvimento e bem-estar da pessoa com TEA.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingThree">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                Onde posso aprender a utilizar estas ferramentas?
-                            </button>
-                        </h2>
-                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
-                            data-bs-parent="#accordionFAQ">
-                            <div class="accordion-body">
-                                Muitas ferramentas possuem tutoriais online, cursos de capacitação e manuais
-                                de instrução. Nossa escola oferece workshops periódicos para famílias e educadores
-                                sobre o uso de diversas ferramentas. Consulte nossa agenda de eventos ou entre em
-                                contato com nossa equipe para mais informações sobre capacitações disponíveis.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="text-center mt-5">
+            <a href="#" class="btn btn-outline-primary btn-lg">Carregar mais matérias</a>
         </div>
     </div>
 </section>
 
 {% endblock %}
 
+
 {% block scripts %}
+{{ block.super }}
 <script>
-    $(document).ready(function () {
-        // Animações ao scroll
-        function animateElements() {
-            $('.animate__animated').each(function () {
-                var position = $(this).offset().top;
-                var scroll = $(window).scrollTop();
-                var windowHeight = $(window).height();
+document.addEventListener("DOMContentLoaded", function() {
+    // Animações de surgimento ao rolar a página
+    const animatedElements = document.querySelectorAll('[data-animation]');
 
-                if (scroll + windowHeight > position) {
-                    var animation = $(this).data('animation');
-                    var delay = $(this).data('delay');
-
-                    if (delay) {
-                        setTimeout(() => {
-                            $(this).addClass(animation);
-                        }, delay);
-                    } else {
-                        $(this).addClass(animation);
-                    }
-                }
-            });
-        }
-
-        // Iniciar animações visíveis no carregamento
-        animateElements();
-
-        // Animar ao scroll
-        $(window).scroll(function () {
-            animateElements();
-        });
-
-        // Funcionalidade de filtro (a ser implementada)
-        $('#aplicar-filtro').click(function () {
-            var tipo = $('#tipo-filtro').val();
-            var publico = $('#publico-filtro').val();
-            var gratuitas = $('#gratuitas-filtro').is(':checked');
-
-            // Lógica de filtro a ser implementada
-            alert('Filtro aplicado! Esta funcionalidade será implementada em breve.');
-        });
-
-        // Envio do formulário de sugestão
-        $('#formSugestao').submit(function (e) {
-            e.preventDefault();
-            // Lógica de envio a ser implementada
-            $('#sugestaoModal').modal('hide');
-            alert('Obrigado pela sua sugestão! Ela será analisada por nossa equipe.');
-            this.reset();
-        });
-    });
-
-    /**
-    * Scripts específicos para a página de ferramentas
-    */
-
-    // Quando o documento estiver pronto
-    $(document).ready(function () {
-
-        // Inicializar tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        });
-
-        // Funcionalidade de filtro
-        initializeFiltros();
-
-        // Animações
-        initializeAnimations();
-
-        // Modal de sugestão
-        setupSugestaoForm();
-    });
-
-    /**
-     * Inicializa a funcionalidade de filtros
-     */
-    function initializeFiltros() {
-        // Cache dos elementos DOM
-        const tipoFiltro = $('#tipo-filtro');
-        const publicoFiltro = $('#publico-filtro');
-        const gratuitasFiltro = $('#gratuitas-filtro');
-        const aplicarFiltroBtn = $('#aplicar-filtro');
-
-        // Evento de clique no botão de aplicar filtro
-        aplicarFiltroBtn.on('click', function () {
-            // Capturar valores selecionados
-            const tipo = tipoFiltro.val();
-            const publico = publicoFiltro.val();
-            const apenasGratuitas = gratuitasFiltro.prop('checked');
-
-            // Log para depuração
-            console.log('Filtros aplicados:', { tipo, publico, apenasGratuitas });
-
-            // Aplicar filtros (versão simulada)
-            aplicarFiltros(tipo, publico, apenasGratuitas);
-        });
-
-        // Redefine filtros quando a página é carregada
-        resetFiltros();
-    }
-
-    /**
-     * Simula a aplicação dos filtros (versão temporária)
-     */
-    function aplicarFiltros(tipo, publico, apenasGratuitas) {
-        // Restaurar visibilidade de todos os cartões
-        $('.feature-card').closest('.col-lg-4').show();
-
-        // Contador de itens visíveis
-        let itensFiltrados = 0;
-
-        // Percorrer todos os cartões
-        $('.feature-card').each(function () {
-            const card = $(this);
-            let passouFiltro = true;
-
-            // Filtrar por tipo
-            if (tipo !== 'todos') {
-                const tipoCard = card.find('.badge.bg-primary').text();
-                const tipoFiltroTexto = mapearValorTipoParaTexto(tipo);
-
-                if (tipoCard !== tipoFiltroTexto) {
-                    passouFiltro = false;
-                }
-            }
-
-            // Filtrar por público (simulado - na implementação real, precisaria verificar o publicoAlvo)
-            if (publico !== 'todos' && passouFiltro) {
-                const descricao = card.find('.feature-description').text().toLowerCase();
-                const publicoTexto = mapearValorPublicoParaPalavrasChave(publico);
-
-                if (!publicoTexto.some(palavra => descricao.includes(palavra))) {
-                    passouFiltro = false;
-                }
-            }
-
-            // Filtrar por gratuidade
-            if (apenasGratuitas && passouFiltro) {
-                const temBadgeGratuita = card.find('.badge.bg-success').length > 0;
-                if (!temBadgeGratuita) {
-                    passouFiltro = false;
-                }
-            }
-
-            // Aplicar visibilidade
-            if (passouFiltro) {
-                card.closest('.col-lg-4').show();
-                itensFiltrados++;
-            } else {
-                card.closest('.col-lg-4').hide();
-            }
-        });
-
-        // Exibir mensagem se nenhum item for encontrado
-        if (itensFiltrados === 0) {
-            // Se nenhuma ferramenta foi encontrada, mostrar mensagem
-            if ($('.no-results-message').length === 0) {
-                const mensagem = `
-                    <div class="col-12 no-results-message text-center py-5">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle me-2"></i>
-                            Nenhuma ferramenta encontrada com os filtros selecionados.
-                            <button id="limpar-filtros" class="btn btn-sm btn-link">Limpar filtros</button>
-                        </div>
-                    </div>
-                `;
-
-                // Adicionar mensagem à primeira seção
-                $('#ferramentas-comunicacao .row').append(mensagem);
-
-                // Adicionar evento ao botão de limpar filtros
-                $('#limpar-filtros').on('click', function () {
-                    resetFiltros();
-                    aplicarFiltros('todos', 'todos', false);
-                });
-            }
-        } else {
-            // Remover mensagem de "nenhum resultado" se existir
-            $('.no-results-message').remove();
-        }
-    }
-
-    /**
-     * Mapeia os valores do select de tipo para textos exibidos nos badges
-     */
-    function mapearValorTipoParaTexto(valor) {
-        const mapa = {
-            'comunicacao': 'Comunicação',
-            'comportamental': 'Comportamental',
-            'educacional': 'Educacional',
-            'organizacao': 'Organização',
-            'sensorial': 'Sensorial',
-            'tecnologia': 'Tecnologia Assistiva'
-        };
-
-        return mapa[valor] || '';
-    }
-
-    /**
-     * Mapeia os valores do select de público alvo para palavras-chave a serem buscadas
-     */
-    function mapearValorPublicoParaPalavrasChave(valor) {
-        const mapa = {
-            'criancas': ['criança', 'crianças', 'infantil'],
-            'adolescentes': ['adolescente', 'adolescentes', 'jovem', 'jovens'],
-            'adultos': ['adulto', 'adultos'],
-            'educadores': ['professor', 'professores', 'educador', 'educadores', 'escolar']
-        };
-
-        return mapa[valor] || [];
-    }
-
-    /**
-     * Reseta os filtros para valores padrão
-     */
-    function resetFiltros() {
-        $('#tipo-filtro').val('todos');
-        $('#publico-filtro').val('todos');
-        $('#gratuitas-filtro').prop('checked', false);
-    }
-
-    /**
-     * Inicializa animações nos elementos
-     */
-    function initializeAnimations() {
-        // Verificar se o elemento está visível na viewport
-        function isElementInViewport(el) {
-            if (typeof jQuery === "function" && el instanceof jQuery) {
-                el = el[0];
-            }
-
-            const rect = el.getBoundingClientRect();
-            return (
-                rect.top <= (window.innerHeight || document.documentElement.clientHeight) &&
-                rect.bottom >= 0
-            );
-        }
-
-        // Verificar elementos e adicionar classe de animação quando visíveis
-        function checkAnimations() {
-            $('.animate__animated').each(function () {
-                const element = $(this);
-
-                if (isElementInViewport(element) && !element.hasClass('animated')) {
-                    const animation = element.data('animation');
-                    const delay = element.data('delay') || 0;
-
-                    setTimeout(function () {
-                        element.addClass(animation + ' animated');
+    // Verifica se o navegador suporta IntersectionObserver para melhor performance
+    if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                // Quando o elemento entra na tela
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    const delay = parseInt(el.getAttribute('data-delay') || 0, 10);
+                    
+                    // Aplica a animação após o delay (se houver)
+                    setTimeout(() => {
+                        el.classList.add('is-visible');
                     }, delay);
+                    
+                    // Para de observar o elemento para não animar novamente
+                    observer.unobserve(el);
                 }
             });
-        }
-
-        // Verificar elementos ao carregar a página
-        checkAnimations();
-
-        // Verificar elementos ao rolar a página
-        $(window).on('scroll resize', checkAnimations);
-    }
-
-    /**
-     * Configura o formulário de sugestão de ferramentas
-     */
-    function setupSugestaoForm() {
-        // Validação do formulário
-        const formSugestao = $('#formSugestao');
-
-        formSugestao.on('submit', function (e) {
-            e.preventDefault();
-
-            // Verificar se o formulário é válido (validação básica)
-            if (!formSugestao[0].checkValidity()) {
-                e.stopPropagation();
-                formSugestao.addClass('was-validated');
-                return;
-            }
-
-            // Simulação de envio de dados (em produção, isso seria um AJAX para o servidor)
-            const dadosSugestao = {
-                nome: $('#nomeFerramenta').val(),
-                tipo: $('#tipoFerramenta').val(),
-                descricao: $('#descricaoFerramenta').val(),
-                publicoAlvo: $('#publicoAlvo').val(),
-                url: $('#urlFerramenta').val(),
-                ehGratuita: $('#ehGratuita').is(':checked'),
-                nomeUsuario: $('#seuNome').val(),
-                emailUsuario: $('#seuEmail').val()
-            };
-
-            console.log('Dados da sugestão:', dadosSugestao);
-
-            // Fechar o modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('sugestaoModal'));
-            modal.hide();
-
-            // Exibir mensagem de sucesso
-            showToast('Sugestão enviada', 'Obrigado pela sua contribuição! Nossa equipe irá analisar sua sugestão.');
-
-            // Limpar o formulário
-            formSugestao[0].reset();
-            formSugestao.removeClass('was-validated');
+        }, {
+            threshold: 0.1 // A animação começa quando 10% do elemento está visível
         });
 
-        // Validação em tempo real
-        const inputs = formSugestao.find('input, textarea, select');
-        inputs.on('input', function () {
-            const input = $(this);
-
-            if (input.val().trim() === '' && input.prop('required')) {
-                input.addClass('is-invalid').removeClass('is-valid');
-            } else {
-                input.removeClass('is-invalid').addClass('is-valid');
-            }
+        animatedElements.forEach(element => {
+            observer.observe(element);
+        });
+    } else {
+        // Fallback para navegadores antigos: simplesmente mostra os elementos
+        animatedElements.forEach(element => {
+            element.classList.add('is-visible');
         });
     }
-
-    /**
-     * Exibe um toast de notificação
-     */
-    function showToast(titulo, mensagem) {
-        // Criar toast dinamicamente se não existir
-        if ($('#toast-container').length === 0) {
-            const toastContainer = `
-                <div id="toast-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
-                </div>
-            `;
-            $('body').append(toastContainer);
-        }
-
-        // ID único para o toast
-        const toastId = 'toast-' + Date.now();
-
-        // Criar HTML do toast
-        const toastHTML = `
-            <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-header">
-                    <strong class="me-auto">${titulo}</strong>
-                    <small>Agora</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Fechar"></button>
-                </div>
-                <div class="toast-body">
-                    ${mensagem}
-                </div>
-            </div>
-        `;
-
-        // Adicionar toast ao container
-        $('#toast-container').append(toastHTML);
-
-        // Inicializar e mostrar toast
-        const toastElement = document.getElementById(toastId);
-        const toast = new bootstrap.Toast(toastElement, {
-            autohide: true,
-            delay: 5000
-        });
-
-        toast.show();
-
-        // Remover depois que desaparecer
-        toastElement.addEventListener('hidden.bs.toast', function () {
-            $(toastElement).remove();
-        });
-    }
+});
 </script>
 {% endblock %}

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CategoriaFAQ, CategoriaContato, CategoriaFerramenta, FAQ, Contato, Ferramenta, CustomUser, UserDownload, UserSavedFAQ,  FotoContato
+from .models import CategoriaFAQ, CategoriaContato, CategoriaFerramenta, FAQ, Contato, Ferramenta, CustomUser, UserDownload, UserSavedFAQ, FotoContato, UserSavedContato
 
 # =============================================================================
 # ADMINISTRAÇÃO DE USUÁRIOS
@@ -112,6 +112,36 @@ class FotoContatoAdmin(admin.ModelAdmin):
     search_fields = ('contato__nome', 'legenda')
     ordering = ('contato', 'ordem')
 
+@admin.register(UserSavedContato)
+class UserSavedContatoAdmin(admin.ModelAdmin):
+    list_display = ('user', 'get_contato_nome', 'get_categoria', 'data_salva')
+    list_filter = ('data_salva', 'contato__categoria')
+    search_fields = ('user__username', 'user__email', 'contato__nome')
+    readonly_fields = ('data_salva',)
+    date_hierarchy = 'data_salva'
+    
+    fieldsets = (
+        (None, {
+            'fields': ('user', 'contato')
+        }),
+        ('Informações de Data', {
+            'fields': ('data_salva',),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    @admin.display(description='Nome do Contato', ordering='contato__nome')
+    def get_contato_nome(self, obj):
+        return obj.contato.nome
+    
+    @admin.display(description='Categoria', ordering='contato__categoria__nome')
+    def get_categoria(self, obj):
+        return obj.contato.categoria.nome if obj.contato.categoria else 'Sem categoria'
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'contato', 'contato__categoria')
+
+
 # =============================================================================
 # ADMINISTRAÇÃO DE FERRAMENTAS
 # =============================================================================
@@ -136,3 +166,4 @@ class UserDownloadAdmin(admin.ModelAdmin):
     list_display = ('user', 'ferramenta', 'data_download')
     list_filter = ('data_download',)
     search_fields = ('user__username', 'ferramenta__nome')
+

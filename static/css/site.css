@@ -27,8 +27,10 @@
 }
 
 /* Reset e estilos base */
-html {
-    scroll-behavior: smooth;
+html,
+body {
+    overflow-x: hidden;
+    max-width: 100%;
 }
 
 body {
@@ -48,6 +50,10 @@ a {
 a:hover {
     color: var(--primary-dark);
     text-decoration: none;
+}
+
+* {
+    box-sizing: border-box;
 }
 
 /* Utilitários */

@@ -8,8 +8,9 @@ from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserProfile
 from django.db.models import Q
 from .models import (
     FAQ, CategoriaFAQ, CategoriaContato, CategoriaFerramenta, 
-    Contato, Ferramenta, CustomUser, UserDownload, UserSavedFAQ
+    Contato, Ferramenta, CustomUser, UserDownload, UserSavedFAQ, UserSavedContato
 )
+
 from collections import defaultdict
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
@@ -92,6 +93,7 @@ def register_download(request, ferramenta_id):
         return redirect('detalhes_ferramenta', id=ferramenta_id)
     
     return redirect('ferramentas')
+
 
 # =============================================================================
 # VIEWS DE FAQ/DÚVIDAS
@@ -273,6 +275,7 @@ def remover_faq_salva(request, faq_id):
 # VIEWS DE CONTATOS
 # =============================================================================
 
+# Modificar a view contatos para incluir contatos salvos
 def contatos(request):
     """Lista todos os contatos organizados por categoria"""
     # Busca todas as categorias disponíveis
@@ -290,18 +293,150 @@ def contatos(request):
     # Verifica se não há contatos cadastrados
     sem_contatos = not contatos_por_categoria
     
+    # Se usuário estiver logado, busca seus contatos salvos
+    contatos_salvos_ids = []
+    if request.user.is_authenticated:
+        contatos_salvos_ids = UserSavedContato.objects.filter(
+            user=request.user
+        ).values_list('contato_id', flat=True)
+    
     context = {
         'title': 'Contatos',
         'contatos_por_categoria': contatos_por_categoria,
         'sem_contatos': sem_contatos,
+        'contatos_salvos_ids': list(contatos_salvos_ids),
     }
     
-    return render(request, 'core/contatos.html', context)   
+    return render(request, 'core/contatos.html', context)
 
 def detalhes_contato(request, id):
     """Exibe detalhes de um contato específico"""
     contato = Contato.objects.get(pk=id)
     return render(request, 'core/detalhes_contato.html', {'contato': contato})
+
+@login_required
+@require_POST
+@csrf_protect
+def salvar_contato(request, contato_id):
+    """View para salvar um contato no perfil do usuário"""
+    try:
+        # Busca o contato
+        contato = get_object_or_404(Contato, id=contato_id)
+        
+        # Busca o CustomUser de forma mais robusta
+        try:
+            # Primeiro tenta por username
+            user = CustomUser.objects.get(username=request.user.username)
+        except CustomUser.DoesNotExist:
+            try:
+                # Se não encontrar, tenta por email (se ambos modelos tiverem)
+                if hasattr(request.user, 'email') and request.user.email:
+                    user = CustomUser.objects.get(email=request.user.email)
+                else:
+                    raise CustomUser.DoesNotExist
+            except CustomUser.DoesNotExist:
+                return JsonResponse({
+                    'success': False, 
+                    'message': 'Usuário não encontrado no sistema. Faça login novamente.'
+                })
+        
+        # Verifica se o usuário está autenticado
+        if not request.user.is_authenticated:
+            return JsonResponse({
+                'success': False, 
+                'message': 'Usuário não autenticado corretamente.'
+            })
+        
+        # Verifica se já não está salvo
+        contato_salvo, created = UserSavedContato.objects.get_or_create(
+            user=user, 
+            contato=contato
+        )
+        
+        if created:
+            return JsonResponse({
+                'success': True, 
+                'message': 'Contato salvo com sucesso!',
+                'action': 'saved'
+            })
+        else:
+            return JsonResponse({
+                'success': True,
+                'message': 'Este contato já está salvo.',
+                'action': 'already_saved'
+            })
+            
+    except Contato.DoesNotExist:
+        return JsonResponse({
+            'success': False, 
+            'message': 'Contato não encontrado.'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False, 
+            'message': f'Erro interno: {str(e)}'
+        })
+
+@login_required
+@require_POST
+@csrf_protect
+def remover_contato_salvo(request, contato_id):
+    """View para remover um contato salvo do perfil do usuário"""
+    try:
+        # Busca o contato
+        contato = get_object_or_404(Contato, id=contato_id)
+        
+        # Busca o CustomUser de forma mais robusta
+        try:
+            # Primeiro tenta por username
+            user = CustomUser.objects.get(username=request.user.username)
+        except CustomUser.DoesNotExist:
+            try:
+                # Se não encontrar, tenta por email (se ambos modelos tiverem)
+                if hasattr(request.user, 'email') and request.user.email:
+                    user = CustomUser.objects.get(email=request.user.email)
+                else:
+                    raise CustomUser.DoesNotExist
+            except CustomUser.DoesNotExist:
+                return JsonResponse({
+                    'success': False, 
+                    'message': 'Usuário não encontrado no sistema. Faça login novamente.'
+                })
+        
+        # Verifica se o usuário está autenticado
+        if not request.user.is_authenticated:
+            return JsonResponse({
+                'success': False, 
+                'message': 'Usuário não autenticado corretamente.'
+            })
+        
+        # Tenta remover o contato salvo
+        contato_salvo = UserSavedContato.objects.filter(user=user, contato=contato).first()
+        
+        if contato_salvo:
+            contato_salvo.delete()
+            return JsonResponse({
+                'success': True, 
+                'message': 'Contato removido com sucesso!',
+                'action': 'removed'
+            })
+        else:
+            return JsonResponse({
+                'success': False, 
+                'message': 'Contato não encontrado nos seus contatos salvos.',
+                'action': 'not_found'
+            })
+            
+    except Contato.DoesNotExist:
+        return JsonResponse({
+            'success': False, 
+            'message': 'Contato não encontrado.'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False, 
+            'message': f'Erro interno: {str(e)}'
+        })
 
 # =============================================================================
 # VIEWS DE AUTENTICAÇÃO E PERFIL
@@ -370,7 +505,7 @@ def logout_view(request):
 
 @login_required
 def profile_view(request):
-    """Perfil do usuário com histórico de downloads e FAQs salvas"""
+    """Perfil do usuário com histórico de downloads, FAQs salvas e contatos salvos"""
     user = request.user
     downloads = UserDownload.objects.filter(user=user).select_related('ferramenta')
     
@@ -378,6 +513,11 @@ def profile_view(request):
     duvidas_salvas = UserSavedFAQ.objects.filter(
         user=user
     ).select_related('faq', 'faq__categoria').order_by('-data_salva')
+    
+    # Busca os contatos salvos pelo usuário
+    contatos_salvos = UserSavedContato.objects.filter(
+        user=user
+    ).select_related('contato', 'contato__categoria').order_by('-data_salva')
     
     if request.method == 'POST':
         form = UserProfileForm(request.POST, instance=user)
@@ -392,6 +532,7 @@ def profile_view(request):
         'form': form,
         'downloads': downloads,
         'duvidas_salvas': duvidas_salvas,
+        'contatos_salvos': contatos_salvos,
         'title': 'Meu Perfil'
     })
 
@@ -923,3 +1064,4 @@ def document_list(request):
     # Lógica para listar documentos
     # Pode ser adaptada conforme seus modelos atuais
     return render(request, 'core/document_list.html', {'documents': []})
+

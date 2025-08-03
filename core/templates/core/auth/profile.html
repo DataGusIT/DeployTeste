@@ -34,6 +34,11 @@
                 <span>Dúvidas Salvas</span>
                 <span class="tab-counter">{{ duvidas_salvas.count }}</span>
             </button>
+            <button class="tab-btn" data-tab="contatos-salvos">
+                <i class="fas fa-address-book"></i>
+                <span>Contatos Salvos</span>
+                <span class="tab-counter">{{ contatos_salvos.count }}</span>
+            </button>
             <button class="tab-btn" data-tab="downloads">
                 <i class="fas fa-download"></i>
                 <span>Downloads</span>
@@ -123,6 +128,84 @@
                             <p>Você ainda não salvou nenhuma dúvida.</p>
                             <a href="{% url 'duvidas' %}" class="btn-secondary">
                                 Explorar Dúvidas Frequentes
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Tab Contatos Salvos -->
+            <div class="tab-pane" id="contatos-salvos">
+                <div class="content-card">
+                    <div class="card-header">
+                        <h2>Meus Contatos Salvos</h2>
+                        <p>{{ contatos_salvos.count }} contato{{ contatos_salvos.count|pluralize:"s" }} salvo{{ contatos_salvos.count|pluralize:"s" }}</p>
+                    </div>
+                    
+                    {% if contatos_salvos %}
+                        <div class="contatos-list">
+                            {% for contato_salvo in contatos_salvos %}
+                            <div class="contato-item" data-id="{{ contato_salvo.id }}">
+                                <div class="contato-header">
+                                    <div class="contato-left">
+                                        <div class="contato-icon">
+                                            <i class="fas fa-user-tie"></i>
+                                        </div>
+                                        <div class="contato-info">
+                                            <h3 class="contato-nome">{{ contato_salvo.contato.nome }}</h3>
+                                            <p class="contato-empresa">{{ contato_salvo.contato.empresa }}</p>
+                                            <p class="contato-cargo">{{ contato_salvo.contato.cargo }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="contato-actions">
+                                        <button class="remove-btn" onclick="removerContato({{ contato_salvo.contato.id }}, this)">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                        <button class="contact-btn" onclick="toggleContatoDetalhes(this)">
+                                            <i class="fas fa-phone"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="contato-detalhes">
+                                    <div class="detalhes-content">
+                                        {% if contato_salvo.contato.telefone %}
+                                        <div class="detalhe-item">
+                                            <i class="fas fa-phone"></i>
+                                            <span>{{ contato_salvo.contato.telefone }}</span>
+                                        </div>
+                                        {% endif %}
+                                        {% if contato_salvo.contato.email %}
+                                        <div class="detalhe-item">
+                                            <i class="fas fa-envelope"></i>
+                                            <span>{{ contato_salvo.contato.email }}</span>
+                                        </div>
+                                        {% endif %}
+                                        {% if contato_salvo.contato.whatsapp %}
+                                        <div class="detalhe-item">
+                                            <i class="fab fa-whatsapp"></i>
+                                            <span>{{ contato_salvo.contato.whatsapp }}</span>
+                                        </div>
+                                        {% endif %}
+                                        <div class="contato-meta">
+                                            <span class="save-date">
+                                                <i class="fas fa-clock"></i>
+                                                Salvo em {{ contato_salvo.data_salvo|date:"d/m/Y \à\s H:i" }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-address-book"></i>
+                            </div>
+                            <h3>Nenhum contato salvo</h3>
+                            <p>Você ainda não salvou nenhum contato.</p>
+                            <a href="{% url 'contatos' %}" class="btn-secondary">
+                                Explorar Contatos
                             </a>
                         </div>
                     {% endif %}
@@ -665,6 +748,153 @@
     }
 }
 
+/* Contatos List */
+.contatos-list {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.contato-item {
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    transition: var(--transition);
+    overflow: hidden;
+    background: white;
+}
+
+.contato-item:hover {
+    border-color: var(--primary-light);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.contato-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background: white;
+}
+
+.contato-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.contato-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--primary-very-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    font-size: 1.2rem;
+}
+
+.contato-info h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin: 0 0 0.25rem 0;
+}
+
+.contato-info p {
+    color: var(--gray-600);
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.contato-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.contact-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.contact-btn:hover {
+    background: var(--primary-dark);
+    transform: scale(1.1);
+}
+
+.contato-detalhes {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background: var(--gray-50);
+}
+
+.contato-item.expanded .contato-detalhes {
+    max-height: 300px;
+}
+
+.detalhes-content {
+    padding: 1.5rem;
+    border-top: 1px solid var(--gray-200);
+}
+
+.detalhe-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    color: var(--gray-600);
+}
+
+.detalhe-item i {
+    width: 16px;
+    color: var(--primary);
+}
+
+.contato-meta {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--gray-500);
+}
+
+/* Responsive para contatos */
+@media (max-width: 768px) {
+    .contato-header {
+        padding: 1rem;
+    }
+    
+    .contato-left {
+        gap: 0.75rem;
+    }
+    
+    .contato-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .detalhes-content {
+        padding: 1rem;
+    }
+}
+
 /* Downloads List */
 .downloads-list {
     padding: 2rem;
@@ -1047,6 +1277,95 @@ function showToast(type, message) {
 function hideToast() {
     const toast = document.getElementById('toast');
     toast.classList.remove('show');
+}
+
+// Remove Contact function
+function removerContato(contatoId, element) {
+    if (!confirm('Tem certeza que deseja remover este contato dos seus contatos salvos?')) {
+        return;
+    }
+    
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const contatoItem = element.closest('.contato-item');
+    
+    // Add removing animation
+    contatoItem.classList.add('removing');
+    
+    fetch(`/remover-contato/${contatoId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({'contato_id': contatoId})
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            setTimeout(() => {
+                contatoItem.remove();
+                
+                // Update counter
+                const counter = document.querySelector('[data-tab="contatos-salvos"] .tab-counter');
+                const currentCount = parseInt(counter.textContent);
+                const newCount = currentCount - 1;
+                counter.textContent = newCount;
+                
+                // Update header count
+                const headerCount = document.querySelector('#contatos-salvos .card-header p');
+                headerCount.textContent = `${newCount} contato${newCount !== 1 ? 's' : ''} salvo${newCount !== 1 ? 's' : ''}`;
+                
+                // Show empty state if no more items
+                if (newCount === 0) {
+                    const contatosList = document.querySelector('.contatos-list');
+                    contatosList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-address-book"></i>
+                            </div>
+                            <h3>Nenhum contato salvo</h3>
+                            <p>Você ainda não salvou nenhum contato.</p>
+                            <a href="/contatos/" class="btn-secondary">
+                                Explorar Contatos
+                            </a>
+                        </div>
+                    `;
+                }
+            }, 500);
+            
+            showToast('success', 'Contato removido com sucesso!');
+        } else {
+            contatoItem.classList.remove('removing');
+            showToast('error', data.message || 'Erro ao remover contato');
+        }
+    })
+    .catch(error => {
+        contatoItem.classList.remove('removing');
+        console.error('Erro:', error);
+        showToast('error', 'Erro de conexão. Tente novamente.');
+    });
+}
+
+// Toggle contact details
+function toggleContatoDetalhes(buttonElement) {
+    const contatoItem = buttonElement.closest('.contato-item');
+    const detalhes = contatoItem.querySelector('.contato-detalhes');
+    const isExpanded = contatoItem.classList.contains('expanded');
+    
+    if (isExpanded) {
+        // Collapse
+        contatoItem.classList.remove('expanded');
+        detalhes.style.maxHeight = '0px';
+    } else {
+        // Expand
+        contatoItem.classList.add('expanded');
+        detalhes.style.maxHeight = detalhes.scrollHeight + 'px';
+    }
 }
 </script>
 {% endblock %}

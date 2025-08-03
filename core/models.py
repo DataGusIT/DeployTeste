@@ -168,7 +168,38 @@ class Contato(models.Model):
     class Meta:
         verbose_name = 'Contato'
         verbose_name_plural = 'Contatos'
-
+    
+class UserSavedContato(models.Model):
+    user = models.ForeignKey(
+        'CustomUser',
+        on_delete=models.CASCADE, 
+        related_name='saved_contatos',
+        verbose_name='Usuário'
+    )
+    contato = models.ForeignKey(
+        'Contato', 
+        on_delete=models.CASCADE, 
+        related_name='saved_by_users',
+        verbose_name='Contato'
+    )
+    data_salva = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Data de Salvamento'
+    )
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.contato.nome}"
+    
+    class Meta:
+        verbose_name = 'Contato Salvo'
+        verbose_name_plural = 'Contatos Salvos'
+        ordering = ['-data_salva']
+        unique_together = ['user', 'contato']  # Evita duplicatas
+        indexes = [
+            models.Index(fields=['user', '-data_salva']),
+            models.Index(fields=['contato']),
+        ]
+    
 
 # Modelo para galeria de fotos do contato
 class FotoContato(models.Model):
@@ -221,3 +252,4 @@ class UserDownload(models.Model):
         verbose_name = 'Download'
         verbose_name_plural = 'Downloads'
         ordering = ['-data_download']
+

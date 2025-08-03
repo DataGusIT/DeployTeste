@@ -373,18 +373,30 @@
 </div>
 
 <!-- =============================================================================
-   CONTAINER DE NOTIFICAÇÕES TOAST
+   CONTAINER DE NOTIFICAÇÕES (TOAST MODERNO)
    ============================================================================= -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100">
+    <div id="notificationToast" class="toast modern-toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-body p-0">
+            <div class="d-flex">
+                <!-- Barra lateral colorida com ícone -->
+                <div class="toast-icon-area d-flex align-items-center justify-content-center">
+                    <i id="toastIcon" class="fas fa-check-circle"></i>
+                </div>
 
-{# Toast para notificações #}
-<div class="toast-container position-fixed top-0 end-0 p-3">
-    <div id="toastMessage" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-            <strong class="me-auto" id="toastTitle">Notificação</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body" id="toastBody">
-            Mensagem aqui
+                <!-- Conteúdo da mensagem -->
+                <div class="toast-content-area p-3">
+                    <h6 id="toastTitle" class="toast-title mb-1">Sucesso!</h6>
+                    <p id="toastBody" class="toast-message mb-0">
+                        Sua notificação aparecerá aqui.
+                    </p>
+                </div>
+                
+                <!-- Botão de fechar -->
+                <button type="button" class="btn-close-toast" data-bs-dismiss="toast" aria-label="Fechar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -673,48 +685,36 @@
     // =============================================================================
     
     /**
-     * Exibe notificação toast para o usuário
-     * @param {string} type - Tipo da notificação (success, error, warning, info)
-     * @param {string} message - Mensagem a ser exibida
+     * Exibe uma notificação toast moderna e customizada.
+     * @param {string} title - O título da notificação.
+     * @param {string} message - A mensagem principal.
+     * @param {string} type - O tipo de notificação ('success', 'error', 'info', 'warning').
      */
-    function showToast(type, message) {
-        const toastElement = document.getElementById('toastMessage');
-        const toastTitle = document.getElementById('toastTitle');
-        const toastBody = document.getElementById('toastBody');
+    function showToast(title, message, type = 'info') {
+        const toastElement = document.getElementById('notificationToast');
+        if (!toastElement) return;
+
+        const toast = new bootstrap.Toast(toastElement, { delay: 4000 });
+        const toastIconArea = toastElement.querySelector('.toast-icon-area');
+        const toastIcon = toastElement.querySelector('#toastIcon');
+        const toastTitle = toastElement.querySelector('#toastTitle');
+        const toastBody = toastElement.querySelector('#toastBody');
+
+        const configs = {
+            success: { icon: 'fa-check-circle', colorClass: 'toast-success' },
+            error: { icon: 'fa-times-circle', colorClass: 'toast-error' },
+            info: { icon: 'fa-info-circle', colorClass: 'toast-info' },
+            warning: { icon: 'fa-exclamation-triangle', colorClass: 'toast-warning' }
+        };
+
+        const config = configs[type] || configs.info;
         
-        // Resetar classes
-        toastElement.className = 'toast';
-        const toastHeader = toastElement.querySelector('.toast-header');
-        
-        // Definir estilo baseado no tipo
-        switch(type) {
-            case 'success':
-                toastHeader.className = 'toast-header bg-success text-white';
-                toastTitle.textContent = 'Sucesso';
-                break;
-            case 'error':
-                toastHeader.className = 'toast-header bg-danger text-white';
-                toastTitle.textContent = 'Erro';
-                break;
-            case 'warning':
-                toastHeader.className = 'toast-header bg-warning text-dark';
-                toastTitle.textContent = 'Atenção';
-                break;
-            case 'info':
-                toastHeader.className = 'toast-header bg-info text-white';
-                toastTitle.textContent = 'Informação';
-                break;
-            default:
-                toastHeader.className = 'toast-header';
-                toastTitle.textContent = 'Notificação';
-        }
-        
+        toastTitle.textContent = title;
         toastBody.textContent = message;
-        
-        // Exibir toast
-        const toast = new bootstrap.Toast(toastElement, {
-            delay: 4000
-        });
+        toastIcon.className = `fas ${config.icon}`;
+        toastIconArea.className = 'toast-icon-area d-flex align-items-center justify-content-center';
+        toastIconArea.classList.add(config.colorClass);
+
         toast.show();
     }
 
@@ -744,599 +744,485 @@
 {% block extra_css %}
 {{ block.super }}
 <style>
-    /* =============================================================================
-    * MODAL DE LOGIN MODERNO - ESTILOS REFATORADOS
-    * ============================================================================= */
+    /*
+=============================================================================
+|                                                                           |
+|                     STYLESHEET DA PÁGINA DE DÚVIDAS (FAQ)                 |
+|                                                                           |
+=============================================================================
+|
+| ÍNDICE DE ESTILOS:
+|
+| 1. COMPONENTES DE FAQ (ACORDEÃO)
+| 2. COMPONENTES DE NAVEGAÇÃO E DESTAQUE
+| 3. COMPONENTE DE NOTIFICAÇÃO (TOAST MODERNO)
+| 4. COMPONENTE DE MODAL (LOGIN)
+| 5. ANIMAÇÕES GLOBAIS (@keyframes)
+| 6. MEDIA QUERIES (Estilos Responsivos)
+|
+\*---------------------------------------------------------------------------*/
 
-    /* Backdrop com desfoque */
-    .modal-backdrop.show {
-        backdrop-filter: blur(10px);
-        background-color: rgba(0, 0, 0, 0.3); /* escurece um pouco o fundo */
+/*
+=============================================================================
+1. COMPONENTES DE FAQ (ACORDEÃO)
+=============================================================================
+*/
+
+/* Container Geral do Item FAQ */
+.accordion-item {
+    margin-bottom: 1.5rem !important;
+    border-radius: 15px !important;
+    overflow: hidden;
+    border: none !important;
+    transition: all 0.4s ease;
+}
+
+.accordion-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(106, 62, 161, 0.1);
+}
+
+/* Botão da Pergunta (Header) */
+.accordion-button {
+    padding: 1.5rem 2rem;
+    background-color: #fff;
+    color: var(--gray-800);
+    font-weight: 600;
+    text-align: left;
+    box-shadow: none;
+    transition: all 0.4s ease;
+    position: relative;
+}
+
+.accordion-button:not(.collapsed) {
+    background: linear-gradient(135deg, var(--primary-very-light) 0%, rgba(255, 255, 255, 0.95) 100%);
+    color: var(--primary-dark);
+    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.02);
+}
+
+.accordion-button:focus {
+    box-shadow: 0 0 0 2px rgba(106, 62, 161, 0.1);
+    border-color: transparent;
+}
+
+/* Indicador de seta do Bootstrap */
+.accordion-button::after {
+    transition: all 0.3s ease;
+}
+
+.accordion-button:not(.collapsed)::after {
+    color: var(--primary);
+    transform: rotate(-180deg) scale(1.1);
+}
+
+/* Corpo da Resposta (Body) */
+.accordion-body {
+    padding: 1rem 2rem 2rem 2rem;
+    background-color: #fff;
+    color: var(--gray-700);
+    font-size: 1.05rem;
+    line-height: 1.8;
+}
+
+.accordion-body p {
+    margin-bottom: 1.2rem;
+}
+
+.accordion-body p:last-child {
+    margin-bottom: 0;
+}
+
+.accordion-body strong {
+    color: var(--primary-dark);
+    font-weight: 600;
+}
+
+.accordion-body a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.accordion-body a:hover {
+    text-decoration: underline;
+}
+
+/* Listas customizadas dentro das respostas */
+.faq-list {
+    background-color: var(--primary-very-light);
+    border-left: 3px solid var(--primary);
+    border-radius: 0 10px 10px 0;
+    padding: 1.2rem 1.2rem 1.2rem 1.5rem;
+    margin: 1rem 0;
+}
+
+.faq-list li {
+    padding: 0.3rem 0;
+}
+
+/* Botão de Salvar FAQ */
+.faq-save-button .btn-icon {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.faq-save-button .btn-icon:hover {
+    transform: scale(1.1);
+    background-color: rgba(106, 62, 161, 0.1);
+}
+
+/* Animação para o corpo do accordion */
+.accordion-body.animate__fadeIn {
+    animation-duration: 0.6s;
+}
+
+/*
+=============================================================================
+2. COMPONENTES DE NAVEGAÇÃO E DESTAQUE
+=============================================================================
+*/
+
+/* Abas de Navegação por Categoria */
+.faq-nav .btn {
+    border-radius: 30px;
+    margin: 4px;
+    font-size: 0.9rem;
+    padding: 0.6rem 1.5rem;
+    box-shadow: 0 5px 10px rgba(106, 62, 161, 0.08);
+    transition: all 0.4s ease;
+}
+
+.faq-nav .btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 15px rgba(106, 62, 161, 0.15);
+}
+
+/* Ícones de Categoria */
+.feature-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+    color: var(--primary);
+    background: linear-gradient(135deg, rgba(106, 62, 161, 0.1), rgba(154, 109, 215, 0.1));
+    border-radius: 50%;
+}
+
+/*
+=============================================================================
+3. COMPONENTE DE NOTIFICAÇÃO (TOAST MODERNO)
+=============================================================================
+*/
+
+.modern-toast {
+    width: 380px;
+    max-width: 100%;
+    background-color: #fff;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.toast-icon-area {
+    flex: 0 0 50px;
+    color: #fff;
+    font-size: 1.5rem;
+    transition: background-color 0.3s ease;
+}
+
+.toast-icon-area.toast-success {
+    background-color: #28a745;
+}
+
+.toast-icon-area.toast-error {
+    background-color: #dc3545;
+}
+
+.toast-icon-area.toast-info {
+    background-color: #0dcaf0;
+}
+
+.toast-icon-area.toast-warning {
+    background-color: #ffc107;
+}
+
+.toast-content-area {
+    flex-grow: 1;
+}
+
+.toast-title {
+    font-weight: 700;
+    color: #343a40;
+}
+
+.toast-message {
+    font-size: 0.9rem;
+    color: #6c757d;
+    line-height: 1.4;
+}
+
+.btn-close-toast {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #f0f0f0;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    color: #6c757d;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.btn-close-toast:hover {
+    background: #e9ecef;
+    color: #343a40;
+}
+
+/*
+=============================================================================
+4. COMPONENTE DE MODAL (LOGIN)
+=============================================================================
+*/
+
+/* Modal Backdrop */
+.modal-backdrop.show {
+    backdrop-filter: blur(10px);
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Modal Dialog */
+.login-modal .modal-dialog {
+    max-width: 440px;
+    margin: 1rem auto;
+}
+
+.login-modal-content {
+    border: 2px solid #ccc;
+    border-radius: 24px;
+    box-shadow: var(--shadow-modern);
+    background: white;
+    overflow: hidden;
+}
+
+/* Modal Header */
+.login-modal .modal-header {
+    position: relative;
+    padding: 1rem 1rem 0;
+}
+
+.btn-close-modern {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.btn-close-modern:hover {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    transform: rotate(90deg);
+}
+
+/* Login Icon */
+.login-icon-wrapper {
+    position: relative;
+}
+
+.login-icon {
+    width: 70px;
+    height: 70px;
+    background: var(--gradient-modern);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    animation: pulse-modern 2s infinite;
+}
+
+.login-icon i {
+    font-size: 1.8rem;
+    color: white;
+}
+
+/* Login Content */
+.login-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+.login-description {
+    font-size: 1rem;
+    color: #6c757d;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+/* Benefits List */
+.benefits-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+}
+
+.benefit-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0.5rem 1rem;
+    background: rgba(106, 62, 161, 0.05);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.benefit-item:hover {
+    background: rgba(106, 62, 161, 0.1);
+    transform: translateX(5px);
+}
+
+.benefit-item i {
+    color: var(--primary);
+    margin-right: 12px;
+    width: 16px;
+    font-size: 0.9rem;
+}
+
+.benefit-item span {
+    font-size: 0.9rem;
+    color: #495057;
+    font-weight: 500;
+}
+
+/* Login Footer */
+.login-footer {
+    border-top: 1px solid #e9ecef;
+    padding-top: 1rem;
+}
+
+.btn-link-modern {
+    background: none;
+    border: none;
+    color: #6c757d;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+}
+
+.btn-link-modern:hover {
+    color: var(--primary);
+    background: rgba(106, 62, 161, 0.05);
+}
+
+/*
+=============================================================================
+5. ANIMAÇÕES GLOBAIS (@keyframes)
+=============================================================================
+*/
+
+@keyframes pulse-modern {
+    0%, 100% {
+        transform: scale(1);
     }
-
-    /* =============================================================================
-    * ESTRUTURA DO MODAL
-    * ============================================================================= */
-
-    .login-modal .modal-dialog {
-        max-width: 440px;
-        margin: 1rem auto;
-        /* Remova o border-radius e overflow daqui */
+    50% {
+        transform: scale(1.05);
     }
+}
 
-    .login-modal-content {
-        border: 2px solid #ccc;
-        border-radius: 24px; /* Aumentado de var(--border-radius) para mais redondo */
-        box-shadow: var(--shadow-modern);
-        background: white;
-        overflow: hidden; /* Mantenha aqui para que o conteúdo siga o arredondamento */
+/*
+=============================================================================
+6. MEDIA QUERIES (Estilos Responsivos)
+=============================================================================
+*/
+
+/* Tablets */
+@media (max-width: 768px) {
+    .accordion-button {
+        padding: 1.2rem 1.5rem;
+        font-size: 1rem;
     }
-
-
-    /* =============================================================================
-    * HEADER DO MODAL
-    * ============================================================================= */
-
-    .modal-header {
-        position: relative;
-        padding: 1rem 1rem 0;
+    
+    .accordion-body {
+        padding: 1.5rem;
+        font-size: 1rem;
     }
-
-    .btn-close-modern {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        background: rgba(0, 0, 0, 0.05);
-        border: none;
-        border-radius: 50%;
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #666;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        z-index: 10;
-    }
-
-    .btn-close-modern:hover {
-        background: rgba(220, 53, 69, 0.1);
-        color: #dc3545;
-        transform: rotate(90deg);
-    }
-
-    /* =============================================================================
-    * ÍCONE PRINCIPAL
-    * ============================================================================= */
-
-    .login-icon-wrapper {
-        position: relative;
-    }
-
-    .login-icon {
-        width: 70px;
-        height: 70px;
-        background: var(--gradient-modern);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto;
-        animation: pulse-modern 2s infinite;
-    }
-
-    .login-icon i {
-        font-size: 1.8rem;
-        color: white;
-    }
-
-    @keyframes pulse-modern {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-    }
-
-    /* =============================================================================
-    * TEXTOS E CONTEÚDO
-    * ============================================================================= */
-
-    .login-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #2c3e50;
+    
+    .feature-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
         margin-bottom: 1rem;
     }
+}
 
-    .login-description {
-        font-size: 1rem;
-        color: #6c757d;
-        line-height: 1.6;
-        margin-bottom: 1.5rem;
+/* Mobile */
+@media (max-width: 576px) {
+    .login-modal .modal-dialog {
+        margin: 1rem;
+        max-width: none;
     }
-
-    /* =============================================================================
-    * LISTA DE BENEFÍCIOS
-    * ============================================================================= */
-
-    .benefits-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.8rem;
-        margin-bottom: 2rem;
+    
+    .modal-body {
+        padding: 1.5rem !important;
     }
-
-    .benefit-item {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        padding: 0.5rem 1rem;
-        background: rgba(106, 62, 161, 0.05);
-        border-radius: 16px; /* Aumentado de 12px para mais redondo */
-        transition: all 0.3s ease;
-    }
-
-    .benefit-item:hover {
-        background: rgba(106, 62, 161, 0.1);
-        transform: translateX(5px);
-    }
-
-    .benefit-item i {
-        color: var(--primary);
-        margin-right: 12px;
-        width: 16px;
-        font-size: 0.9rem;
-    }
-
-    .benefit-item span {
-        font-size: 0.9rem;
-        color: #495057;
-        font-weight: 500;
-    }
-
-    /* =============================================================================
-    * FOOTER DO MODAL
-    * ============================================================================= */
-
-    .login-footer {
-        border-top: 1px solid #e9ecef;
-        padding-top: 1rem;
-    }
-
-    .btn-link-modern {
-        background: none;
-        border: none;
-        color: #6c757d;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        padding: 0.5rem 1rem;
-        border-radius: 30px; /* Aumentado de 25px para mais redondo */
-    }
-
-    .btn-link-modern:hover {
-        color: var(--primary);
-        background: rgba(106, 62, 161, 0.05);
-    }
-
-    /* =============================================================================
-    * TOAST NOTIFICATIONS
-    * ============================================================================= */
-
-    .modern-toast {
-        border: none;
-        border-radius: 16px; /* Aumentado de 12px para mais redondo */
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        backdrop-filter: blur(10px);
-        background: rgba(255, 255, 255, 0.95);
-    }
-
-    .toast-icon {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .toast-success .toast-icon {
-        background: #28a745;
-        color: white;
-    }
-
-    .toast-error .toast-icon {
-        background: #dc3545;
-        color: white;
-    }
-
-    .toast-warning .toast-icon {
-        background: #ffc107;
-        color: #212529;
-    }
-
-    .toast-info .toast-icon {
-        background: #17a2b8;
-        color: white;
-    }
-
-    /* =============================================================================
-    * RESPONSIVIDADE
-    * ============================================================================= */
-
-    @media (max-width: 576px) {
-        .login-modal .modal-dialog {
-            margin: 1rem;
-            max-width: none;
-        }
-        
-        .modal-body {
-            padding: 1.5rem !important;
-        }
-        
-        .login-icon {
-            width: 60px;
-            height: 60px;
-        }
-        
-        .login-icon i {
-            font-size: 1.5rem;
-        }
-        
-        .login-title {
-            font-size: 1.3rem;
-        }
-        
-        .login-description {
-            font-size: 0.9rem;
-        }
-        
-        .benefit-item {
-            padding: 0.4rem 0.8rem;
-        }
-        
-        .benefit-item span {
-            font-size: 0.85rem;
-        }
-        
-        .btn-login, .btn-register {
-            padding: 10px 20px;
-            font-size: 0.9rem;
-        }
-    }
-
-    /* =============================================================================
-     * BOTÕES DO ACCORDION - CABEÇALHO DAS PERGUNTAS
-     * ============================================================================= */
-
-    .accordion-button {
-        /* Layout e espaçamento */
-        padding: 1.5rem 2rem;
-        border-radius: 15px !important;
-        
-        /* Aparência visual */
-        background-color: #fff;
-        color: var(--gray-800);
-        font-weight: 600;
-        box-shadow: none;
-        
-        /* Animações e transições */
-        transition: all 0.4s ease;
-        
-        /* Posicionamento para pseudo-elementos */
-        position: relative;
-        overflow: hidden;
-    }
-
-    /* Indicador lateral esquerdo (barra colorida) */
-    .accordion-button::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 4px;
-        background: linear-gradient(to bottom, var(--primary), var(--primary-light));
-        opacity: 0;
-        transition: all 0.3s ease;
-    }
-
-    /* Estado expandido do botão */
-    .accordion-button:not(.collapsed) {
-        background: linear-gradient(135deg, var(--primary-very-light) 0%, rgba(255, 255, 255, 0.95) 100%);
-        color: var(--primary-dark);
-        box-shadow: 0 10px 20px rgba(106, 62, 161, 0.05);
-        transform: translateY(-2px);
-    }
-
-    /* Mostrar indicador lateral quando expandido */
-    .accordion-button:not(.collapsed)::before {
-        opacity: 1;
-    }
-
-    /* Ícone de seta quando expandido */
-    .accordion-button:not(.collapsed)::after {
-        color: var(--primary);
-        transform: rotate(180deg) scale(1.2);
-        filter: none;
-    }
-
-    /* Estado de foco para acessibilidade */
-    .accordion-button:focus {
-        box-shadow: 0 0 0 2px rgba(106, 62, 161, 0.1);
-        border-color: transparent;
-    }
-
-    /* Efeito hover */
-    .accordion-button:hover {
-        background-color: var(--primary-very-light);
-        transform: translateY(-2px);
-    }
-
-    /* =============================================================================
-     * CORPO DO ACCORDION - CONTEÚDO DAS RESPOSTAS
-     * ============================================================================= */
-
-    .accordion-body {
-        /* Layout e espaçamento */
-        padding: 2rem;
-        border-radius: 0 0 15px 15px;
-        
-        /* Aparência visual */
-        background-color: #fff;
-        color: var(--gray-700);
-        font-size: 1.05rem;
-        line-height: 1.8;
-        box-shadow: 0 10px 20px rgba(106, 62, 161, 0.03);
-        
-        /* Posicionamento */
-        position: relative;
-    }
-
-    /* Espaçamento entre parágrafos */
-    .accordion-body p {
-        margin-bottom: 1.2rem;
-        text-align: justify;
-    }
-
-    .accordion-body p:last-child {
-        margin-bottom: 0;
-    }
-
-    /* Formatação de listas */
-    .accordion-body ul,
-    .accordion-body ol {
-        padding-left: 1.5rem;
-        margin-bottom: 1.2rem;
-    }
-
-    .accordion-body ul li,
-    .accordion-body ol li {
-        margin-bottom: 0.5rem;
-    }
-
-    /* Destaque para texto em negrito */
-    .accordion-body strong,
-    .accordion-body b {
-        color: var(--primary-dark);
-        font-weight: 600;
-    }
-
-    /* =============================================================================
-     * LINKS DENTRO DO CONTEÚDO
-     * ============================================================================= */
-
-    .accordion-body a {
-        color: var(--primary);
-        text-decoration: none;
-        position: relative;
-        display: inline-block;
-    }
-
-    /* Efeito de sublinhado animado */
-    .accordion-body a::after {
-        content: '';
-        position: absolute;
-        bottom: -2px;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background: linear-gradient(to right, var(--primary), var(--primary-light));
-        transform: scaleX(0);
-        transform-origin: right;
-        transition: transform 0.3s ease;
-    }
-
-    .accordion-body a:hover::after {
-        transform: scaleX(1);
-        transform-origin: left;
-    }
-
-    /* =============================================================================
-     * NAVEGAÇÃO E BOTÕES DE AÇÃO
-     * ============================================================================= */
-
-    /* Botões de navegação das categorias */
-    .faq-nav .btn {
-        border-radius: 30px;
-        margin: 0 4px;
-        font-size: 0.9rem;
-        padding: 0.6rem 1.5rem;
-        box-shadow: 0 5px 10px rgba(106, 62, 161, 0.1);
-        transition: all 0.4s ease;
-    }
-
-    .faq-nav .btn:hover {
-        transform: translateY(-3px) scale(1.05);
-        box-shadow: 0 8px 15px rgba(106, 62, 161, 0.15);
-    }
-
-    .faq-nav .btn:active {
-        transform: translateY(-1px);
-    }
-
-    /* Botões de ação (ícones) */
-    .faq-actions .btn-icon {
-        padding: 0.4rem;
-        font-size: 1rem;
-        border-radius: 50%;
-        line-height: 1;
-    }
-
-    /* Remover bordas padrão dos botões outline */
-    .faq-actions .btn-outline-primary {
-        border: none;
-        background: transparent;
-        box-shadow: none;
-    }
-
-    /* Efeito hover para botões de ação */
-    .faq-actions .btn-icon:hover {
-        transform: translateY(-2px);
-        background-color: rgba(106, 62, 161, 0.1);
-        box-shadow: none;
-    }
-
-    /* =============================================================================
-     * ITENS DO ACCORDION - CONTAINER PRINCIPAL
-     * ============================================================================= */
-
-    .accordion-item {
-        margin-bottom: 1.5rem !important;
-        transition: all 0.4s ease;
-    }
-
-    .accordion-item:hover {
-        transform: translateY(-3px);
-    }
-
-    /* =============================================================================
-     * ANIMAÇÕES E EFEITOS ESPECIAIS
-     * ============================================================================= */
-
-    /* Animação de fade-in para conteúdo */
-    .accordion-body.animate__fadeIn {
-        animation-duration: 0.6s;
-    }
-
-    /* Efeito de destaque quando FAQ é aberta */
-    .accordion-collapse.show .accordion-body {
-        animation: highlightFaq 1.5s ease;
-    }
-
-    @keyframes highlightFaq {
-        0% {
-            background-color: var(--primary-very-light);
-        }
-        100% {
-            background-color: #fff;
-        }
-    }
-
-    /* Efeito Ripple para botões */
-    .ripple-effect {
-        position: absolute;
-        border-radius: 50%;
-        background-color: rgba(255, 255, 255, 0.7);
-        width: 100px;
-        height: 100px;
-        margin-top: -50px;
-        margin-left: -50px;
-        animation: ripple 1s;
-        opacity: 0;
-    }
-
-    @keyframes ripple {
-        from {
-            opacity: 1;
-            transform: scale(0);
-        }
-        to {
-            opacity: 0;
-            transform: scale(10);
-        }
-    }
-
-    /* =============================================================================
-     * ELEMENTOS DE DESTAQUE E FORMATAÇÃO
-     * ============================================================================= */
-
-    /* Texto destacado/marcado */
-    mark {
-        padding: 0.2em 0.4em;
-        border-radius: 4px;
-        background-color: rgba(255, 214, 10, 0.3);
-    }
-
-    /* Ícones de categoria */
-    .feature-icon {
-        /* Dimensões e posicionamento */
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+    
+    .login-icon {
         width: 60px;
         height: 60px;
-        
-        /* Aparência visual */
+    }
+    
+    .login-icon i {
         font-size: 1.5rem;
-        color: var(--primary);
-        background: linear-gradient(135deg, rgba(106, 62, 161, 0.1) 0%, rgba(154, 109, 215, 0.1) 100%);
-        border-radius: 50%;
-        box-shadow: 0 5px 15px rgba(106, 62, 161, 0.1);
-        
-        /* Espaçamento e animações */
-        margin-bottom: 1.5rem;
-        transition: all 0.4s ease;
     }
-
-    .feature-icon:hover {
-        transform: rotateY(180deg);
-        background-color: var(--primary);
-        color: white;
+    
+    .login-title {
+        font-size: 1.3rem;
     }
-
-    /* =============================================================================
-     * LISTAS ESPECIALIZADAS
-     * ============================================================================= */
-
-    /* Container para listas dentro de FAQs */
-    .faq-list {
-        background-color: var(--primary-very-light);
-        border-radius: 10px;
-        padding: 1.2rem 1.2rem 1.2rem 2.5rem;
+    
+    .login-description {
+        font-size: 0.9rem;
     }
-
-    .faq-list li {
-        padding: 0.3rem 0;
+    
+    .benefit-item {
+        padding: 0.4rem 0.8rem;
     }
-
-    /* =============================================================================
-     * RESPONSIVIDADE - DISPOSITIVOS MÓVEIS
-     * ============================================================================= */
-
-    @media (max-width: 768px) {
-        /* Ajustes para botões do accordion */
-        .accordion-button {
-            padding: 1.2rem 1.5rem;
-            font-size: 1rem;
-        }
-
-        /* Ajustes para corpo do accordion */
-        .accordion-body {
-            padding: 1.5rem;
-            font-size: 1rem;
-        }
-
-        /* Ajustes para ícones de categoria */
-        .feature-icon {
-            width: 50px;
-            height: 50px;
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-        }
+    
+    .benefit-item span {
+        font-size: 0.85rem;
     }
-
-    /* =============================================================================
-     * FIM DOS ESTILOS FAQ
-     * ============================================================================= */
+    
+    .btn-login, .btn-register {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+}
 </style>
 {% endblock %}
