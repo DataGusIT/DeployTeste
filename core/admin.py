@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.utils.html import format_html 
 from .models import CategoriaFAQ, CategoriaContato, CategoriaFerramenta, FAQ, Contato, Ferramenta, CustomUser, UserDownload, UserSavedFAQ, FotoContato, UserSavedContato
 
 # =============================================================================
@@ -20,8 +21,16 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(CategoriaFAQ)
 class CategoriaFAQAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'icone')
+    # Adicionamos 'display_icone' para mostrar o ícone na lista
+    list_display = ('nome', 'display_icone') 
     search_fields = ('nome',)
+    
+    @admin.display(description='Ícone Atual')
+    def display_icone(self, obj):
+        # Renderiza a tag <i> com a classe do ícone escolhido
+        if obj.icone:
+            return format_html('<i class="{}" style="font-size: 20px;"></i>', obj.icone)
+        return "Nenhum"
 
 @admin.register(FAQ)
 class FAQAdmin(admin.ModelAdmin):
@@ -64,8 +73,16 @@ class UserSavedFAQAdmin(admin.ModelAdmin):
 
 @admin.register(CategoriaContato)
 class CategoriaContatoAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'icone')
+    # Adicionamos 'display_icone' também aqui
+    list_display = ('nome', 'display_icone')
     search_fields = ('nome',)
+
+    @admin.display(description='Ícone Atual')
+    def display_icone(self, obj):
+        # Reutilizamos a mesma lógica
+        if obj.icone:
+            return format_html('<i class="{}" style="font-size: 20px;"></i>', obj.icone)
+        return "Nenhum"
 
 class FotoContatoInline(admin.TabularInline):
     model = FotoContato

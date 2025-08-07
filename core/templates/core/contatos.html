@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load query_tags %}
 
 {% block content %}
 
@@ -109,141 +110,148 @@
             </div>
         </div>
 
-        {% if contatos_por_categoria %}
-            <div class="row mb-4">
-                <div class="col-12">
-                    <nav class="contact-nav d-flex justify-content-center flex-wrap">
-                        {% for categoria_nome in contatos_por_categoria.keys %}
-                            <a href="#{{ categoria_nome|lower|slugify }}" class="btn btn-sm btn-outline-primary m-1">
-                                {{ categoria_nome }}
-                            </a>
-                        {% endfor %}
-                    </nav>
-                </div>
-            </div>
+        {# Verificação se há algum conteúdo para mostrar #}
+        {% if contatos_por_categoria_paginada %}
+            
+            {# Loop principal pelas categorias da página #}
+            {% for categoria, dados in contatos_por_categoria_paginada.items %}
+                {% with contatos_page_obj=dados.contatos_page_obj query_param_name=dados.query_param_name %}
 
-            {% for categoria_nome, contatos_list in contatos_por_categoria.items %}
-                <div class="contato-category mb-5" id="{{ categoria_nome|lower|slugify }}">
-                    <div class="category-header">
-                        <div class="category-icon">
-                            <i class="fas fa-building text-primary fs-3"></i>
-                        </div>
-                        <h3 class="mb-0">{{ categoria_nome }}</h3>
-                    </div>
+                    {# Só exibe a categoria se ela tiver contatos nesta página #}
+                    {% if contatos_page_obj %}
+                        <div class="contato-category mb-5" id="{{ categoria.nome|lower|slugify }}">
+                            <div class="category-header">
+                                <div class="category-icon">
+                                    <i class="{{ categoria.icone }} text-primary fs-3"></i>
+                                </div>
+                                <h3 class="mb-0">{{ categoria.nome }}</h3>
+                            </div>
 
-                    <div class="row g-4">
-                        {% for contato in contatos_list %}
-                            <div class="col-md-6 col-lg-4 contato-item">
-                                <div class="card h-100 border-0 shadow-sm hover-card">
-                                    
-                                    <div class="card-img-top position-relative">
-                                        {% if contato.imagem %}
-                                            <img src="{{ contato.imagem.url }}" 
-                                                 alt="{{ contato.nome }}" 
-                                                 class="img-fluid rounded-top"
-                                                 style="height: 200px; width: 100%; object-fit: cover;">
-                                        {% else %}
-                                            <img src="{% static 'img/default-contact.jpg' %}" 
-                                                 alt="{{ contato.nome }}"
-                                                 class="img-fluid rounded-top" 
-                                                 style="height: 200px; width: 100%; object-fit: cover;">
-                                        {% endif %}
-                                        
-                                        {% if user.is_authenticated %}
-                                            {% if contato.id in contatos_salvos_ids %}
-                                                <button type="button" 
-                                                        class="btn btn-save-contact saved"
-                                                        data-contato-id="{{ contato.id }}"
-                                                        onclick="removerContato({{ contato.id }})"
-                                                        title="Remover dos salvos">
-                                                    <i class="fas fa-bookmark"></i>
-                                                </button>
-                                            {% else %}
-                                                <button type="button" 
-                                                        class="btn btn-save-contact"
-                                                        data-contato-id="{{ contato.id }}"
-                                                        onclick="salvarContato({{ contato.id }})"
-                                                        title="Salvar contato">
-                                                    <i class="far fa-bookmark"></i>
-                                                </button>
-                                            {% endif %}
-                                        {% else %}
-                                            <button type="button" 
-                                                    class="btn btn-save-contact"
-                                                    onclick="showLoginRequired()"
-                                                    title="Faça login para salvar">
-                                                <i class="far fa-bookmark"></i>
-                                            </button>
-                                        {% endif %}
-
-                                        <div class="position-absolute bottom-0 start-0 p-3">
-                                            <span class="badge bg-primary">{{ contato.categoria.nome }}</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <h5 class="card-title mb-0">{{ contato.nome }}</h5>
-                                        </div>
-                                        
-                                        <p class="card-text text-muted mb-3">
-                                            {{ contato.descricao|truncatechars:80 }}
-                                        </p>
-
-                                        <div class="contact-info-item mb-2">
-                                            <div class="contact-info-icon">
-                                                <i class="fas fa-map-marker-alt text-primary"></i>
-                                            </div>
-                                            <small>
-                                                {% if contato.rua %}
-                                                    {{ contato.rua }}{% if contato.numero %}, {{ contato.numero }}{% endif %}
-                                                    {% if contato.bairro %} - {{ contato.bairro }}{% endif %}<br>
+                            <div class="row g-4">
+                                {# Loop pelos contatos DA PÁGINA DE CONTATOS ATUAL #}
+                                {% for contato in contatos_page_obj %}
+                                    <div class="col-md-6 col-lg-4 contato-item">
+                                        <div class="card h-100 border-0 shadow-sm hover-card">
+                                            
+                                            <div class="card-img-top position-relative">
+                                                {% if contato.imagem %}
+                                                    <img src="{{ contato.imagem.url }}" alt="{{ contato.nome }}" class="img-fluid rounded-top" style="height: 200px; width: 100%; object-fit: cover;">
+                                                {% else %}
+                                                    <img src="{% static 'img/default-contact.jpg' %}" alt="{{ contato.nome }}" class="img-fluid rounded-top" style="height: 200px; width: 100%; object-fit: cover;">
                                                 {% endif %}
-                                                {{ contato.cidade }}, {{ contato.estado }}
-                                                {% if contato.cep %}<br>CEP: {{ contato.cep }}{% endif %}
-                                            </small>
-                                        </div>
-                                        <div class="contact-info-item mb-2">
-                                            <div class="contact-info-icon">
-                                                <i class="fas fa-phone text-primary"></i>
-                                            </div>
-                                            <small>{{ contato.telefone }}</small>
-                                        </div>
-                                        <div class="contact-info-item mb-3">
-                                            <div class="contact-info-icon">
-                                                <i class="fas fa-clock text-primary"></i>
-                                            </div>
-                                            <small>{{ contato.horario_funcionamento }}</small>
-                                        </div>
+                                                
+                                                {% if user.is_authenticated %}
+                                                    {% if contato.id in contatos_salvos_ids %}
+                                                        <button type="button" class="btn btn-save-contact saved" data-contato-id="{{ contato.id }}" onclick="removerContato({{ contato.id }})" title="Remover dos salvos"><i class="fas fa-bookmark"></i></button>
+                                                    {% else %}
+                                                        <button type="button" class="btn btn-save-contact" data-contato-id="{{ contato.id }}" onclick="salvarContato({{ contato.id }})" title="Salvar contato"><i class="far fa-bookmark"></i></button>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <button type="button" class="btn btn-save-contact" onclick="showLoginRequired()" title="Faça login para salvar"><i class="far fa-bookmark"></i></button>
+                                                {% endif %}
 
-                                        <div class="card-action-area">
-                                            <div class="mb-3">
-                                                {% if contato.atendimento_presencial %}
-                                                    <span class="badge bg-success me-1">
-                                                        <i class="fas fa-building me-1"></i>Presencial
-                                                    </span>
-                                                {% endif %}
-                                                {% if contato.atendimento_online %}
-                                                    <span class="badge bg-info">
-                                                        <i class="fas fa-laptop me-1"></i>Online
-                                                    </span>
-                                                {% endif %}
+                                                <div class="position-absolute bottom-0 start-0 p-3">
+                                                    <span class="badge bg-primary">{{ contato.categoria.nome }}</span>
+                                                </div>
                                             </div>
                                             
-                                            <div class="d-flex gap-2 flex-wrap">
-                                                <a href="{% url 'detalhes_contato' contato.id %}" 
-                                                   class="btn btn-sm btn-outline-primary flex-fill">
-                                                    <i class="fas fa-eye me-1"></i>Ver detalhes
-                                                </a>
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="card-title mb-0">{{ contato.nome }}</h5></div>
+                                                <p class="card-text text-muted mb-3">{{ contato.descricao|truncatechars:80 }}</p>
+                                                <div class="contact-info-item mb-2">
+                                                    <div class="contact-info-icon"><i class="fas fa-map-marker-alt text-primary"></i></div>
+                                                    <small>
+                                                        {% if contato.rua %}{{ contato.rua }}{% if contato.numero %}, {{ contato.numero }}{% endif %}{% if contato.bairro %} - {{ contato.bairro }}{% endif %}<br>{% endif %}
+                                                        {{ contato.cidade }}, {{ contato.estado }}{% if contato.cep %}<br>CEP: {{ contato.cep }}{% endif %}
+                                                    </small>
+                                                </div>
+                                                <div class="contact-info-item mb-2">
+                                                    <div class="contact-info-icon"><i class="fas fa-phone text-primary"></i></div>
+                                                    <small>{{ contato.telefone }}</small>
+                                                </div>
+                                                <div class="contact-info-item mb-3">
+                                                    <div class="contact-info-icon"><i class="fas fa-clock text-primary"></i></div>
+                                                    <small>{{ contato.horario_funcionamento }}</small>
+                                                </div>
+                                                <div class="card-action-area">
+                                                    <div class="mb-3">
+                                                        {% if contato.atendimento_presencial %}<span class="badge bg-success me-1"><i class="fas fa-building me-1"></i>Presencial</span>{% endif %}
+                                                        {% if contato.atendimento_online %}<span class="badge bg-info"><i class="fas fa-laptop me-1"></i>Online</span>{% endif %}
+                                                    </div>
+                                                    <div class="d-flex gap-2 flex-wrap"><a href="{% url 'detalhes_contato' contato.id %}" class="btn btn-sm btn-outline-primary flex-fill"><i class="fas fa-eye me-1"></i>Ver detalhes</a></div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                {% endfor %}
                             </div>
-                        {% endfor %}
-                    </div>
-                </div>
+
+                            <!-- ============================================= -->
+                            <!--      PAGINAÇÃO DOS CONTATOS (ANINHADA)      -->
+                            <!-- ============================================= -->
+                            <!-- PAGINAÇÃO DOS CONTATOS (ANINHADA) - VERSÃO CORRIGIDA -->
+                            {% if contatos_page_obj.paginator.num_pages > 1 %}
+                            <nav aria-label="Navegação de contatos para {{ categoria.nome }}" class="mt-4">
+                                <ul class="pagination pagination-sm justify-content-center">
+                                    {% if contatos_page_obj.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?{% build_query query_param_name contatos_page_obj.previous_page_number %}">&laquo;</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1">&laquo;</a></li>
+                                    {% endif %}
+
+                                    {% for i in contatos_page_obj.paginator.page_range %}
+                                        {% if contatos_page_obj.number == i %}
+                                            <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                                        {% else %}
+                                            <li class="page-item"><a class="page-link" href="?{% build_query query_param_name i %}">{{ i }}</a></li>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {% if contatos_page_obj.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?{% build_query query_param_name contatos_page_obj.next_page_number %}">&raquo;</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1">&raquo;</a></li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                            {% endif %}
+                            <!-- ============================================= -->
+                        </div>
+                    {% endif %}
+                {% endwith %}
             {% endfor %}
+
+            <!-- =============================================================================
+            PAGINAÇÃO PRINCIPAL DAS CATEGORIAS (COM CLASSES ATUALIZADAS)
+            ============================================================================= -->
+            {% if page_obj.has_other_pages %}
+            <nav aria-label="Navegação das páginas de categorias" class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        {# Adicionamos a classe 'main-pagination-item' aqui #}
+                        <li class="page-item main-pagination-item">
+                            <a class="page-link" href="?{% query_transform page=page_obj.previous_page_number %}">&laquo; Categorias Anteriores</a>
+                        </li>
+                    {% endif %}
+                    
+                    {# E aqui também #}
+                    <li class="page-item main-pagination-item disabled">
+                        <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                    </li>
+                    
+                    {% if page_obj.has_next %}
+                        {# E finalmente aqui #}
+                        <li class="page-item main-pagination-item">
+                            <a class="page-link" href="?{% query_transform page=page_obj.next_page_number %}">Próximas Categorias &raquo;</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
 
         {% else %}
             <div class="row">
@@ -252,8 +260,7 @@
                         <i class="fas fa-info-circle fa-2x mb-3"></i>
                         <h4>Nenhum contato encontrado</h4>
                         <p class="mb-0">
-                            Não há contatos cadastrados no momento. Entre em contato com o administrador para mais
-                            informações.
+                            Não há contatos cadastrados no momento. Entre em contato com o administrador para mais informações.
                         </p>
                     </div>
                 </div>
@@ -265,16 +272,8 @@
                 <div class="card cta-card border-0 shadow">
                     <div class="card-body p-5 text-center text-white">
                         <h4 class="mb-3">Conhece algum profissional ou instituição especializada?</h4>
-                        <p class="mb-4">
-                            Ajude a ampliar nossa rede de apoio indicando contatos que possam auxiliar
-                            famílias e pessoas com TEA.
-                        </p>
-                        <button type="button" 
-                                class="btn cta-btn" 
-                                data-bs-toggle="modal"
-                                data-bs-target="#sugerirContatoModal">
-                            <i class="fas fa-plus-circle me-2"></i>Sugerir contato
-                        </button>
+                        <p class="mb-4">Ajude a ampliar nossa rede de apoio indicando contatos que possam auxiliar famílias e pessoas com TEA.</p>
+                        <button type="button" class="btn cta-btn" data-bs-toggle="modal" data-bs-target="#sugerirContatoModal"><i class="fas fa-plus-circle me-2"></i>Sugerir contato</button>
                     </div>
                 </div>
             </div>
@@ -1168,5 +1167,102 @@ ESTRUTURA GERAL DO CSS
         transform: translateY(-8px);
     }
 }
+/*
+=============================================================================
+8. CORREÇÃO PARA PAGINAÇÃO PRINCIPAL (BOTÕES DE TEXTO)
+=============================================================================
+*/
+
+/* Container principal da paginação */
+        .pagination {
+            /* Usamos 'gap' para um espaçamento moderno entre os botões */
+            gap: 8px;
+        }
+
+        /* Removemos as margens padrão do Bootstrap para usar o 'gap' */
+        .pagination .page-item {
+            margin: 0 !important;
+        }
+
+        /* Estilo base para todos os links da paginação */
+        .pagination .page-link {
+            border-radius: 50%; /* Deixa os botões perfeitamente circulares */
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            border: 2px solid #e9ecef; /* Uma borda neutra e clara */
+            color: var(--primary);
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        /* Efeito de hover para botões clicáveis (que não estão ativos nem desabilitados) */
+        .pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+            background-color: rgba(106, 62, 161, 0.05); /* Um fundo roxo bem claro */
+            box-shadow: 0 5px 15px rgba(106, 62, 161, 0.15);
+            color: var(--primary);
+        }
+
+        /* Estilo para o item ATIVO (página atual) */
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(45deg, var(--primary), var(--primary-light));
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(106, 62, 161, 0.3);
+            transform: scale(1.05); /* Deixa o botão ativo um pouco maior */
+        }
+
+        /* Estilo para itens DESABILITADOS (primeira/última página) */
+        .pagination .page-item.disabled .page-link {
+            background-color: #f8f9fa;
+            color: #adb5bd;
+            border-color: #e9ecef;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* Ajustes para a paginação menor (aninhada) */
+        .pagination-sm .page-link {
+            width: 36px;
+            height: 36px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-width: 1px;
+        }
+
+        /* Estilo para a paginação principal de categorias (links de texto) */
+        .pagination a[href*="Categorias"] {
+            width: auto;
+            padding: 0 1.5rem;
+            border-radius: 50px; /* Formato de pílula */
+        }
+
+        /* Seleciona o link/span dentro do item com a nossa nova classe */
+        .main-pagination-item .page-link {
+            width: auto;      /* Largura automática baseada no conteúdo */
+            height: auto;     /* Altura automática baseada no conteúdo */
+            border-radius: 50px; /* Transforma em formato de pílula */
+            padding: 0.5rem 1.2rem; /* Espaçamento interno para conforto visual */
+            white-space: nowrap; /* Impede que o texto quebre em duas linhas */
+        }
+        
+        /* Garante que o item ativo da paginação principal também fique como pílula */
+        .main-pagination-item.active .page-link,
+        .main-pagination-item.disabled .page-link {
+            transform: scale(1); /* Remove o efeito de escala do botão circular */
+        }
+
+        /* Efeito de hover específico para as pílulas */
+        .page-item.main-pagination-item:not(.disabled) .page-link:hover {
+            background-color: var(--primary); /* Fica roxo sólido no hover */
+            color: #fff;
+        }
 </style>
 {% endblock %}

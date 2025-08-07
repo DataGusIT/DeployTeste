@@ -1,13 +1,45 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
+# =============================================================================
+# LISTA DE ÍCONES PREDEFINIDOS PARA O ADMIN
+# Formato: (valor_no_banco, 'Rótulo no Admin')
+# =============================================================================
+ICON_CHOICES = [
+    # Ícones para FAQ
+    ('fas fa-book-open', 'Livro Aberto (Definições, Contexto)'),
+    ('fas fa-stethoscope', 'Estetoscópio (Diagnóstico, Tratamento)'),
+    ('fas fa-gavel', 'Martelo (Legislação, Direitos)'),
+    ('fas fa-graduation-cap', 'Chapéu de Formatura (Educação)'),
+    ('fas fa-comment-medical', 'Balão de Fala (Terapias)'),
+    
+    # Ícones para Contatos
+    ('fas fa-hands-helping', 'Mãos Ajudando (Apoio, ONGs)'),
+    ('fas fa-clinic-medical', 'Clínica (Clínicas, Hospitais)'),
+    ('fas fa-user-md', 'Médico (Profissionais de Saúde)'),
+    ('fas fa-users', 'Grupo de Pessoas (Grupos de Apoio)'),
+    ('fas fa-building-ngo', 'Prédio (Associações)'),
+
+    # Ícones Gerais
+    ('fas fa-info-circle', 'Círculo de Informação (Geral)'),
+    ('fas fa-question-circle', 'Círculo de Interrogação (Padrão)'),
+    ('fas fa-tools', 'Ferramentas (Ferramentas)'),
+]
+
 # =============================================================================
 # CATEGORIA BASE (ABSTRATA)
 # =============================================================================
 
 class CategoriaBase(models.Model):
     nome = models.CharField(max_length=100)
-    icone = models.CharField(max_length=50, blank=True, null=True)
+    # AGORA UM CAMPO DE ESCOLHA!
+    icone = models.CharField(
+        max_length=50, 
+        choices=ICON_CHOICES, # Usa a lista de ícones como opções
+        default='fas fa-question-circle', # Ícone padrão
+        verbose_name='Ícone'
+    )
     
     class Meta:
         abstract = True
@@ -38,16 +70,6 @@ class CategoriaFAQ(CategoriaBase):
     class Meta:
         verbose_name = 'Categoria de Dúvida'
         verbose_name_plural = 'Categorias de Dúvidas'
-    
-    def get_icone(self):
-        icones = {
-            'Geral': 'fas fa-info-circle',
-            'Diagnóstico': 'fas fa-stethoscope',
-            'Tratamento': 'fas fa-heartbeat',
-            'Apoio': 'fas fa-hands-helping',
-            'Conceitos': 'fas fa-book',
-        }
-        return icones.get(self.nome, 'fas fa-question-circle')
 
 class FAQ(models.Model):
     categoria = models.ForeignKey(CategoriaFAQ, on_delete=models.CASCADE, related_name='faqs')
@@ -96,6 +118,7 @@ class CategoriaContato(CategoriaBase):
     class Meta:
         verbose_name = 'Categoria de Contato'
         verbose_name_plural = 'Categorias de Contatos'
+
 
 class Contato(models.Model):
     nome = models.CharField(max_length=200)
@@ -252,4 +275,3 @@ class UserDownload(models.Model):
         verbose_name = 'Download'
         verbose_name_plural = 'Downloads'
         ordering = ['-data_download']
-
