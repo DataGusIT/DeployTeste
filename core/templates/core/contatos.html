@@ -1157,6 +1157,35 @@ ESTRUTURA GERAL DO CSS
     }
 }
 
+@media (max-width: 768px) {
+    
+    /* Seleciona o container que envolve os botões de "Filtrar" e "Limpar" */
+    #filtro-section .col-12.text-end {
+        /* Converte o container em flexbox para controlar o alinhamento */
+        display: flex;
+        
+        /* Empilha os botões verticalmente */
+        flex-direction: column;
+        
+        /* Centraliza os botões na horizontal */
+        align-items: center;
+        
+        /* Cria o espaçamento vertical entre os botões */
+        gap: 12px;
+        
+        /* Adiciona um espaço acima do primeiro botão para separá-lo dos selects */
+        margin-top: 1rem;
+    }
+
+    /* Faz os botões ocuparem uma largura agradável e consistente */
+    #filtro-section #btnFiltrar,
+    #filtro-section #btnLimpar {
+        width: 100%;
+        max-width: 350px; /* Define uma largura máxima para não ficarem esticados demais */
+        margin: 0; /* Remove qualquer margem lateral que possa existir */
+    }
+}
+
 /* Desktop Grande */
 @media (min-width: 1200px) {
     .hover-card:hover {
@@ -1167,102 +1196,148 @@ ESTRUTURA GERAL DO CSS
         transform: translateY(-8px);
     }
 }
+
 /*
 =============================================================================
-8. CORREÇÃO PARA PAGINAÇÃO PRINCIPAL (BOTÕES DE TEXTO)
+8. CORREÇÃO DE PAGINAÇÃO (VERSÃO FINAL CORRIGIDA E RESPONSIVA)
 =============================================================================
 */
 
-/* Container principal da paginação */
-        .pagination {
-            /* Usamos 'gap' para um espaçamento moderno entre os botões */
-            gap: 8px;
-        }
+/* --- A. ESTILOS GERAIS DO CONTAINER --- */
+.pagination {
+    display: flex;
+    flex-wrap: wrap; /* Permite que os botões quebrem a linha em telas médias */
+    justify-content: center;
+    gap: 8px; /* Espaçamento entre todos os botões */
+    list-style: none;
+    padding-left: 0;
+}
 
-        /* Removemos as margens padrão do Bootstrap para usar o 'gap' */
-        .pagination .page-item {
-            margin: 0 !important;
-        }
+.pagination .page-item {
+    margin: 0 !important; /* Remove margens padrão para usar 'gap' */
+}
 
-        /* Estilo base para todos os links da paginação */
-        .pagination .page-link {
-            border-radius: 50%; /* Deixa os botões perfeitamente circulares */
-            width: 42px;
-            height: 42px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            border: 2px solid #e9ecef; /* Uma borda neutra e clara */
-            color: var(--primary);
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-            font-size: 0.95rem;
-        }
+/* --- B. ESTILOS PARA PAGINAÇÃO NUMÉRICA (CÍRCULOS) --- */
+/* A regra :not(.main-pagination-item) é a chave!
+   Ela aplica estes estilos apenas aos botões que NÃO são da paginação de texto. */
+.pagination .page-item:not(.main-pagination-item) .page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%; /* Perfeitamente circular */
+    font-weight: 600;
+    border: 2px solid #e9ecef;
+    color: var(--primary);
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
 
-        /* Efeito de hover para botões clicáveis (que não estão ativos nem desabilitados) */
-        .pagination .page-item:not(.active):not(.disabled) .page-link:hover {
-            transform: translateY(-3px);
-            border-color: var(--primary);
-            background-color: rgba(106, 62, 161, 0.05); /* Um fundo roxo bem claro */
-            box-shadow: 0 5px 15px rgba(106, 62, 161, 0.15);
-            color: var(--primary);
-        }
+/* Hover para botões numéricos */
+.pagination .page-item:not(.main-pagination-item):not(.active):not(.disabled) .page-link:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary);
+    box-shadow: 0 5px 15px rgba(106, 62, 161, 0.15);
+}
 
-        /* Estilo para o item ATIVO (página atual) */
-        .pagination .page-item.active .page-link {
-            background: linear-gradient(45deg, var(--primary), var(--primary-light));
-            color: #fff;
-            border-color: var(--primary);
-            box-shadow: 0 5px 15px rgba(106, 62, 161, 0.3);
-            transform: scale(1.05); /* Deixa o botão ativo um pouco maior */
-        }
+/* Estilo ATIVO para botões numéricos */
+.pagination .page-item:not(.main-pagination-item).active .page-link {
+    background: linear-gradient(45deg, var(--primary), var(--primary-light));
+    color: #fff;
+    border-color: var(--primary);
+    box-shadow: 0 5px 15px rgba(106, 62, 161, 0.3);
+    transform: scale(1.05); /* Efeito de destaque */
+}
 
-        /* Estilo para itens DESABILITADOS (primeira/última página) */
-        .pagination .page-item.disabled .page-link {
-            background-color: #f8f9fa;
-            color: #adb5bd;
-            border-color: #e9ecef;
-            box-shadow: none;
-            cursor: not-allowed;
-        }
+/* --- C. ESTILOS PARA PAGINAÇÃO DE TEXTO (PÍLULAS) --- */
+/* Estilo base que anula qualquer conflito com os estilos circulares */
+.main-pagination-item .page-link {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    border-radius: 50px; /* Formato de pílula */
+    padding: 0.5rem 1.2rem;
+    white-space: nowrap;
+    font-weight: 500;
+    border: 2px solid #e9ecef;
+    color: var(--primary);
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
 
-        /* Ajustes para a paginação menor (aninhada) */
-        .pagination-sm .page-link {
-            width: 36px;
-            height: 36px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            border-width: 1px;
-        }
+/* Efeito de hover específico para as pílulas */
+.page-item.main-pagination-item:not(.disabled) .page-link:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+    background-color: var(--primary);
+    color: #fff;
+    box-shadow: 0 5px 15px rgba(106, 62, 161, 0.2);
+}
 
-        /* Estilo para a paginação principal de categorias (links de texto) */
-        .pagination a[href*="Categorias"] {
-            width: auto;
-            padding: 0 1.5rem;
-            border-radius: 50px; /* Formato de pílula */
-        }
+/* Garante que o item ativo ou desabilitado da paginação de texto não tenha escala */
+.main-pagination-item.active .page-link,
+.main-pagination-item.disabled .page-link {
+    transform: none;
+}
 
-        /* Seleciona o link/span dentro do item com a nossa nova classe */
-        .main-pagination-item .page-link {
-            width: auto;      /* Largura automática baseada no conteúdo */
-            height: auto;     /* Altura automática baseada no conteúdo */
-            border-radius: 50px; /* Transforma em formato de pílula */
-            padding: 0.5rem 1.2rem; /* Espaçamento interno para conforto visual */
-            white-space: nowrap; /* Impede que o texto quebre em duas linhas */
-        }
-        
-        /* Garante que o item ativo da paginação principal também fique como pílula */
-        .main-pagination-item.active .page-link,
-        .main-pagination-item.disabled .page-link {
-            transform: scale(1); /* Remove o efeito de escala do botão circular */
-        }
+/* Estilo para pílula ATIVA (caso você use no futuro) */
+.main-pagination-item.active .page-link {
+    background: linear-gradient(45deg, var(--primary), var(--primary-light));
+    color: #fff;
+    border-color: var(--primary);
+}
 
-        /* Efeito de hover específico para as pílulas */
-        .page-item.main-pagination-item:not(.disabled) .page-link:hover {
-            background-color: var(--primary); /* Fica roxo sólido no hover */
-            color: #fff;
-        }
+/* Estilo DESABILITADO para todos os tipos de paginação */
+.pagination .page-item.disabled .page-link {
+    background-color: #f8f9fa;
+    color: #adb5bd;
+    border-color: #e9ecef;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+/*
+=============================================================================
+9. AJUSTES RESPONSIVOS PARA PAGINAÇÃO
+=============================================================================
+*/
+@media (max-width: 768px) {
+    /*
+     * O seletor :has() garante que o empilhamento vertical só aconteça
+     * no container de paginação que CONTÉM os botões de texto.
+     * A paginação numérica não será afetada.
+    */
+    .pagination:has(.main-pagination-item) {
+        flex-direction: column;   /* Empilha os botões de texto */
+        align-items: center;      /* Centraliza na vertical */
+        gap: 12px;                /* Aumenta o espaço quando empilhado */
+    }
+
+    /* Expande os botões de texto para serem mais fáceis de tocar no celular */
+    .pagination:has(.main-pagination-item) .main-pagination-item {
+      width: 90%;
+      max-width: 320px;
+    }
+
+    .pagination:has(.main-pagination-item) .main-pagination-item .page-link {
+      display: block;
+      text-align: center;
+      width: 100%;
+    }
+
+    /*
+     * Para a paginação numérica, em telas menores, apenas diminuímos um pouco
+     * o tamanho dos botões para caberem melhor, sem empilhar.
+    */
+    .pagination .page-item:not(.main-pagination-item) .page-link {
+        width: 38px;
+        height: 38px;
+        font-size: 0.9rem;
+    }
+}
 </style>
 {% endblock %}
