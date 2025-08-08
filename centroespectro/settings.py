@@ -2,6 +2,8 @@
 import os
 import dj_database_url  # Importe o dj-database-url
 from pathlib import Path
+from django.contrib.messages import constants as messages
+
 
 # ... (outras configurações como BASE_DIR)
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -109,3 +111,12 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ... (DEFAULT_AUTO_FIELD continua igual)
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'info',
+    messages.INFO: 'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR: 'error',
+}

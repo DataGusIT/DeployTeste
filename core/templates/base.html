@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="{% static 'css/site.css' %}" />
     
     <style>
+        /* [Seus estilos CSS existentes - mantidos como estão] */
         /* Header & Navigation - mantido igual */
         .navbar {
             background-color: #fff;
@@ -768,17 +769,11 @@
         </div>
         {% endblock %}
         
-        {% if messages %}
-        <div class="messages">
-            {% for message in messages %}
-            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show"
-                role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
+        <!-- ================================================================== -->
+        <!-- O BLOCO DE MENSAGENS ANTIGO FOI REMOVIDO DAQUI -->
+        <!-- O código que estava aqui foi substituído pelo script no final do arquivo. -->
+        <!-- ================================================================== -->
+
     </main>
 
     <!-- Footer Simplificado -->
@@ -804,19 +799,6 @@
                     <a href="{% url 'contatos' %}">Contatos</a>
                 </div>
 
-                <!-- Contato simples 
-                <div class="footer-contact">
-                    <p><i class="fas fa-envelope"></i> contato@centroespectro.com.br</p>
-                </div>
-
-                Redes sociais
-                <div class="footer-social">
-                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                </div> -->
-
                 <!-- Copyright -->
                 <div class="footer-copyright">
                     <p>&copy; 2025 CentroEspectro - Projeto TCC. Todos os direitos reservados.</p>
@@ -832,6 +814,12 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ================================================================== -->
+    <!-- MODIFICAÇÃO #1: ADICIONANDO A BIBLIOTECA SWEETALERT2 -->
+    <!-- ================================================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script src="{% static 'js/site.js' %}"></script>
 
     <script>
@@ -900,6 +888,31 @@
         $(window).scroll(animateOnScroll);
         $(document).ready(animateOnScroll);
     </script>
+
+    <!-- ================================================================== -->
+    <!-- MODIFICAÇÃO #2: SCRIPT PARA EXIBIR AS MENSAGENS COM SWEETALERT2 -->
+    <!-- ================================================================== -->
+    {% if messages %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% for message in messages %}
+            Swal.fire({
+                toast: true,
+                position: 'top-end', // Posição no canto superior direito
+                icon: '{{ message.tags }}', // Ícone (success, error, warning, info)
+                title: '{{ message }}', // O texto da sua mensagem de sucesso
+                showConfirmButton: false, // Não mostrar o botão "OK"
+                timer: 4000, // A notificação desaparecerá após 4 segundos
+                timerProgressBar: true, // Mostra uma barra de progresso do tempo
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+            {% endfor %}
+        });
+    </script>
+    {% endif %}
 
     {% block extra_js %}{% endblock %}
 </body>
