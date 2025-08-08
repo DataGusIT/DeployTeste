@@ -91,13 +91,13 @@
                         <div class="duvidas-list">
                             {% for duvida_salva in duvidas_salvas %}
                             <div class="duvida-item" data-id="{{ duvida_salva.id }}">
-                                <div class="duvida-header" onclick="toggleDuvida(this)">
+                                <div class="duvida-header">
                                     <div class="duvida-left">
                                         <div class="duvida-category">{{ duvida_salva.faq.categoria.nome }}</div>
                                         <h3 class="duvida-question">{{ duvida_salva.faq.pergunta }}</h3>
                                     </div>
                                     <div class="duvida-actions">
-                                        <button class="remove-btn" onclick="event.stopPropagation(); removerDuvida({{ duvida_salva.faq.id }}, this)">
+                                         <button class="remove-btn" data-faq-id="{{ duvida_salva.faq.id }}">
                                             <i class="fas fa-times"></i>
                                         </button>
                                         <div class="expand-icon">
@@ -158,10 +158,10 @@
                                         </div>
                                     </div>
                                     <div class="contato-actions">
-                                        <button class="remove-btn" onclick="removerContato({{ contato_salvo.contato.id }}, this)">
+                                        <button class="remove-btn" data-contato-id="{{ contato_salvo.contato.id }}">
                                             <i class="fas fa-times"></i>
                                         </button>
-                                        <button class="contact-btn" onclick="toggleContatoDetalhes(this)">
+                                        <button class="contact-btn">
                                             <i class="fas fa-phone"></i>
                                         </button>
                                     </div>
@@ -255,6 +255,27 @@
             </div>
         </div>
     </div>
+    <!-- MODAL -->
+    <div id="confirmation-modal" class="confirmation-overlay">
+        <div class="confirmation-dialog">
+            <div class="confirmation-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="confirmation-header">
+                <h3 id="confirmation-title">Confirmar Exclusão</h3>
+            </div>
+            <div class="confirmation-body">
+                <p id="confirmation-message">Você tem certeza de que deseja realizar esta ação?</p>
+            </div>
+            <div class="confirmation-footer">
+                <button id="modal-cancel-btn" class="btn-secondary">Cancelar</button>
+                <button id="modal-confirm-btn" class="btn-danger">
+                    <i class="fas fa-trash-alt"></i>
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Toast Notification -->
@@ -272,30 +293,6 @@
         <button class="toast-close" onclick="hideToast()">
             <i class="fas fa-times"></i>
         </button>
-    </div>
-</div>
-
-<!-- =============================================================================
-MODAL DE CONFIRMAÇÃO (REUTILIZÁVEL E CORRIGIDO)
-============================================================================= -->
-<div id="confirmationModal" class="confirmation-modal" onclick="closeModalOnClickOutside(event)">
-    <div class="modal-content">
-        <div class="modal-icon">
-            <i class="fas fa-exclamation-triangle"></i>
-        </div>
-        <h3 id="modalTitle" class="modal-title">Confirmar Ação</h3>
-        <p id="modalMessage" class="modal-message">
-            Você tem certeza que deseja prosseguir com esta ação?
-        </p>
-        <div class="modal-actions">
-            <button id="modalCancelBtn" class="btn-secondary" onclick="hideConfirmationModal()">
-                Cancelar
-            </button>
-            <button id="modalConfirmBtn" class="btn-danger">
-                <i class="fas fa-trash-alt"></i>
-                Confirmar
-            </button>
-        </div>
     </div>
 </div>
 {% endblock %}
@@ -1160,356 +1157,412 @@ MODAL DE CONFIRMAÇÃO (REUTILIZÁVEL E CORRIGIDO)
     animation: slideOutRight 0.5s ease forwards;
 }
 
-/*
-====================================================================
-10. MODAL DE CONFIRMAÇÃO (CORRIGIDO)
-====================================================================
-*/
-.confirmation-modal {
+/* ================================================== */
+/*        ESTILOS DO NOVO MODAL DE CONFIRMAÇÃO        */
+/* ================================================== */
+
+/* Animações de entrada para o modal */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.confirmation-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1050;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: rgba(28, 17, 41, 0.6); /* Cor escura com base no seu roxo */
+    backdrop-filter: blur(8px);
+    z-index: 2000;
     opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-    
-    /* ESTILOS DO FUNDO MOVIDOS PARA CÁ */
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px); /* Para compatibilidade com Safari */
-    cursor: pointer;
+    visibility: hidden;
+    transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), visibility 0s 0.4s linear;
 }
 
-.confirmation-modal.show {
+.confirmation-overlay.show {
     opacity: 1;
-    pointer-events: auto;
+    visibility: visible;
+    transition-delay: 0s;
+    animation: fadeIn 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-/* O .modal-backdrop FOI REMOVIDO */
-
-.modal-content {
+.confirmation-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
     background: white;
-    border-radius: 16px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-    padding: 2.5rem;
+    border-radius: 24px; /* Mais arredondado */
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
     width: 90%;
     max-width: 450px;
     text-align: center;
-    position: relative;
-    z-index: 1;
-    transform: scale(0.9);
-    transition: transform 0.3s ease;
-    cursor: default; /* Garante que o cursor não seja de clique sobre o conteúdo */
+    padding-top: 50px; /* Espaço para o ícone que vai ficar acima */
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.confirmation-modal.show .modal-content {
-    transform: scale(1);
+.confirmation-overlay.show .confirmation-dialog {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
 }
 
-.modal-icon {
-    width: 70px;
-    height: 70px;
+/* Ícone de alerta no topo */
+.confirmation-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--danger), #ff7979); /* Gradiente para o vermelho */
     border-radius: 50%;
-    background: #fff3cd; /* Amarelo de alerta do Bootstrap */
-    color: #ffc107; /* Cor do ícone */
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
-    margin: 0 auto 1.5rem auto;
-    border: 4px solid #ffeeba;
+    position: absolute;
+    top: -40px; /* Puxa o ícone para cima, fora do modal */
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 10px 20px rgba(244, 67, 54, 0.2);
+    border: 4px solid white;
 }
 
-.modal-title {
-    font-size: 1.5rem;
+.confirmation-icon i {
+    color: white;
+    font-size: 2.2rem;
+}
+
+.confirmation-header {
+    padding: 1.5rem 2rem 0.5rem;
+    border-bottom: none; /* Removemos a linha para um look mais limpo */
+}
+
+.confirmation-header h3 {
+    margin: 0;
+    font-size: 1.8rem;
     font-weight: 600;
     color: var(--gray-800);
-    margin: 0 0 0.75rem 0;
 }
 
-.modal-message {
+.confirmation-body {
+    padding: 0.5rem 2.5rem 2rem;
+}
+
+.confirmation-body p {
+    margin: 0;
     color: var(--gray-600);
-    margin: 0 0 2rem 0;
-    line-height: 1.6;
+    font-size: 1.05rem;
+    line-height: 1.7;
 }
 
-.modal-actions {
-    display: flex;
-    justify-content: center;
+.confirmation-footer {
+    display: grid; /* Usando grid para espaçamento fácil */
+    grid-template-columns: 1fr 1fr;
     gap: 1rem;
+    padding: 0 2rem 2rem;
 }
 
-/* Botão de perigo customizado */
+/* Polimento nos botões do modal */
+.confirmation-footer .btn-secondary,
+.confirmation-footer .btn-danger {
+    flex: 1;
+    justify-content: center;
+    padding: 0.875rem 1rem;
+    font-weight: 500;
+    border: 2px solid transparent;
+}
+
+.confirmation-footer .btn-secondary {
+    background: var(--gray-200);
+    color: var(--gray-700);
+    border-color: var(--gray-200);
+}
+
+.confirmation-footer .btn-secondary:hover {
+    background: var(--gray-300);
+    border-color: var(--gray-300);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* Botão de perigo redesenhado */
 .btn-danger {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.875rem 2rem;
-    background: linear-gradient(135deg, var(--danger), #c82333);
+    background: linear-gradient(135deg, var(--danger), #ff7979);
     color: white;
     border: none;
     border-radius: 8px;
     font-weight: 500;
     cursor: pointer;
     transition: var(--transition);
+    text-decoration: none;
 }
 
 .btn-danger:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(220, 53, 69, 0.3);
+    box-shadow: 0 10px 25px rgba(211, 47, 47, 0.3);
 }
+
 </style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// Tab Navigation
 document.addEventListener('DOMContentLoaded', function() {
+    
+    // ===============================================
+    // LÓGICA DO MODAL DE CONFIRMAÇÃO
+    // ===============================================
+    const modal = document.getElementById('confirmation-modal');
+    const modalMessage = document.getElementById('confirmation-message');
+    const confirmBtn = document.getElementById('modal-confirm-btn');
+    const cancelBtn = document.getElementById('modal-cancel-btn');
+    let onConfirmCallback = null;
+
+    function showConfirmationModal(message, callback) {
+        modalMessage.textContent = message;
+        onConfirmCallback = callback;
+        modal.classList.add('show');
+    }
+
+    function hideConfirmationModal() {
+        modal.classList.remove('show');
+        onConfirmCallback = null;
+    }
+
+    // ===============================================
+    // ANEXAR EVENTOS (EVENT LISTENERS)
+    // ===============================================
+
+    // Lógica das Tabs de Navegação
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabPanes = document.querySelectorAll('.tab-pane');
-    
     tabBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             const tabId = this.dataset.tab;
-            
-            // Remove active class from all buttons and panes
             tabBtns.forEach(b => b.classList.remove('active'));
             tabPanes.forEach(p => p.classList.remove('active'));
-            
-            // Add active class to clicked button and corresponding pane
             this.classList.add('active');
             document.getElementById(tabId).classList.add('active');
         });
     });
-});
 
-// =============================================================================
-// MODAL DE CONFIRMAÇÃO (LÓGICA CORRIGIDA)
-// =============================================================================
-const confirmationModal = document.getElementById('confirmationModal');
-const modalTitle = document.getElementById('modalTitle');
-const modalMessage = document.getElementById('modalMessage');
-const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+    // Lógica para abrir/fechar o accordion de DÚVIDAS
+    document.querySelectorAll('.duvida-header').forEach(header => {
+        header.addEventListener('click', () => {
+            toggleDuvida(header);
+        });
+    });
 
-function showConfirmationModal(title, message, onConfirmCallback) {
-    modalTitle.textContent = title;
-    modalMessage.textContent = message;
+    // Lógica para REMOVER DÚVIDA
+    document.querySelectorAll('.duvidas-list .remove-btn').forEach(btn => {
+        btn.addEventListener('click', (event) => {
+            event.stopPropagation(); // Impede o accordion de abrir/fechar
+            const faqId = btn.dataset.faqId;
+            removerDuvida(faqId, btn);
+        });
+    });
 
-    modalConfirmBtn.onclick = function() {
-        onConfirmCallback();
+    // Lógica para abrir/fechar detalhes do CONTATO
+    document.querySelectorAll('.contato-actions .contact-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            toggleContatoDetalhes(btn);
+        });
+    });
+
+    // Lógica para REMOVER CONTATO
+    document.querySelectorAll('.contatos-list .remove-btn').forEach(btn => {
+        btn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const contatoId = btn.dataset.contatoId;
+            removerContato(contatoId, btn);
+        });
+    });
+
+    // Eventos do Modal
+    confirmBtn.addEventListener('click', () => {
+        if (typeof onConfirmCallback === 'function') {
+            onConfirmCallback();
+        }
         hideConfirmationModal();
-    };
+    });
+    cancelBtn.addEventListener('click', hideConfirmationModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            hideConfirmationModal();
+        }
+    });
 
-    confirmationModal.classList.add('show');
-}
+    // ===============================================
+    // DEFINIÇÕES DE FUNÇÕES
+    // (Agora todas dentro do mesmo escopo)
+    // ===============================================
 
-function hideConfirmationModal() {
-    confirmationModal.classList.remove('show');
-}
-
-// NOVA FUNÇÃO: Fecha o modal apenas se o clique for no fundo (o próprio container)
-function closeModalOnClickOutside(event) {
-    if (event.target === confirmationModal) {
-        hideConfirmationModal();
-    }
-}
-
-
-// =============================================================================
-// FUNÇÕES DE REMOÇÃO (ATUALIZADAS)
-// =============================================================================
-
-function removerDuvida(faqId, element) {
-    showConfirmationModal(
-        'Remover Dúvida',
-        'Tem certeza que deseja remover esta dúvida dos seus itens salvos? Esta ação não pode ser desfeita.',
-        () => {
+    function removerDuvida(faqId, element) {
+        const message = 'Tem certeza que deseja remover esta dúvida das suas dúvidas salvas? Esta ação não pode ser desfeita.';
+        
+        showConfirmationModal(message, () => {
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
             const duvidasItem = element.closest('.duvida-item');
             duvidasItem.classList.add('removing');
-
+            
             fetch(`/remover-faq/${faqId}/`, {
                 method: 'POST',
-                headers: {
-                    'X-CSRFToken': csrfToken,
-                    'Content-Type': 'application/json',
-                }
+                headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/json' },
+                body: JSON.stringify({'faq_id': faqId})
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+            .then(response => response.json().then(data => ({ ok: response.ok, data })))
+            .then(({ ok, data }) => {
+                if (ok && data.success) {
                     setTimeout(() => {
                         duvidasItem.remove();
-                        // Atualiza contadores
                         const counter = document.querySelector('[data-tab="duvidas-salvas"] .tab-counter');
-                        const newCount = parseInt(counter.textContent) - 1;
+                        const newCount = Math.max(0, parseInt(counter.textContent) - 1);
                         counter.textContent = newCount;
-                        document.querySelector('#duvidas-salvas .card-header p').textContent = `${newCount} dúvida${newCount !== 1 ? 's' : ''} salva${newCount !== 1 ? 's' : ''}`;
+                        
+                        const headerCount = document.querySelector('#duvidas-salvas .card-header p');
+                        headerCount.textContent = `${newCount} dúvida${newCount !== 1 ? 's' : ''} salva${newCount !== 1 ? 's' : ''}`;
+                        
                         if (newCount === 0) {
-                            document.querySelector('.duvidas-list').innerHTML = `
+                            document.querySelector('.duvidas-list').parentElement.innerHTML += `
                                 <div class="empty-state">
                                     <div class="empty-icon"><i class="fas fa-bookmark"></i></div>
                                     <h3>Nenhuma dúvida salva</h3>
                                     <p>Você ainda não salvou nenhuma dúvida.</p>
-                                    <a href="{% url 'duvidas' %}" class="btn-secondary">Explorar Dúvidas</a>
+                                    <a href="/duvidas/" class="btn-secondary">Explorar Dúvidas Frequentes</a>
                                 </div>`;
+                            document.querySelector('.duvidas-list').remove();
                         }
                     }, 500);
                     showToast('success', 'Dúvida removida com sucesso!');
                 } else {
                     duvidasItem.classList.remove('removing');
-                    showToast('error', data.message || 'Erro ao remover dúvida.');
+                    showToast('error', data.message || 'Erro ao remover dúvida');
                 }
             })
             .catch(error => {
                 duvidasItem.classList.remove('removing');
                 showToast('error', 'Erro de conexão. Tente novamente.');
             });
-        }
-    );
-}
+        });
+    }
 
-function removerContato(contatoId, element) {
-    showConfirmationModal(
-        'Remover Contato',
-        'Tem certeza que deseja remover este contato dos seus itens salvos? Esta ação não pode ser desfeita.',
-        () => {
+    function removerContato(contatoId, element) {
+        const message = 'Tem certeza que deseja remover este contato? Ele será apagado permanentemente.';
+
+        showConfirmationModal(message, () => {
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
             const contatoItem = element.closest('.contato-item');
             contatoItem.classList.add('removing');
-
+            
             fetch(`/remover-contato/${contatoId}/`, {
                 method: 'POST',
-                headers: {
-                    'X-CSRFToken': csrfToken,
-                    'Content-Type': 'application/json',
-                }
+                headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/json' },
+                body: JSON.stringify({'contato_id': contatoId})
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+            .then(response => response.json().then(data => ({ ok: response.ok, data })))
+            .then(({ ok, data }) => {
+                if (ok && data.success) {
                     setTimeout(() => {
                         contatoItem.remove();
-                        // Atualiza contadores
                         const counter = document.querySelector('[data-tab="contatos-salvos"] .tab-counter');
-                        const newCount = parseInt(counter.textContent) - 1;
+                        const newCount = Math.max(0, parseInt(counter.textContent) - 1);
                         counter.textContent = newCount;
-                        document.querySelector('#contatos-salvos .card-header p').textContent = `${newCount} contato${newCount !== 1 ? 's' : ''} salvo${newCount !== 1 ? 's' : ''}`;
+                        
+                        const headerCount = document.querySelector('#contatos-salvos .card-header p');
+                        headerCount.textContent = `${newCount} contato${newCount !== 1 ? 's' : ''} salvo${newCount !== 1 ? 's' : ''}`;
+                        
                         if (newCount === 0) {
-                            document.querySelector('.contatos-list').innerHTML = `
+                             document.querySelector('.contatos-list').parentElement.innerHTML += `
                                 <div class="empty-state">
                                     <div class="empty-icon"><i class="fas fa-address-book"></i></div>
                                     <h3>Nenhum contato salvo</h3>
                                     <p>Você ainda não salvou nenhum contato.</p>
-                                    <a href="{% url 'contatos' %}" class="btn-secondary">Explorar Contatos</a>
+                                    <a href="/contatos/" class="btn-secondary">Explorar Contatos</a>
                                 </div>`;
+                            document.querySelector('.contatos-list').remove();
                         }
                     }, 500);
                     showToast('success', 'Contato removido com sucesso!');
                 } else {
                     contatoItem.classList.remove('removing');
-                    showToast('error', data.message || 'Erro ao remover contato.');
+                    showToast('error', data.message || 'Erro ao remover contato');
                 }
             })
             .catch(error => {
                 contatoItem.classList.remove('removing');
                 showToast('error', 'Erro de conexão. Tente novamente.');
             });
+        });
+    }
+
+    function toggleDuvida(headerElement) {
+        const duvidaItem = headerElement.closest('.duvida-item');
+        const content = duvidaItem.querySelector('.duvida-content');
+        
+        if (duvidaItem.classList.toggle('expanded')) {
+            content.style.maxHeight = content.scrollHeight + 'px';
+        } else {
+            content.style.maxHeight = '0px';
         }
-    );
-}
-
-// Toggle accordion function
-function toggleDuvida(headerElement) {
-    const duvidasItem = headerElement.closest('.duvida-item');
-    const content = duvidasItem.querySelector('.duvida-content');
-    const isExpanded = duvidasItem.classList.contains('expanded');
-    
-    if (isExpanded) {
-        // Collapse
-        duvidasItem.classList.remove('expanded');
-        content.style.maxHeight = '0px';
-    } else {
-        // Expand
-        duvidasItem.classList.add('expanded');
-        content.style.maxHeight = content.scrollHeight + 'px';
     }
-}
 
-// Toast functions
-function showToast(type, message) {
-    const toast = document.getElementById('toast');
-    const toastIcon = toast.querySelector('.toast-icon i');
-    const toastTitle = toast.querySelector('.toast-title');
-    const toastText = toast.querySelector('.toast-text');
-    const toastIconContainer = toast.querySelector('.toast-icon');
-    
-    // Set icon and colors based on type
-    switch(type) {
-        case 'success':
-            toastIcon.className = 'fas fa-check-circle';
-            toastIconContainer.style.background = 'var(--success)';
-            toastTitle.textContent = 'Sucesso';
-            break;
-        case 'error':
-            toastIcon.className = 'fas fa-exclamation-circle';
-            toastIconContainer.style.background = 'var(--danger)';
-            toastTitle.textContent = 'Erro';
-            break;
-        case 'warning':
-            toastIcon.className = 'fas fa-exclamation-triangle';
-            toastIconContainer.style.background = 'var(--warning)';
-            toastTitle.textContent = 'Atenção';
-            break;
-        case 'info':
-            toastIcon.className = 'fas fa-info-circle';
-            toastIconContainer.style.background = 'var(--info)';
-            toastTitle.textContent = 'Informação';
-            break;
-        default:
-            toastIcon.className = 'fas fa-bell';
-            toastIconContainer.style.background = 'var(--primary)';
-            toastTitle.textContent = 'Notificação';
+    function toggleContatoDetalhes(buttonElement) {
+        const contatoItem = buttonElement.closest('.contato-item');
+        const detalhes = contatoItem.querySelector('.contato-detalhes');
+        
+        if (contatoItem.classList.toggle('expanded')) {
+            detalhes.style.maxHeight = detalhes.scrollHeight + 'px';
+        } else {
+            detalhes.style.maxHeight = '0px';
+        }
     }
-    
-    toastText.textContent = message;
-    
-    // Show toast
-    toast.classList.add('show');
-    
-    // Auto hide after 4 seconds
-    setTimeout(() => {
-        hideToast();
-    }, 4000);
-}
 
-function hideToast() {
-    const toast = document.getElementById('toast');
-    toast.classList.remove('show');
-}
-
-
-// Toggle contact details
-function toggleContatoDetalhes(buttonElement) {
-    const contatoItem = buttonElement.closest('.contato-item');
-    const detalhes = contatoItem.querySelector('.contato-detalhes');
-    const isExpanded = contatoItem.classList.contains('expanded');
-    
-    if (isExpanded) {
-        // Collapse
-        contatoItem.classList.remove('expanded');
-        detalhes.style.maxHeight = '0px';
-    } else {
-        // Expand
-        contatoItem.classList.add('expanded');
-        detalhes.style.maxHeight = detalhes.scrollHeight + 'px';
+    function showToast(type, message) {
+        const toast = document.getElementById('toast');
+        const toastIcon = toast.querySelector('.toast-icon i');
+        const toastTitle = toast.querySelector('.toast-title');
+        const toastText = toast.querySelector('.toast-text');
+        const toastIconContainer = toast.querySelector('.toast-icon');
+        
+        switch(type) {
+            case 'success':
+                toastIcon.className = 'fas fa-check-circle';
+                toastIconContainer.style.background = 'var(--success)';
+                toastTitle.textContent = 'Sucesso';
+                break;
+            case 'error':
+                toastIcon.className = 'fas fa-exclamation-circle';
+                toastIconContainer.style.background = 'var(--danger)';
+                toastTitle.textContent = 'Erro';
+                break;
+            default:
+                toastIcon.className = 'fas fa-bell';
+                toastIconContainer.style.background = 'var(--primary)';
+                toastTitle.textContent = 'Notificação';
+        }
+        
+        toastText.textContent = message;
+        toast.classList.add('show');
+        setTimeout(hideToast, 4000);
     }
-}
+
+    function hideToast() {
+        document.getElementById('toast').classList.remove('show');
+    }
+});
 </script>
 {% endblock %}
