@@ -483,7 +483,7 @@
     }
 
     // =============================================================================
-    // FUNCIONALIDADES DE SALVAMENTO DE FAQ
+    // FUNCIONALIDADES DE SALVAMENTO DE FAQ (ATUALIZADO)
     // =============================================================================
     
     /**
@@ -499,37 +499,27 @@
             headers: {
                 'X-CSRFToken': csrfToken,
                 'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                'faq_id': faqId
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
             }
-            return response.json();
         })
+        .then(response => response.json())
         .then(data => {
             if (data.success) {
-                if (data.action === 'saved') {
-                    // Atualizar interface para estado "salvo"
-                    element.classList.remove('btn-outline-primary');
-                    element.classList.add('btn-primary');
-                    element.innerHTML = '<i class="fas fa-bookmark"></i>';
-                    element.setAttribute('onclick', `removerFAQ(${faqId}, this)`);
-                    
-                    showToast('success', 'Dúvida salva com sucesso!');
-                } else if (data.action === 'already_saved') {
-                    showToast('info', 'Esta dúvida já foi salva anteriormente.');
-                }
+                // Atualizar interface para estado "salvo"
+                element.classList.remove('btn-outline-primary');
+                element.classList.add('btn-primary');
+                element.innerHTML = '<i class="fas fa-bookmark"></i>';
+                element.setAttribute('onclick', `removerFAQ(${faqId}, this)`);
+                
+                // ATUALIZADO: Chamada para a nova função de toast
+                showToast('Dúvida Salva!', 'A pergunta foi adicionada aos seus favoritos.', 'success');
+
             } else {
-                showToast('error', data.message || 'Erro ao salvar dúvida');
+                showToast('Ops!', data.message || 'Ocorreu um erro ao salvar a dúvida.', 'error');
             }
         })
         .catch(error => {
-            console.error('Erro completo:', error);
-            showToast('error', 'Erro de conexão. Verifique sua internet e tente novamente.');
+            console.error('Erro ao salvar FAQ:', error);
+            showToast('Erro de Rede', 'Não foi possível conectar ao servidor. Tente novamente.', 'error');
         });
     }
 
@@ -546,17 +536,9 @@
             headers: {
                 'X-CSRFToken': csrfToken,
                 'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                'faq_id': faqId
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
             }
-            return response.json();
         })
+        .then(response => response.json())
         .then(data => {
             if (data.success) {
                 // Atualizar interface para estado "não salvo"
@@ -565,14 +547,16 @@
                 element.innerHTML = '<i class="far fa-bookmark"></i>';
                 element.setAttribute('onclick', `salvarFAQ(${faqId}, this)`);
                 
-                showToast('success', 'Dúvida removida com sucesso!');
+                // ATUALIZADO: Chamada para a nova função de toast
+                showToast('Dúvida Removida', 'A pergunta foi retirada da sua lista de favoritos.', 'info');
+
             } else {
-                showToast('error', data.message || 'Erro ao remover dúvida');
+                showToast('Ops!', data.message || 'Ocorreu um erro ao remover a dúvida.', 'error');
             }
         })
         .catch(error => {
-            console.error('Erro completo:', error);
-            showToast('error', 'Erro de conexão. Verifique sua internet e tente novamente.');
+            console.error('Erro ao remover FAQ:', error);
+            showToast('Erro de Rede', 'Não foi possível conectar ao servidor. Tente novamente.', 'error');
         });
     }
 
@@ -644,7 +628,7 @@
     }
 
     // =============================================================================
-    // SISTEMA DE NOTIFICAÇÕES TOAST
+    // SISTEMA DE NOTIFICAÇÕES TOAST (VERSÃO ÚNICA E APRIMORADA)
     // =============================================================================
     
     /**
@@ -655,30 +639,46 @@
      */
     function showToast(title, message, type = 'info') {
         const toastElement = document.getElementById('notificationToast');
-        if (!toastElement) return;
+        if (!toastElement) {
+            console.error("Elemento de Toast #notificationToast não encontrado!");
+            return;
+        }
+        
+        const toast = new bootstrap.Toast(toastElement, { delay: 5000 }); // 5 segundos
 
-        const toast = new bootstrap.Toast(toastElement, { delay: 4000 });
         const toastIconArea = toastElement.querySelector('.toast-icon-area');
         const toastIcon = toastElement.querySelector('#toastIcon');
         const toastTitle = toastElement.querySelector('#toastTitle');
         const toastBody = toastElement.querySelector('#toastBody');
 
         const configs = {
-            success: { icon: 'fa-check-circle', colorClass: 'toast-success' },
-            error: { icon: 'fa-times-circle', colorClass: 'toast-error' },
-            info: { icon: 'fa-info-circle', colorClass: 'toast-info' },
-            warning: { icon: 'fa-exclamation-triangle', colorClass: 'toast-warning' }
+            success: { icon: 'fa-check-circle', colorClass: 'toast-success', defaultTitle: 'Sucesso!' },
+            error: { icon: 'fa-times-circle', colorClass: 'toast-error', defaultTitle: 'Erro!' },
+            info: { icon: 'fa-info-circle', colorClass: 'toast-info', defaultTitle: 'Informação' },
+            warning: { icon: 'fa-exclamation-triangle', colorClass: 'toast-warning', defaultTitle: 'Atenção!' }
         };
 
         const config = configs[type] || configs.info;
         
-        toastTitle.textContent = title;
+        // Atualiza o conteúdo do toast
+        toastTitle.textContent = title || config.defaultTitle;
         toastBody.textContent = message;
+        
+        // Atualiza ícone e classes de cor
         toastIcon.className = `fas ${config.icon}`;
         toastIconArea.className = 'toast-icon-area d-flex align-items-center justify-content-center';
         toastIconArea.classList.add(config.colorClass);
 
+        // Adiciona classes de animação ao mostrar
+        toastElement.classList.remove('hide');
+        toastElement.classList.add('show', 'animate__animated', 'animate__fadeInRight');
+        
         toast.show();
+
+        // Limpa as classes de animação ao fechar para evitar piscadas
+        toastElement.addEventListener('hidden.bs.modal', function () {
+            toastElement.classList.remove('animate__animated', 'animate__fadeInRight');
+        }, { once: true });
     }
 
     // =============================================================================
@@ -706,6 +706,10 @@
 
 {% block extra_css %}
 {{ block.super }}
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+/>
 <style>
     /*
 =============================================================================
@@ -880,69 +884,85 @@
 
 /*
 =============================================================================
-3. COMPONENTE DE NOTIFICAÇÃO (TOAST MODERNO)
+3. COMPONENTE DE NOTIFICAÇÃO (TOAST MODERNO - VERSÃO APRIMORADA)
 =============================================================================
 */
 
+/* Container para garantir que o toast fique sobre todos os elementos */
+.toast-container {
+    z-index: 9999 !important;
+}
+
+/* Corpo do Toast Moderno */
 .modern-toast {
     width: 380px;
-    max-width: 100%;
+    max-width: 95%;
     background-color: #fff;
-    border-radius: 12px;
+    border-radius: 15px; /* Borda mais suave */
     border: none;
-    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.2); /* Sombra 3D */
     overflow: hidden;
+    /* Borda inferior sutil para reforçar a cor do status */
+    border-bottom: 4px solid transparent; 
+    transition: all 0.4s ease-in-out;
 }
 
+/* Variações de cor da borda inferior */
+.modern-toast .toast-success { border-bottom-color: #28a745; }
+.modern-toast .toast-error { border-bottom-color: #dc3545; }
+.modern-toast .toast-info { border-bottom-color: #0dcaf0; }
+.modern-toast .toast-warning { border-bottom-color: #ffc107; }
+
+.toast-body {
+    padding: 0 !important; /* Reset do padding padrão */
+}
+
+/* Área do Ícone Colorida */
 .toast-icon-area {
-    flex: 0 0 50px;
+    flex: 0 0 60px; /* Espaço maior para o ícone */
     color: #fff;
-    font-size: 1.5rem;
+    font-size: 1.8rem; /* Ícone maior */
     transition: background-color 0.3s ease;
+    border-top-left-radius: 12px;
 }
 
-.toast-icon-area.toast-success {
-    background-color: #28a745;
-}
+/* Variações de Cor com Gradiente para a Área do Ícone */
+.toast-icon-area.toast-success { background: linear-gradient(135deg, #28a745, #218838); }
+.toast-icon-area.toast-error { background: linear-gradient(135deg, #dc3545, #c82333); }
+.toast-icon-area.toast-info { background: linear-gradient(135deg, #17a2b8, #138496); }
+.toast-icon-area.toast-warning { background: linear-gradient(135deg, #ffc107, #e0a800); }
 
-.toast-icon-area.toast-error {
-    background-color: #dc3545;
-}
-
-.toast-icon-area.toast-info {
-    background-color: #0dcaf0;
-}
-
-.toast-icon-area.toast-warning {
-    background-color: #ffc107;
-}
-
+/* Área de Conteúdo do Toast */
 .toast-content-area {
     flex-grow: 1;
+    padding: 1rem 1.2rem; /* Espaçamento interno confortável */
 }
 
 .toast-title {
     font-weight: 700;
+    font-size: 1.1rem; /* Título em destaque */
     color: #343a40;
+    margin-bottom: 0.25rem;
 }
 
 .toast-message {
-    font-size: 0.9rem;
+    font-size: 0.95rem; /* Mensagem clara e legível */
     color: #6c757d;
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
+/* Botão de Fechar Moderno */
 .btn-close-toast {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    background: #f0f0f0;
+    top: 10px;
+    right: 10px;
+    background: transparent;
     border: none;
     border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    color: #6c757d;
-    font-size: 0.8rem;
+    width: 30px;
+    height: 30px;
+    color: #adb5bd;
+    font-size: 0.9rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -950,8 +970,9 @@
 }
 
 .btn-close-toast:hover {
-    background: #e9ecef;
-    color: #343a40;
+    background-color: #f1f3f5;
+    color: #495057;
+    transform: rotate(90deg) scale(1.1);
 }
 
 /*

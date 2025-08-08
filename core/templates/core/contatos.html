@@ -427,19 +427,16 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                if (data.action === 'saved') {
-                    updateButton(contatoId, true);
-                    showToast(data.message, 'success');
-                } else if (data.action === 'already_saved') {
-                    showToast(data.message, 'info');
-                }
+                updateButton(contatoId, true);
+                // ATUALIZADO: Chamando showToast com título e mensagem
+                showToast('Contato Salvo!', 'Este contato foi adicionado à sua lista de favoritos.', 'success');
             } else {
-                showToast(data.message, 'error');
+                showToast('Ops!', data.message, 'error');
             }
         })
         .catch(error => {
             console.error('Erro:', error);
-            showToast('Erro ao salvar contato', 'error');
+            showToast('Erro de Rede', 'Não foi possível salvar o contato. Tente novamente.', 'error');
         });
     }
 
@@ -452,14 +449,15 @@
         .then(data => {
             if (data.success) {
                 updateButton(contatoId, false);
-                showToast(data.message, 'success');
+                // ATUALIZADO: Mensagem de remoção também aprimorada
+                showToast('Contato Removido', 'O contato foi removido da sua lista de salvos.', 'info');
             } else {
-                showToast(data.message, 'error');
+                showToast('Ops!', data.message, 'error');
             }
         })
         .catch(error => {
             console.error('Erro:', error);
-            showToast('Erro ao remover contato', 'error');
+            showToast('Erro de Rede', 'Não foi possível remover o contato. Tente novamente.', 'error');
         });
     }
 
@@ -496,44 +494,52 @@
     }
 
     /**
-     * Exibe uma notificação toast moderna e customizada.
+     * ATUALIZADO: Exibe uma notificação toast moderna e customizada.
      * @param {string} title - O título da notificação.
      * @param {string} message - A mensagem principal.
      * @param {string} type - O tipo de notificação ('success', 'error', 'info', 'warning').
      */
     function showToast(title, message, type = 'info') {
         const toastElement = document.getElementById('notificationToast');
-        const toast = new bootstrap.Toast(toastElement);
+        if (!toastElement) {
+            console.error("Elemento de Toast não encontrado!");
+            return;
+        }
+        const toast = new bootstrap.Toast(toastElement, { delay: 5000 }); // Aumenta o tempo para 5s
 
         const toastIconArea = toastElement.querySelector('.toast-icon-area');
         const toastIcon = toastElement.querySelector('#toastIcon');
         const toastTitle = toastElement.querySelector('#toastTitle');
         const toastBody = toastElement.querySelector('#toastBody');
 
-        // Configurações baseadas no tipo
+        // Configurações baseadas no tipo para um visual mais rico
         const configs = {
             success: {
                 icon: 'fa-check-circle',
-                colorClass: 'toast-success'
+                colorClass: 'toast-success',
+                defaultTitle: 'Sucesso!'
             },
             error: {
                 icon: 'fa-times-circle',
-                colorClass: 'toast-error'
+                colorClass: 'toast-error',
+                defaultTitle: 'Erro!'
             },
             info: {
                 icon: 'fa-info-circle',
-                colorClass: 'toast-info'
+                colorClass: 'toast-info',
+                defaultTitle: 'Informação'
             },
             warning: {
                 icon: 'fa-exclamation-triangle',
-                colorClass: 'toast-warning'
+                colorClass: 'toast-warning',
+                defaultTitle: 'Atenção!'
             }
         };
 
         const config = configs[type] || configs.info;
 
-        // Atualiza o conteúdo
-        toastTitle.textContent = title;
+        // Atualiza o conteúdo do toast
+        toastTitle.textContent = title || config.defaultTitle;
         toastBody.textContent = message;
         
         // Atualiza ícone e classes de cor
@@ -541,7 +547,16 @@
         toastIconArea.className = 'toast-icon-area d-flex align-items-center justify-content-center'; // Reseta classes
         toastIconArea.classList.add(config.colorClass);
 
+        // Adiciona uma classe de animação ao mostrar
+        toastElement.classList.remove('hide');
+        toastElement.classList.add('show', 'animate__animated', 'animate__fadeInRight');
+        
         toast.show();
+
+        // Remove a animação ao esconder para evitar piscadas
+        toastElement.addEventListener('hidden.bs.toast', function () {
+            toastElement.classList.remove('animate__animated', 'animate__fadeInRight');
+        });
     }
 
     function getCookie(name) {
@@ -563,6 +578,10 @@
 
 {% block extra_css %}
 {{ block.super }}
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+/>
 <style>
     /*
 ===============================================================================
@@ -761,61 +780,90 @@ ESTRUTURA GERAL DO CSS
 
 /* 
 ===============================================================================
-4. NOTIFICAÇÕES TOAST
+4. NOTIFICAÇÕES TOAST (VERSÃO APRIMORADA)
 ===============================================================================
 */
+/* Container principal para posicionamento */
+.toast-container {
+    z-index: 9999 !important; /* Garante que o toast fique acima de tudo */
+}
+
+/* Corpo do Toast Moderno */
 .modern-toast {
     width: 380px;
-    max-width: 100%;
+    max-width: 95%;
     background-color: #fff;
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--border-radius-md); /* Borda mais suave */
     border: none;
-    box-shadow: var(--shadow-modern);
+    box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.2); /* Sombra mais pronunciada */
     overflow: hidden;
+    /* Adiciona uma borda sutil na parte inferior */
+    border-bottom: 4px solid transparent; 
+    transition: all 0.4s ease-in-out;
 }
 
-/* Área do Ícone */
+/* Variações de Cor (aplicadas na borda inferior) */
+.modern-toast .toast-success { border-bottom-color: #28a745; }
+.modern-toast .toast-error { border-bottom-color: #dc3545; }
+.modern-toast .toast-info { border-bottom-color: #0dcaf0; }
+.modern-toast .toast-warning { border-bottom-color: #ffc107; }
+
+/* Animação de entrada */
+.modern-toast.show {
+    animation: fadeInRight 0.5s ease forwards;
+}
+
+.toast-body {
+    padding: 0 !important; /* Removemos o padding padrão */
+}
+
+/* Área do Ícone Colorida */
 .toast-icon-area {
-    flex: 0 0 50px;
+    flex: 0 0 60px; /* Um pouco maior para mais destaque */
     color: #fff;
-    font-size: 1.5rem;
+    font-size: 1.8rem; /* Ícone maior */
     transition: background-color 0.3s ease;
+    border-top-left-radius: var(--border-radius-md);
 }
 
-/* Variações de Cor do Toast */
-.toast-icon-area.toast-success { background-color: #28a745; }
-.toast-icon-area.toast-error { background-color: #dc3545; }
-.toast-icon-area.toast-info { background-color: #0dcaf0; }
-.toast-icon-area.toast-warning { background-color: #ffc107; }
+/* Variações de Cor da Área do Ícone */
+.toast-icon-area.toast-success { background: linear-gradient(135deg, #28a745, #218838); }
+.toast-icon-area.toast-error { background: linear-gradient(135deg, #dc3545, #c82333); }
+.toast-icon-area.toast-info { background: linear-gradient(135deg, #17a2b8, #138496); }
+.toast-icon-area.toast-warning { background: linear-gradient(135deg, #ffc107, #e0a800); }
 
-/* Área do Conteúdo */
+
+/* Área de Conteúdo do Toast */
 .toast-content-area {
     flex-grow: 1;
+    padding: 1rem 1.2rem; /* Espaçamento interno generoso */
 }
 
 .toast-title {
     font-weight: 700;
+    font-size: 1.1rem; /* Título mais proeminente */
     color: #343a40;
+    margin-bottom: 0.25rem;
 }
 
 .toast-message {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: #6c757d;
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
-/* Botão de Fechar Toast */
+/* Botão de Fechar Moderno */
 .btn-close-toast {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    background: #f0f0f0;
+    top: 10px;
+    right: 10px;
+    background: transparent;
     border: none;
     border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    color: #6c757d;
-    font-size: 0.8rem;
+    width: 30px;
+    height: 30px;
+    color: #adb5bd;
+    font-size: 0.9rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -823,8 +871,9 @@ ESTRUTURA GERAL DO CSS
 }
 
 .btn-close-toast:hover {
-    background: #e9ecef;
-    color: #343a40;
+    background-color: #f1f3f5;
+    color: #495057;
+    transform: rotate(90deg) scale(1.1);
 }
 
 /* 

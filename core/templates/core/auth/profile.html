@@ -274,6 +274,30 @@
         </button>
     </div>
 </div>
+
+<!-- =============================================================================
+MODAL DE CONFIRMAÇÃO (REUTILIZÁVEL E CORRIGIDO)
+============================================================================= -->
+<div id="confirmationModal" class="confirmation-modal" onclick="closeModalOnClickOutside(event)">
+    <div class="modal-content">
+        <div class="modal-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3 id="modalTitle" class="modal-title">Confirmar Ação</h3>
+        <p id="modalMessage" class="modal-message">
+            Você tem certeza que deseja prosseguir com esta ação?
+        </p>
+        <div class="modal-actions">
+            <button id="modalCancelBtn" class="btn-secondary" onclick="hideConfirmationModal()">
+                Cancelar
+            </button>
+            <button id="modalConfirmBtn" class="btn-danger">
+                <i class="fas fa-trash-alt"></i>
+                Confirmar
+            </button>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_css %}
@@ -1135,6 +1159,111 @@
 .removing {
     animation: slideOutRight 0.5s ease forwards;
 }
+
+/*
+====================================================================
+10. MODAL DE CONFIRMAÇÃO (CORRIGIDO)
+====================================================================
+*/
+.confirmation-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    
+    /* ESTILOS DO FUNDO MOVIDOS PARA CÁ */
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px); /* Para compatibilidade com Safari */
+    cursor: pointer;
+}
+
+.confirmation-modal.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* O .modal-backdrop FOI REMOVIDO */
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    padding: 2.5rem;
+    width: 90%;
+    max-width: 450px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+    cursor: default; /* Garante que o cursor não seja de clique sobre o conteúdo */
+}
+
+.confirmation-modal.show .modal-content {
+    transform: scale(1);
+}
+
+.modal-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: #fff3cd; /* Amarelo de alerta do Bootstrap */
+    color: #ffc107; /* Cor do ícone */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto 1.5rem auto;
+    border: 4px solid #ffeeba;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin: 0 0 0.75rem 0;
+}
+
+.modal-message {
+    color: var(--gray-600);
+    margin: 0 0 2rem 0;
+    line-height: 1.6;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* Botão de perigo customizado */
+.btn-danger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 2rem;
+    background: linear-gradient(135deg, var(--danger), #c82333);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(220, 53, 69, 0.3);
+}
 </style>
 {% endblock %}
 
@@ -1160,76 +1289,140 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Remove FAQ function
-function removerDuvida(faqId, element) {
-    if (!confirm('Tem certeza que deseja remover esta dúvida das suas dúvidas salvas?')) {
-        return;
+// =============================================================================
+// MODAL DE CONFIRMAÇÃO (LÓGICA CORRIGIDA)
+// =============================================================================
+const confirmationModal = document.getElementById('confirmationModal');
+const modalTitle = document.getElementById('modalTitle');
+const modalMessage = document.getElementById('modalMessage');
+const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+
+function showConfirmationModal(title, message, onConfirmCallback) {
+    modalTitle.textContent = title;
+    modalMessage.textContent = message;
+
+    modalConfirmBtn.onclick = function() {
+        onConfirmCallback();
+        hideConfirmationModal();
+    };
+
+    confirmationModal.classList.add('show');
+}
+
+function hideConfirmationModal() {
+    confirmationModal.classList.remove('show');
+}
+
+// NOVA FUNÇÃO: Fecha o modal apenas se o clique for no fundo (o próprio container)
+function closeModalOnClickOutside(event) {
+    if (event.target === confirmationModal) {
+        hideConfirmationModal();
     }
-    
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    const duvidasItem = element.closest('.duvida-item');
-    
-    // Add removing animation
-    duvidasItem.classList.add('removing');
-    
-    fetch(`/remover-faq/${faqId}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': csrfToken,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({'faq_id': faqId})
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            setTimeout(() => {
-                duvidasItem.remove();
-                
-                // Update counter
-                const counter = document.querySelector('[data-tab="duvidas-salvas"] .tab-counter');
-                const currentCount = parseInt(counter.textContent);
-                const newCount = currentCount - 1;
-                counter.textContent = newCount;
-                
-                // Update header count
-                const headerCount = document.querySelector('#duvidas-salvas .card-header p');
-                headerCount.textContent = `${newCount} dúvida${newCount !== 1 ? 's' : ''} salva${newCount !== 1 ? 's' : ''}`;
-                
-                // Show empty state if no more items
-                if (newCount === 0) {
-                    const duvidasList = document.querySelector('.duvidas-list');
-                    duvidasList.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">
-                                <i class="fas fa-bookmark"></i>
-                            </div>
-                            <h3>Nenhuma dúvida salva</h3>
-                            <p>Você ainda não salvou nenhuma dúvida.</p>
-                            <a href="/duvidas/" class="btn-secondary">
-                                Explorar Dúvidas Frequentes
-                            </a>
-                        </div>
-                    `;
+}
+
+
+// =============================================================================
+// FUNÇÕES DE REMOÇÃO (ATUALIZADAS)
+// =============================================================================
+
+function removerDuvida(faqId, element) {
+    showConfirmationModal(
+        'Remover Dúvida',
+        'Tem certeza que deseja remover esta dúvida dos seus itens salvos? Esta ação não pode ser desfeita.',
+        () => {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const duvidasItem = element.closest('.duvida-item');
+            duvidasItem.classList.add('removing');
+
+            fetch(`/remover-faq/${faqId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json',
                 }
-            }, 500);
-            
-            showToast('success', 'Dúvida removida com sucesso!');
-        } else {
-            duvidasItem.classList.remove('removing');
-            showToast('error', data.message || 'Erro ao remover dúvida');
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    setTimeout(() => {
+                        duvidasItem.remove();
+                        // Atualiza contadores
+                        const counter = document.querySelector('[data-tab="duvidas-salvas"] .tab-counter');
+                        const newCount = parseInt(counter.textContent) - 1;
+                        counter.textContent = newCount;
+                        document.querySelector('#duvidas-salvas .card-header p').textContent = `${newCount} dúvida${newCount !== 1 ? 's' : ''} salva${newCount !== 1 ? 's' : ''}`;
+                        if (newCount === 0) {
+                            document.querySelector('.duvidas-list').innerHTML = `
+                                <div class="empty-state">
+                                    <div class="empty-icon"><i class="fas fa-bookmark"></i></div>
+                                    <h3>Nenhuma dúvida salva</h3>
+                                    <p>Você ainda não salvou nenhuma dúvida.</p>
+                                    <a href="{% url 'duvidas' %}" class="btn-secondary">Explorar Dúvidas</a>
+                                </div>`;
+                        }
+                    }, 500);
+                    showToast('success', 'Dúvida removida com sucesso!');
+                } else {
+                    duvidasItem.classList.remove('removing');
+                    showToast('error', data.message || 'Erro ao remover dúvida.');
+                }
+            })
+            .catch(error => {
+                duvidasItem.classList.remove('removing');
+                showToast('error', 'Erro de conexão. Tente novamente.');
+            });
         }
-    })
-    .catch(error => {
-        duvidasItem.classList.remove('removing');
-        console.error('Erro:', error);
-        showToast('error', 'Erro de conexão. Tente novamente.');
-    });
+    );
+}
+
+function removerContato(contatoId, element) {
+    showConfirmationModal(
+        'Remover Contato',
+        'Tem certeza que deseja remover este contato dos seus itens salvos? Esta ação não pode ser desfeita.',
+        () => {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const contatoItem = element.closest('.contato-item');
+            contatoItem.classList.add('removing');
+
+            fetch(`/remover-contato/${contatoId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    setTimeout(() => {
+                        contatoItem.remove();
+                        // Atualiza contadores
+                        const counter = document.querySelector('[data-tab="contatos-salvos"] .tab-counter');
+                        const newCount = parseInt(counter.textContent) - 1;
+                        counter.textContent = newCount;
+                        document.querySelector('#contatos-salvos .card-header p').textContent = `${newCount} contato${newCount !== 1 ? 's' : ''} salvo${newCount !== 1 ? 's' : ''}`;
+                        if (newCount === 0) {
+                            document.querySelector('.contatos-list').innerHTML = `
+                                <div class="empty-state">
+                                    <div class="empty-icon"><i class="fas fa-address-book"></i></div>
+                                    <h3>Nenhum contato salvo</h3>
+                                    <p>Você ainda não salvou nenhum contato.</p>
+                                    <a href="{% url 'contatos' %}" class="btn-secondary">Explorar Contatos</a>
+                                </div>`;
+                        }
+                    }, 500);
+                    showToast('success', 'Contato removido com sucesso!');
+                } else {
+                    contatoItem.classList.remove('removing');
+                    showToast('error', data.message || 'Erro ao remover contato.');
+                }
+            })
+            .catch(error => {
+                contatoItem.classList.remove('removing');
+                showToast('error', 'Erro de conexão. Tente novamente.');
+            });
+        }
+    );
 }
 
 // Toggle accordion function
@@ -1301,77 +1494,6 @@ function hideToast() {
     toast.classList.remove('show');
 }
 
-// Remove Contact function
-function removerContato(contatoId, element) {
-    if (!confirm('Tem certeza que deseja remover este contato dos seus contatos salvos?')) {
-        return;
-    }
-    
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    const contatoItem = element.closest('.contato-item');
-    
-    // Add removing animation
-    contatoItem.classList.add('removing');
-    
-    fetch(`/remover-contato/${contatoId}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': csrfToken,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({'contato_id': contatoId})
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            setTimeout(() => {
-                contatoItem.remove();
-                
-                // Update counter
-                const counter = document.querySelector('[data-tab="contatos-salvos"] .tab-counter');
-                const currentCount = parseInt(counter.textContent);
-                const newCount = currentCount - 1;
-                counter.textContent = newCount;
-                
-                // Update header count
-                const headerCount = document.querySelector('#contatos-salvos .card-header p');
-                headerCount.textContent = `${newCount} contato${newCount !== 1 ? 's' : ''} salvo${newCount !== 1 ? 's' : ''}`;
-                
-                // Show empty state if no more items
-                if (newCount === 0) {
-                    const contatosList = document.querySelector('.contatos-list');
-                    contatosList.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">
-                                <i class="fas fa-address-book"></i>
-                            </div>
-                            <h3>Nenhum contato salvo</h3>
-                            <p>Você ainda não salvou nenhum contato.</p>
-                            <a href="/contatos/" class="btn-secondary">
-                                Explorar Contatos
-                            </a>
-                        </div>
-                    `;
-                }
-            }, 500);
-            
-            showToast('success', 'Contato removido com sucesso!');
-        } else {
-            contatoItem.classList.remove('removing');
-            showToast('error', data.message || 'Erro ao remover contato');
-        }
-    })
-    .catch(error => {
-        contatoItem.classList.remove('removing');
-        console.error('Erro:', error);
-        showToast('error', 'Erro de conexão. Tente novamente.');
-    });
-}
 
 // Toggle contact details
 function toggleContatoDetalhes(buttonElement) {
