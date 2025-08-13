@@ -123,7 +123,7 @@ class CategoriaContato(CategoriaBase):
 class Contato(models.Model):
     nome = models.CharField(max_length=200)
     descricao = models.TextField()
-    imagem = models.ImageField(upload_to='static/img/', blank=True, null=True)    
+    imagem_url = models.URLField(max_length=1024, blank=True, null=True, verbose_name="URL da Imagem")
     
     # Campos de endereço
     rua = models.CharField(max_length=200, blank=True, null=True)
@@ -227,7 +227,7 @@ class UserSavedContato(models.Model):
 # Modelo para galeria de fotos do contato
 class FotoContato(models.Model):
     contato = models.ForeignKey(Contato, on_delete=models.CASCADE, related_name='fotos')
-    imagem = models.ImageField(upload_to='static/img/contatos/')
+    imagem_url = models.URLField(max_length=1024, blank=True, null=True, verbose_name="URL da Imagem")
     legenda = models.CharField(max_length=200, blank=True, null=True)
     ordem = models.PositiveIntegerField(default=0)
     

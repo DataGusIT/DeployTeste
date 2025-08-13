@@ -134,9 +134,12 @@
                                         <div class="card h-100 border-0 shadow-sm hover-card">
                                             
                                             <div class="card-img-top position-relative">
-                                                {% if contato.imagem %}
-                                                    <img src="{{ contato.imagem.url }}" alt="{{ contato.nome }}" class="img-fluid rounded-top" style="height: 200px; width: 100%; object-fit: cover;">
+                                                {# Verificamos o novo campo 'imagem_url' #}
+                                                {% if contato.imagem_url %}
+                                                    {# Usamos diretamente o 'imagem_url', sem o .url no final #}
+                                                    <img src="{{ contato.imagem_url }}" alt="{{ contato.nome }}" class="img-fluid rounded-top" style="height: 200px; width: 100%; object-fit: cover;">
                                                 {% else %}
+                                                    {# O 'else' para a imagem padrão continua perfeito #}
                                                     <img src="{% static 'img/default-contact.jpg' %}" alt="{{ contato.nome }}" class="img-fluid rounded-top" style="height: 200px; width: 100%; object-fit: cover;">
                                                 {% endif %}
                                                 
