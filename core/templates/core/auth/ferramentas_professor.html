@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- A cor de fundo é a variável do seu tema -->
+<section class="py-5" style="background-color: var(--primary-very-light);">
+    <div class="container">
+        <!-- CABEÇALHO DA PÁGINA -->
+        <div class="section-header text-center mb-5 animate-fade-up">
+            <span class="section-subtitle">Nosso Acervo</span>
+            <h2 class="section-title">Ferramentas Pedagógicas</h2>
+            <div class="section-divider"></div>
+            <p class="section-description">
+                Recursos práticos, atividades e materiais de apoio desenvolvidos para auxiliar no processo de ensino e desenvolvimento.
+            </p>
+        </div>
+
+        {% if categorias_com_ferramentas %}
+            {% for categoria in categorias_com_ferramentas %}
+                <div class="mb-5" id="categoria-{{ categoria.id }}">
+                    <!-- CABEÇALHO DA CATEGORIA -->
+                    <div class="d-flex align-items-center mb-4 animate-fade-up">
+                        <div class="feature-icon me-3">
+                            <i class="{{ categoria.icone|default:'fas fa-folder-open' }}"></i>
+                        </div>
+                        <h3 class="feature-title mb-0 fs-2">{{ categoria.nome }}</h3>
+                    </div>
+
+                    <div class="row g-4">
+                        {% for ferramenta in categoria.ferramentas.all %}
+                        <div class="col-md-6 col-lg-4 d-flex align-items-stretch">
+                            <!-- CARD DA FERRAMENTA -->
+                            <div class="update-card w-100 animate-fade-up delay-1">
+                                <div class="update-image">
+                                    {% if ferramenta.imagem_capa %}
+                                        <img src="{{ ferramenta.imagem_capa.url }}" alt="{{ ferramenta.nome }}" class="img-fluid" style="height: 220px; object-fit: cover;">
+                                    {% else %}
+                                        <img src="{% static 'img/default-contact.jpg' %}" alt="Imagem padrão" class="img-fluid" style="height: 220px; object-fit: cover;">
+                                    {% endif %}
+                                    
+                                    {% if ferramenta.publico_alvo %}
+                                       <div class="update-category">{{ ferramenta.get_publico_alvo_display }}</div>
+                                    {% endif %}
+                                    
+                                    {% if not ferramenta.eh_gratuita %}
+                                        <span class="badge position-absolute top-0 start-0 m-3" style="background-color: var(--accent); color: var(--dark); font-size: 0.8rem; padding: 6px 12px;">
+                                            <i class="fas fa-star me-1"></i>Premium
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="update-content d-flex flex-column">
+                                    <span class="update-date">Por <strong>{{ ferramenta.autor|default:"Autor Desconhecido" }}</strong></span>
+                                    <h5 class="update-title">{{ ferramenta.nome }}</h5>
+                                    <p class="update-excerpt flex-grow-1">{{ ferramenta.descricao|truncatechars:100 }}</p>
+                                    
+                                    {% if ferramenta.habilidades_desenvolvidas %}
+                                        <div class="small text-muted mb-3">
+                                            <i class="fas fa-brain me-2 text-primary"></i>
+                                            <strong>Habilidades:</strong> {{ ferramenta.habilidades_desenvolvidas|truncatechars:35 }}
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% if ferramenta.arquivo_pdf %}
+                                        <a href="{{ ferramenta.arquivo_pdf.url }}" class="btn btn-primary w-100 mt-auto" download>
+                                            <i class="fas fa-download me-2"></i>Baixar PDF
+                                        </a>
+                                    {% else %}
+                                        <button class="btn btn-secondary w-100 mt-auto" disabled style="background-color: var(--gray-300); border: none;">
+                                            <i class="fas fa-times-circle me-2"></i>Indisponível
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <!-- MENSAGEM DE 'NENHUMA FERRAMENTA' (COM FUNDO TRANSPARENTE) -->
+            <div class="text-center py-5">
+                <div class="feature-icon mb-4" style="width: 80px; height: 80px; font-size: 2.2rem;">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <h4 class="section-title">Nenhuma Ferramenta Cadastrada</h4>
+                <p class="section-description">Ainda não há ferramentas pedagógicas disponíveis no sistema. Volte em breve!</p>
+            </div>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}
+
+
+{% block extra_css %}
+{{ block.super }}
+<!-- CSS customizado removido -->
+{% endblock %}

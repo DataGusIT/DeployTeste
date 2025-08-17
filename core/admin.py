@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html 
-from .models import CategoriaFAQ, CategoriaContato, CategoriaFerramenta, FAQ, Contato, Ferramenta, CustomUser, UserDownload, UserSavedFAQ, FotoContato, UserSavedContato
+from .models import CategoriaFAQ, CategoriaContato, CategoriaFerramenta, FAQ, Contato, Ferramenta, CustomUser, UserDownload, UserSavedFAQ, FotoContato, UserSavedContato, Aluno, RelatorioDesempenho, Turma
 import uuid
 from supabase import create_client, Client
 import os
@@ -13,11 +13,52 @@ from django import forms
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_admin', 'is_staff')
-    list_filter = ('is_admin', 'is_staff', 'is_active')
+    # MODIFICAÇÃO: Adicionado 'is_professor' para fácil visualização e filtro
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_admin', 'is_professor', 'is_staff')
+    list_filter = ('is_admin', 'is_professor', 'is_staff', 'is_active')
+    
+    # MODIFICAÇÃO: Adicionado 'is_professor' aos campos editáveis
     fieldsets = UserAdmin.fieldsets + (
-        ('Informações Adicionais', {'fields': ('is_admin',)}),
+        ('Funções Customizadas', {'fields': ('is_admin', 'is_professor')}),
     )
+
+# =============================================================================
+# NOVA ADMINISTRAÇÃO: ALUNOS E RELATÓRIOS
+# =============================================================================
+# NOVA ADMINISTRAÇÃO PARA TURMAS
+@admin.register(Turma)
+class TurmaAdmin(admin.ModelAdmin):
+    list_display = ('nome',)
+    search_fields = ('nome',)
+
+@admin.register(Aluno)
+class AlunoAdmin(admin.ModelAdmin):
+    # MODIFICADO: Adicionamos os novos campos
+    list_display = ('nome_completo', 'turma', 'nivel_autismo', 'data_nascimento', 'data_cadastro')
+    search_fields = ('nome_completo',)
+    # MODIFICADO: Adicionamos 'nivel_autismo' ao filtro
+    list_filter = ('turma', 'nivel_autismo', 'data_cadastro',)
+    autocomplete_fields = ['turma']
+
+    # NOVO: Organizando o formulário de edição com fieldsets
+    fieldsets = (
+        ('Informações Pessoais', {
+            'fields': ('nome_completo', 'data_nascimento')
+        }),
+        ('Informações Acadêmicas', {
+            'fields': ('turma',)
+        }),
+        ('Informações de Diagnóstico', {
+            'fields': ('nivel_autismo', 'laudo')
+        }),
+    )
+
+@admin.register(RelatorioDesempenho)
+class RelatorioDesempenhoAdmin(admin.ModelAdmin):
+    list_display = ('aluno', 'professor', 'titulo', 'data_relatorio')
+    list_filter = ('aluno', 'professor', 'data_relatorio')
+    search_fields = ('titulo', 'relato', 'aluno__nome_completo', 'professor__username')
+    autocomplete_fields = ['aluno', 'professor'] # Facilita a busca
 
 # =============================================================================
 # ADMINISTRAÇÃO DE DÚVIDAS/FAQ
@@ -220,13 +261,26 @@ class CategoriaFerramentaAdmin(admin.ModelAdmin):
 
 @admin.register(Ferramenta)
 class FerramentaAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'categoria', 'eh_gratuita', 'classificacao', 'get_tipo_funcionalidade')
-    list_filter = ('categoria', 'eh_gratuita', 'tipo')
-    search_fields = ('nome', 'descricao')
+    list_display = ('nome', 'categoria', 'autor', 'publico_alvo', 'apenas_para_professores', 'eh_gratuita')
+    list_filter = ('categoria', 'apenas_para_professores', 'eh_gratuita', 'publico_alvo')
+    search_fields = ('nome', 'descricao', 'autor')
+    autocomplete_fields = ['categoria']
 
-    @admin.display(description='Tipo de Funcionalidade')
-    def get_tipo_funcionalidade(self, obj):
-        return obj.tipo.nome
+    # Organizando o formulário de edição para melhor usabilidade
+    fieldsets = (
+        ('Informações Principais', {
+            'fields': ('nome', 'categoria', 'descricao', 'autor')
+        }),
+        ('Arquivos e Imagens', {
+            'fields': ('imagem_capa', 'arquivo_pdf')
+        }),
+        ('Detalhes Pedagógicos', {
+            'fields': ('publico_alvo', 'habilidades_desenvolvidas')
+        }),
+        ('Configurações e Acesso', {
+            'fields': ('apenas_para_professores', 'eh_gratuita', 'classificacao', 'icone_classe')
+        }),
+    )
 
 @admin.register(UserDownload)
 class UserDownloadAdmin(admin.ModelAdmin):

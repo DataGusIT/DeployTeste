@@ -4,11 +4,11 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator
-from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserProfileForm
+from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserProfileForm, RelatorioDesempenhoForm
 from django.db.models import Q
 from .models import (
     FAQ, CategoriaFAQ, CategoriaContato, CategoriaFerramenta, 
-    Contato, Ferramenta, CustomUser, UserDownload, UserSavedFAQ, UserSavedContato
+    Contato, Ferramenta, CustomUser, UserDownload, UserSavedFAQ, UserSavedContato, Aluno, RelatorioDesempenho, Turma
 )
 
 from collections import defaultdict
@@ -26,6 +26,146 @@ from collections import OrderedDict
 def is_admin(user):
     """Função auxiliar para verificar se o usuário é admin"""
     return user.is_authenticated and (user.is_staff or user.is_superuser)
+
+# NOVA FUNÇÃO AUXILIAR
+def is_professor(user):
+    """Função auxiliar para verificar se o usuário é professor"""
+    # CORREÇÃO: Acessamos o campo através da relação 'customuser'
+    # Adicionamos um 'hasattr' por segurança, para o caso do admin (superuser) não ter o perfil customuser criado.
+    return user.is_authenticated and hasattr(user, 'customuser') and user.customuser.is_professor
+
+# =============================================================================
+# NOVAS VIEWS: ÁREA DO PROFESSOR
+# =============================================================================
+
+@login_required
+@user_passes_test(is_professor, login_url='/login/', redirect_field_name=None)
+def area_professor(request):
+    """
+    Carrega a página principal da área do professor, incluindo os
+    controles de filtro e a lista inicial de alunos.
+    """
+    alunos_list = Aluno.objects.select_related('turma').all().order_by('nome_completo')
+
+    paginator = Paginator(alunos_list, 10)
+    page_number = request.GET.get('page')
+    alunos_page_obj = paginator.get_page(page_number)
+    
+    # Adicionando último relatório (sua lógica original, mas aplicada à página atual)
+    for aluno in alunos_page_obj:
+        aluno.ultimo_relatorio = RelatorioDesempenho.objects.filter(aluno=aluno).first()
+
+    # Buscando dados para os filtros
+    turmas = Turma.objects.all().order_by('nome')
+    niveis_autismo = Aluno.NIVEL_AUTISMO_CHOICES
+
+    context = {
+        'title': 'Área do Professor',
+        'alunos_page': alunos_page_obj,
+        'turmas': turmas,
+        'niveis_autismo': niveis_autismo,
+    }
+    return render(request, 'core/auth/area_professor.html', context)
+
+
+@login_required
+@user_passes_test(is_professor, login_url='/login/', redirect_field_name=None)
+def filtrar_alunos_api(request):
+    """
+    Endpoint de API que retorna a lista de alunos filtrada em HTML.
+    Esta view é chamada via AJAX pelo JavaScript da página.
+    """
+    # 1. Obter parâmetros da requisição GET
+    search_term = request.GET.get('search', '')
+    turma_id = request.GET.get('turma', '')
+    nivel = request.GET.get('nivel', '')
+    
+    # 2. Construir a query base
+    alunos_list = Aluno.objects.select_related('turma').all().order_by('nome_completo')
+    
+    # 3. Aplicar filtros se eles existirem
+    if search_term:
+        alunos_list = alunos_list.filter(nome_completo__icontains=search_term)
+    
+    if turma_id and turma_id != 'todos':
+        alunos_list = alunos_list.filter(turma_id=turma_id)
+        
+    if nivel and nivel != 'todos':
+        alunos_list = alunos_list.filter(nivel_autismo=nivel)
+        
+    # 4. Paginar os resultados filtrados
+    paginator = Paginator(alunos_list, 10)
+    page_number = request.GET.get('page', 1) # Sempre vai para a página 1 em uma nova filtragem
+    alunos_page_obj = paginator.get_page(page_number)
+
+    # Adicionando último relatório (lógica original)
+    for aluno in alunos_page_obj:
+        aluno.ultimo_relatorio = RelatorioDesempenho.objects.filter(aluno=aluno).first()
+
+    context = {
+        'alunos_page': alunos_page_obj
+    }
+    
+    # 5. Renderizar APENAS a lista de alunos e a paginação
+    return render(request, 'core/auth/_lista_alunos_parcial.html', context)
+
+@login_required
+@user_passes_test(is_professor, login_url='/login/', redirect_field_name=None)
+def detalhes_aluno(request, aluno_id):
+    """Exibe todos os relatórios de um aluno específico."""
+    # MODIFICADO: Usamos select_related aqui também
+    aluno = get_object_or_404(Aluno.objects.select_related('turma'), id=aluno_id)
+    relatorios = RelatorioDesempenho.objects.filter(aluno=aluno).select_related('professor')
+    
+    context = {
+        'title': f'Relatórios de {aluno.nome_completo}',
+        'aluno': aluno,
+        'relatorios': relatorios
+    }
+    return render(request, 'core/auth/detalhes_aluno.html', context)
+
+
+@login_required
+@user_passes_test(is_professor, login_url='/login/', redirect_field_name=None)
+def adicionar_relatorio(request, aluno_id):
+    """Formulário para adicionar um novo relatório para um aluno."""
+    aluno = get_object_or_404(Aluno, id=aluno_id)
+    
+    if request.method == 'POST':
+        form = RelatorioDesempenhoForm(request.POST)
+        if form.is_valid():
+            relatorio = form.save(commit=False)
+            relatorio.aluno = aluno
+            relatorio.professor = request.user.customuser # Associa o CustomUser do professor logado
+            relatorio.save()
+            messages.success(request, f'Relatório para {aluno.nome_completo} salvo com sucesso!')
+            return redirect('detalhes_aluno', aluno_id=aluno.id)
+    else:
+        form = RelatorioDesempenhoForm()
+        
+    context = {
+        'title': f'Adicionar Relatório para {aluno.nome_completo}',
+        'form': form,
+        'aluno': aluno
+    }
+    return render(request, 'core/auth/adicionar_relatorio.html', context)
+
+@login_required
+@user_passes_test(is_professor, login_url='/login/', redirect_field_name=None)
+def ferramentas_professor(request):
+    """Lista TODAS as ferramentas para a área do professor."""
+    # Esta view não precisa de filtro, pois o professor pode ver tudo.
+    categorias_com_ferramentas = CategoriaFerramenta.objects.annotate(
+        num_ferramentas=Count('ferramentas')
+    ).filter(num_ferramentas__gt=0).prefetch_related('ferramentas')
+    
+    context = {
+        'title': 'Ferramentas do Professor',
+        'categorias_com_ferramentas': categorias_com_ferramentas,
+    }
+    
+    return render(request, 'core/auth/ferramentas_professor.html', context)
+
 
 # =============================================================================
 # VIEWS PÚBLICAS - PÁGINAS PRINCIPAIS
@@ -56,24 +196,23 @@ def newsletter_signup(request):
 # =============================================================================
 
 def ferramentas(request):
-    """Lista todas as ferramentas organizadas por categoria"""
-    # Obter todas as ferramentas agrupadas por categoria (usando as novas categorias)
-    ferramentas_pictogramas = Ferramenta.objects.filter(categoria='pictogramas_escolares')
-    ferramentas_alfabetizacao = Ferramenta.objects.filter(categoria='alfabetizacao')
-    ferramentas_brinquedos = Ferramenta.objects.filter(categoria='brinquedos_brincadeiras')
-    ferramentas_historias = Ferramenta.objects.filter(categoria='historias_sociais')
-    ferramentas_atividades = Ferramenta.objects.filter(categoria='atividades_diversas')
+    """Lista todas as ferramentas PÚBLICAS organizadas por categoria."""
+    # MODIFICADO: Adicionamos .filter(apenas_para_professores=False) para
+    # buscar apenas as ferramentas que NÃO são exclusivas para professores.
+    categorias_com_ferramentas = CategoriaFerramenta.objects.annotate(
+        num_ferramentas=Count('ferramentas')
+    ).filter(
+        num_ferramentas__gt=0, 
+        ferramentas__apenas_para_professores=False # <-- Filtro principal
+    ).prefetch_related('ferramentas').distinct()
     
     context = {
         'title': 'Ferramentas',
-        'ferramentas_pictogramas': ferramentas_pictogramas,
-        'ferramentas_alfabetizacao': ferramentas_alfabetizacao,
-        'ferramentas_brinquedos': ferramentas_brinquedos,
-        'ferramentas_historias': ferramentas_historias,
-        'ferramentas_atividades': ferramentas_atividades,
+        'categorias_com_ferramentas': categorias_com_ferramentas,
     }
     
     return render(request, 'core/ferramentas.html', context)
+
 
 def detalhes_ferramenta(request, id):
     """Exibe detalhes de uma ferramenta específica"""
@@ -505,16 +644,18 @@ def register_view(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            # MODIFICAÇÃO IMPORTANTE: Para a herança multi-tabela funcionar corretamente,
+            # precisamos criar o objeto CustomUser explicitamente após criar o User.
+            CustomUser.objects.create(user_ptr_id=user.pk)
+            
             username = form.cleaned_data.get('username')
             messages.success(
                 request, 
                 f'Conta criada com sucesso para {username}! Você foi logado automaticamente.'
             )
-            # Opcional: fazer login automático após o registro
             login(request, user)
-            return redirect('index')  # ou para onde você quiser redirecionar
+            return redirect('index')
         else:
-            # Se houver erros, eles serão exibidos no template
             messages.error(
                 request, 
                 'Por favor, corrija os erros abaixo.'
@@ -523,6 +664,7 @@ def register_view(request):
         form = CustomUserCreationForm()
     
     return render(request, 'core/auth/register.html', {'form': form})
+
 
 def login_view(request):
     """Login de usuários"""
@@ -535,15 +677,12 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 
-                # Verificar se o usuário é administrador usando os atributos padrão do Django
                 if user.is_staff or user.is_superuser:
                     messages.success(request, f'Bem-vindo, {user.first_name}! Acesso administrativo concedido.')
                     return redirect('/admin/')
                 else:
-                    # Mensagem de sucesso específica para usuários normais
                     messages.success(request, f'Bem-vindo, {user.first_name}! Login realizado com sucesso.')
                 
-                # Se não for admin, redireciona para a página solicitada ou para a página inicial
                 next_url = request.GET.get('next', 'index')
                 return redirect(next_url)
             else:
@@ -555,6 +694,7 @@ def login_view(request):
     
     return render(request, 'core/auth/login.html', {'form': form})
 
+
 def logout_view(request):
     """Logout de usuários"""
     logout(request)
@@ -565,20 +705,22 @@ def logout_view(request):
 def profile_view(request):
     """Perfil do usuário com histórico de downloads, FAQs salvas e contatos salvos"""
     user = request.user
-    downloads = UserDownload.objects.filter(user=user).select_related('ferramenta')
+    custom_user = user.customuser # Acessa o perfil customizado aqui
     
-    # Busca as dúvidas salvas pelo usuário
+    # Supondo que UserSavedFAQ e UserSavedContato usam a FK para CustomUser
     duvidas_salvas = UserSavedFAQ.objects.filter(
-        user=user
+        user=custom_user
     ).select_related('faq', 'faq__categoria').order_by('-data_salva')
     
-    # Busca os contatos salvos pelo usuário
     contatos_salvos = UserSavedContato.objects.filter(
-        user=user
+        user=custom_user
     ).select_related('contato', 'contato__categoria').order_by('-data_salva')
+
+    # Supondo que UserDownload usa a FK para CustomUser
+    downloads = UserDownload.objects.filter(user=custom_user).select_related('ferramenta')
     
     if request.method == 'POST':
-        form = UserProfileForm(request.POST, instance=user)
+        form = UserProfileForm(request.POST, instance=user) # O form edita o User base
         if form.is_valid():
             form.save()
             messages.success(request, 'Perfil atualizado com sucesso!')
@@ -593,6 +735,7 @@ def profile_view(request):
         'contatos_salvos': contatos_salvos,
         'title': 'Meu Perfil'
     })
+
 
 # =============================================================================
 # VIEWS ADMINISTRATIVAS - DASHBOARD

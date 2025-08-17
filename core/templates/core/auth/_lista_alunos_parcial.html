@@ -1,0 +1,79 @@
+{% load query_tags %}
+
+<!-- ============================================= -->
+<!--      LISTA DE ALUNOS (CONTEÚDO DINÂMICO)      -->
+<!-- ============================================= -->
+<div class="list-group list-group-flush">
+    {% for aluno in alunos_page %}
+    <!-- Item da Lista -->
+    <a href="{% url 'detalhes_aluno' aluno.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 px-4">
+        <div class="d-flex align-items-center">
+            <!-- Ícone de Aluno -->
+            <div class="feature-icon me-3" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div>
+                <h6 class="feature-title mb-1">{{ aluno.nome_completo }}</h6>
+                <small class="text-muted">
+                    {% if aluno.turma %}
+                        Turma: <strong class="text-primary">{{ aluno.turma.nome }}</strong> |
+                    {% endif %}
+                    Nível de Suporte: 
+                    {% if aluno.get_nivel_autismo_display %}
+                        <strong class="text-primary">{{ aluno.get_nivel_autismo_display|cut:" - Necessita de Pouco Apoio"|cut:" - Necessita de Apoio Substancial"|cut:" - Necessita de Apoio Muito Substancial" }}</strong> |
+                    {% else %}
+                        <strong class="text-secondary">Não informado</strong> |
+                    {% endif %}
+                    Último relatório:
+                    {% if aluno.ultimo_relatorio %}
+                        <strong>{{ aluno.ultimo_relatorio.data_relatorio|date:"d/m/Y" }}</strong>
+                    {% else %}
+                        <span class="text-secondary">Nenhum</span>
+                    {% endif %}
+                </small>
+            </div>
+        </div>
+        <i class="fas fa-chevron-right text-primary"></i>
+    </a>
+    {% empty %}
+    <div class="list-group-item text-center p-4">
+        <i class="fas fa-search-minus fa-2x text-muted mb-3"></i>
+        <p class="text-muted mb-0">Nenhum aluno encontrado com os filtros aplicados.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- ============================================= -->
+<!--      PAGINAÇÃO (CONTEÚDO DINÂMICO)      -->
+<!-- ============================================= -->
+{% if alunos_page.paginator.num_pages > 1 %}
+<div class="p-4 border-top">
+    <nav aria-label="Navegação de alunos">
+        <ul class="pagination justify-content-center mb-0">
+            {% if alunos_page.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ alunos_page.previous_page_number }}" data-page="{{ alunos_page.previous_page_number }}">&laquo;</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1">&laquo;</a></li>
+            {% endif %}
+
+            {% for i in alunos_page.paginator.page_range %}
+                {% if alunos_page.number == i %}
+                    <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ i }}" data-page="{{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if alunos_page.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ alunos_page.next_page_number }}" data-page="{{ alunos_page.next_page_number }}">&raquo;</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1">&raquo;</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}

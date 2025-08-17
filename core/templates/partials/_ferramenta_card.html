@@ -1,0 +1,27 @@
+<!-- core/templates/partials/_ferramenta_card.html -->
+
+{% load static %}
+
+<div class="col">
+    <div class="card h-100 shadow-sm ferramenta-card">
+        <div class="card-body text-center">
+            <!-- Ícone da Ferramenta -->
+            <div class="ferramenta-icon mb-3">
+                <i class="{{ ferramenta.icone_classe|default:'fas fa-tools' }} fa-3x text-primary"></i>
+            </div>
+
+            <!-- Nome da Ferramenta -->
+            <h5 class="card-title">{{ ferramenta.nome }}</h5>
+            
+            <!-- Descrição Curta -->
+            <p class="card-text text-muted">
+                {{ ferramenta.descricao|truncatewords:15 }}
+            </p>
+        </div>
+        <div class="card-footer bg-white border-0 text-center">
+            <a href="{% url 'detalhes_ferramenta' id=ferramenta.id %}" class="btn btn-outline-primary w-100">
+                Ver Detalhes
+            </a>
+        </div>
+    </div>
+</div>

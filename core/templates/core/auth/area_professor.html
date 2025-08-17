@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="container py-5 animate-fade-up">
+
+    <!-- Section Header -->
+    <div class="section-header text-center mb-5">
+        <span class="section-subtitle">Portal de Ensino</span>
+        <h1 class="section-title">Área do Professor</h1>
+        <div class="section-divider"></div>
+        <p class="section-description">Pesquise por um aluno ou utilize os filtros para encontrar quem você procura.</p>
+    </div>
+
+    <!-- Botão de Ferramentas -->
+    <div class="text-center mb-5">
+        <a href="{% url 'ferramentas_professor' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-tools me-2"></i> Acessar Ferramentas
+        </a>
+    </div>
+
+    <!-- ================================== -->
+    <!--     NOVO: SEÇÃO DE FILTROS ESTILIZADA -->
+    <!-- ================================== -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-10 col-xl-9">
+            <div class="filter-card">
+                <div class="filter-card-header">
+                    <h5 class="mb-0"><i class="fas fa-filter me-2 text-primary"></i>Filtros de Pesquisa</h5>
+                    <button id="btn-limpar-filtros" class="btn-reset">
+                        <i class="fas fa-times me-2"></i>Limpar Filtros
+                    </button>
+                </div>
+                <div class="filter-card-body">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-lg-5">
+                            <label for="search-input" class="form-label">Pesquisar por Nome</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" id="search-input" class="form-control" placeholder="Digite o nome do aluno...">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <label for="filtro-turma" class="form-label">Turma</label>
+                            <select id="filtro-turma" class="form-select">
+                                <option value="todos" selected>Todas</option>
+                                {% for turma in turmas %}
+                                <option value="{{ turma.id }}">{{ turma.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-lg-4 col-md-6">
+                            <label for="filtro-nivel" class="form-label">Nível de Suporte</label>
+                            <select id="filtro-nivel" class="form-select">
+                                <option value="todos" selected>Todos</option>
+                                {% for nivel_valor, nivel_texto in niveis_autismo %}
+                                <option value="{{ nivel_valor }}">{{ nivel_texto|truncatechars:25 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Lista de Alunos e Paginação -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-9">
+            <div class="feature-card p-0">
+                <div class="p-4 d-flex justify-content-between align-items-center">
+                    <h5 class="feature-title mb-0">Meus Alunos</h5>
+                    <small id="contador-alunos" class="text-muted fw-500"></small>
+                </div>
+                <!-- Container que será atualizado pelo AJAX -->
+                <div id="lista-alunos-container">
+                    {% include 'core/auth/_lista_alunos_parcial.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    let searchTimeout;
+
+    function fetchAlunos(page = 1) {
+        const searchTerm = $('#search-input').val();
+        const turmaId = $('#filtro-turma').val();
+        const nivel = $('#filtro-nivel').val();
+
+        $('#lista-alunos-container').css('opacity', 0.5);
+
+        $.ajax({
+            url: "{% url 'filtrar_alunos_api' %}",
+            data: {
+                'search': searchTerm,
+                'turma': turmaId,
+                'nivel': nivel,
+                'page': page
+            },
+            success: function(data) {
+                $('#lista-alunos-container').html(data);
+                $('#lista-alunos-container').css('opacity', 1);
+            },
+            error: function() {
+                $('#lista-alunos-container').html('<p class="text-center text-danger p-4">Ocorreu um erro ao carregar os alunos. Tente novamente.</p>');
+                $('#lista-alunos-container').css('opacity', 1);
+            }
+        });
+    }
+
+    // Eventos de filtro
+    $('#search-input').on('keyup', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => fetchAlunos(1), 300);
+    });
+
+    $('#filtro-turma, #filtro-nivel').on('change', () => fetchAlunos(1));
+
+    // NOVO: Evento para o botão de limpar filtros
+    $('#btn-limpar-filtros').on('click', function() {
+        $('#search-input').val('');
+        $('#filtro-turma').val('todos');
+        $('#filtro-nivel').val('todos');
+        fetchAlunos(1);
+    });
+
+    // Evento para os cliques na paginação
+    $('#lista-alunos-container').on('click', '.pagination a.page-link', function(e) {
+        e.preventDefault();
+        const page = $(this).data('page');
+        if (page) {
+            fetchAlunos(page);
+        }
+    });
+});
+</script>
+{% endblock %}
+
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    /* 
+    =================================================================
+    ESTILOS DA SEÇÃO DE FILTROS (Baseado no seu site.css)
+    =================================================================
+    */
+
+    .filter-card {
+        background-color: #fff;
+        border-radius: 16px;
+        box-shadow: var(--card-shadow);
+        border: none;
+        overflow: hidden;
+        transition: var(--transition);
+    }
+    
+    .filter-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background-color: var(--primary-very-light);
+        border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .filter-card-header h5 {
+        color: var(--primary-dark);
+        font-weight: 600;
+    }
+
+    .btn-reset {
+        background: none;
+        border: none;
+        color: var(--gray-600);
+        font-weight: 500;
+        font-size: 0.9rem;
+        padding: 0.25rem 0.5rem;
+        transition: var(--transition);
+        border-radius: 50px;
+    }
+    .btn-reset:hover {
+        color: var(--primary);
+        background-color: rgba(106, 62, 161, 0.1);
+    }
+    
+    .filter-card-body {
+        padding: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: var(--gray-700);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 50px !important;
+        border: 1px solid var(--gray-300);
+        background-color: var(--body-bg);
+        padding: 0.6rem 1.2rem;
+        height: 48px;
+        transition: var(--transition);
+        font-size: 0.95rem;
+    }
+    
+    .form-control:focus,
+    .form-select:focus {
+        background-color: #fff;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(106, 62, 161, 0.15);
+    }
+    
+    .input-group .form-control {
+        border-radius: 0 50px 50px 0 !important;
+    }
+
+    .input-group .input-group-text {
+        background: transparent;
+        border: 1px solid var(--gray-300);
+        border-right: 0;
+        border-radius: 50px 0 0 50px;
+        color: var(--primary);
+    }
+    
+    /* 
+    =================================================================
+    ESTILOS DA PAGINAÇÃO (Consistente com site.css)
+    =================================================================
+    */
+    .pagination { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; list-style: none; padding: 0; }
+    .pagination .page-item { margin: 0 !important; }
+    .pagination .page-item .page-link { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; font-weight: 600; border: 2px solid var(--gray-200); color: var(--primary); background-color: #fff; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); transition: var(--transition); font-size: 0.95rem; }
+    .pagination .page-item:not(.active):not(.disabled) .page-link:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 5px 15px rgba(106, 62, 161, 0.1); }
+    .pagination .page-item.active .page-link { background: linear-gradient(45deg, var(--primary) 30%, var(--primary-light) 90%); color: #fff; border-color: var(--primary); box-shadow: 0 5px 15px rgba(106, 62, 161, 0.3); transform: scale(1.05); }
+    .pagination .page-item.disabled .page-link { background-color: var(--gray-100); color: var(--gray-500); border-color: var(--gray-200); box-shadow: none; cursor: not-allowed; transform: none; }
+    #lista-alunos-container { transition: opacity 0.3s ease-in-out; }
+</style>
+{% endblock %}

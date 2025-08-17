@@ -57,10 +57,89 @@ class CategoriaBase(models.Model):
 class CustomUser(User):
     # Campos adicionais
     is_admin = models.BooleanField(default=False)
+    # MODIFICAÇÃO: Adicionado campo para identificar professores
+    is_professor = models.BooleanField('É professor?', default=False)
     
     class Meta:
         verbose_name = 'Usuário'
         verbose_name_plural = 'Usuários'
+
+# =============================================================================
+# NOVOS MODELOS: ALUNO E RELATÓRIO DE DESEMPENHO
+# =============================================================================
+# NOVA CLASSE PARA AS TURMAS
+class Turma(models.Model):
+    nome = models.CharField(max_length=100, unique=True, verbose_name='Nome da Turma')
+    
+    class Meta:
+        verbose_name = 'Turma'
+        verbose_name_plural = 'Turmas'
+        ordering = ['nome']
+
+    def __str__(self):
+        return self.nome
+    
+class Aluno(models.Model):
+    # NÍVEIS DE SUPORTE (BASEADO NO DSM-5)
+    NIVEL_AUTISMO_CHOICES = [
+        (1, 'Nível 1 - Exige apoio'),
+        (2, 'Nível 2 - Exige apoio substancial'),
+        (3, 'Nível 3 - Exige apoio muito substancial'),
+    ]
+
+    nome_completo = models.CharField(max_length=255, verbose_name='Nome Completo do Aluno')
+    data_nascimento = models.DateField(verbose_name='Data de Nascimento')
+    data_cadastro = models.DateTimeField(auto_now_add=True, verbose_name='Data de Cadastro')
+    
+    turma = models.ForeignKey(
+        Turma, 
+        on_delete=models.SET_NULL,
+        null=True, 
+        blank=True,
+        related_name='alunos', 
+        verbose_name='Turma Regular'
+    )
+    
+    # NOVO CAMPO: NÍVEL DE AUTISMO
+    nivel_autismo = models.IntegerField(
+        choices=NIVEL_AUTISMO_CHOICES,
+        null=True,
+        blank=True, # Torna o campo opcional
+        verbose_name='Nível de Suporte (Autismo)'
+    )
+
+    # NOVO CAMPO: LAUDO
+    laudo = models.FileField(
+        upload_to='laudos_alunos/', # Os arquivos serão salvos na pasta 'media/laudos_alunos/'
+        null=True,
+        blank=True, # Torna o campo opcional
+        verbose_name='Laudo (PDF ou Imagem)'
+    )
+    
+    class Meta:
+        verbose_name = 'Aluno'
+        verbose_name_plural = 'Alunos'
+        ordering = ['nome_completo']
+
+    def __str__(self):
+        return self.nome_completo
+
+class RelatorioDesempenho(models.Model):
+    aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name='relatorios', verbose_name='Aluno')
+    # MODIFICAÇÃO: Usamos CustomUser para referenciar o professor
+    professor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name='relatorios_criados', verbose_name='Professor')
+    titulo = models.CharField(max_length=200, verbose_name='Título do Relatório')
+    relato = models.TextField(verbose_name='Relato de Desempenho')
+    data_relatorio = models.DateTimeField(auto_now_add=True, verbose_name='Data do Relatório')
+    
+    class Meta:
+        verbose_name = 'Relatório de Desempenho'
+        verbose_name_plural = 'Relatórios de Desempenho'
+        ordering = ['-data_relatorio']
+
+    def __str__(self):
+        return f"Relatório para {self.aluno.nome_completo} em {self.data_relatorio.strftime('%d/%m/%Y')}"
+
 
 # =============================================================================
 # MODELOS RELACIONADOS A DÚVIDAS/FAQ
@@ -246,22 +325,67 @@ class CategoriaFerramenta(CategoriaBase):
         verbose_name_plural = 'Categorias de Ferramentas'
 
 class Ferramenta(models.Model):
-    nome = models.CharField(max_length=200)
-    descricao = models.TextField()
-    icone_classe = models.CharField(max_length=50, default='fas fa-tools')
-    tipo = models.ForeignKey(CategoriaFerramenta, on_delete=models.CASCADE, related_name='ferramentas')
-    eh_gratuita = models.BooleanField(default=False)
-    classificacao = models.DecimalField(max_digits=3, decimal_places=1, default=0.0)
-    categoria = models.CharField(max_length=100, choices=[
-        ('pictogramas_escolares', 'Pictogramas Escolares'),
-        ('alfabetizacao', 'Alfabetização'),
-        ('brinquedos_brincadeiras', 'Brinquedos e Brincadeiras'),
-        ('historias_sociais', 'Histórias Sociais'),
-        ('atividades_diversas', 'Atividades Diversas')
-    ])
+    # OPÇÕES PARA O NOVO CAMPO 'PUBLICO_ALVO'
+    PUBLICO_CHOICES = [
+        ('pais_familiares', 'Pais e Familiares'),
+        ('professores', 'Professores'),
+        ('terapeutas', 'Terapeutas'),
+        ('criancas_jovens', 'Crianças e Jovens'),
+        ('todos', 'Todos os Públicos'),
+    ]
+
+    # --- CAMPOS EXISTENTES ---
+    nome = models.CharField(max_length=200, verbose_name="Nome da Ferramenta")
+    descricao = models.TextField(verbose_name="Descrição")
+    icone_classe = models.CharField(max_length=50, default='fas fa-tools', verbose_name="Ícone (Classe Font Awesome)")
+    categoria = models.ForeignKey(CategoriaFerramenta, on_delete=models.CASCADE, related_name='ferramentas')
+    eh_gratuita = models.BooleanField(default=True, verbose_name="É Gratuita?")
+    classificacao = models.DecimalField(max_digits=3, decimal_places=1, default=0.0, verbose_name="Classificação (0.0 a 5.0)")
+    apenas_para_professores = models.BooleanField('Apenas para professores?', default=False)
+    
+    # --- NOVOS CAMPOS ---
+    imagem_capa = models.ImageField(
+        upload_to='ferramentas_capas/',
+        blank=True,
+        null=True,
+        verbose_name="Imagem de Capa",
+        help_text="Imagem que aparecerá no card da ferramenta."
+    )
+    
+    arquivo_pdf = models.FileField(
+        upload_to='ferramentas_pdfs/',
+        blank=True,
+        null=True,
+        verbose_name="Arquivo PDF",
+        help_text="O arquivo PDF da ferramenta para download."
+    )
+
+    publico_alvo = models.CharField(
+        max_length=50,
+        choices=PUBLICO_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Público-Alvo"
+    )
+
+    habilidades_desenvolvidas = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="Habilidades Desenvolvidas",
+        help_text="Ex: Comunicação, Interação Social, Coordenação Motora"
+    )
+
+    autor = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True,
+        verbose_name="Autor/Fonte"
+    )
     
     def __str__(self):
         return self.nome
+
 
 class UserDownload(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='downloads')

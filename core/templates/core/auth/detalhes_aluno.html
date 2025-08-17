@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="container py-5 animate-fade-up">
+
+    <!-- CABEÇALHO DA PÁGINA -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5">
+        <div>
+            <!-- Subtítulo e Título seguindo o padrão do seu site -->
+            <span class="section-subtitle">{{ aluno.nome_completo }}</span>
+            <h1 class="section-title mb-0">Detalhes e Relatórios</h1>
+        </div>
+        <div class="mt-3 mt-md-0 d-flex justify-content-start">
+            <!-- Botões de Ação com o estilo do seu site.css -->
+            <a href="{% url 'area_professor' %}" class="btn btn-outline-primary me-2">
+                <i class="fas fa-arrow-left me-2"></i> Voltar
+            </a>
+            <a href="{% url 'adicionar_relatorio' aluno.id %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i> Adicionar Relatório
+            </a>
+        </div>
+    </div>
+
+    <!-- SEÇÃO DE INFORMAÇÕES DO ALUNO -->
+    <!-- Utilizando o estilo de 'feature-card' para um visual premium -->
+    <div class="feature-card mb-5">
+        <div class="d-flex align-items-center mb-4">
+            <div class="feature-icon me-3">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <h5 class="feature-title mb-0">Informações do Aluno</h5>
+        </div>
+        <div class="row">
+            <div class="col-md-4 d-flex align-items-start mb-3 mb-md-0">
+                <i class="fas fa-users text-primary fa-lg me-3 mt-1"></i>
+                <div>
+                    <strong class="text-dark">Turma:</strong><br>
+                    {{ aluno.turma.nome|default:"Não informada" }}
+                </div>
+            </div>
+            <div class="col-md-4 d-flex align-items-start mb-3 mb-md-0">
+                <i class="fas fa-puzzle-piece text-primary fa-lg me-3 mt-1"></i>
+                <div>
+                    <strong class="text-dark">Nível de Suporte (Autismo):</strong><br>
+                    {{ aluno.get_nivel_autismo_display|default:"Não informado" }}
+                </div>
+            </div>
+            <div class="col-md-4 d-flex align-items-start">
+                <i class="fas fa-file-medical text-primary fa-lg me-3 mt-1"></i>
+                <div>
+                    <strong class="text-dark">Laudo Médico:</strong><br>
+                    {% if aluno.laudo %}
+                        <a href="{{ aluno.laudo.url }}" target="_blank" class="feature-link">
+                            Visualizar Laudo <i class="fas fa-external-link-alt ms-1"></i>
+                        </a>
+                    {% else %}
+                        <span class="text-muted">Nenhum laudo cadastrado</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HISTÓRICO DE RELATÓRIOS -->
+    <h3 class="section-title mb-4">Histórico de Relatórios</h3>
+
+    {% if relatorios %}
+        {% for relatorio in relatorios %}
+        <!-- Utilizando o estilo de 'testimonial-card' para cada relatório -->
+        <div class="testimonial-card mb-4">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h5 class="feature-title">{{ relatorio.titulo }}</h5>
+                    <!-- Estilo de data consistente com a seção de 'updates' -->
+                    <span class="update-date">
+                        <i class="fas fa-calendar-alt me-2"></i>{{ relatorio.data_relatorio|date:"d \d\e F \d\e Y, H:i" }}
+                    </span>
+                </div>
+                <div class="testimonial-quote">
+                    <i class="fas fa-quote-right"></i>
+                </div>
+            </div>
+            <!-- Estilo de texto e autor do 'testimonial' -->
+            <p class="testimonial-text mt-3" style="white-space: pre-wrap;">{{ relatorio.relato }}</p>
+            <div class="testimonial-author">
+                <div class="testimonial-avatar" style="background-color: var(--primary-very-light); display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-user-tie" style="font-size: 22px; color: var(--primary);"></i>
+                </div>
+                <div class="testimonial-info">
+                    <h5>{{ relatorio.professor.get_full_name|default:relatorio.professor.username }}</h5>
+                    <span>Professor(a)</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+    <!-- Mensagem de 'Nenhum relatório' com destaque visual -->
+    <div class="text-center p-5" style="background-color: var(--primary-very-light); border-radius: 16px;">
+        <div class="feature-icon mb-4" style="width: 80px; height: 80px; font-size: 2.2rem; background-color: white; color: var(--primary);">
+            <i class="fas fa-folder-open"></i>
+        </div>
+        <h4 class="section-title">Nenhum relatório encontrado</h4>
+        <p class="section-description mb-4">Ainda não há relatórios de desempenho para este aluno. <br>Clique no botão abaixo para criar o primeiro.</p>
+        <a href="{% url 'adicionar_relatorio' aluno.id %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-plus me-2"></i> Adicionar Primeiro Relatório
+        </a>
+    </div>
+    {% endif %}
+
+</section>
+{% endblock %}

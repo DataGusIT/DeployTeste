@@ -137,5 +137,15 @@ urlpatterns += [
     path('administracao/ferramentas/excluir/<int:id>/', views.admin_ferramenta_excluir, name='admin_ferramenta_excluir'),
 ]
 
+# =============================================================================
+# NOVAS URLS: ÁREA DO PROFESSOR
+# =============================================================================
 
-
+urlpatterns += [
+    path('professor/', views.area_professor, name='area_professor'),
+    # Adicione a linha abaixo:
+    path('professor/ferramentas/', views.ferramentas_professor, name='ferramentas_professor'),
+    path('professor/aluno/<int:aluno_id>/', views.detalhes_aluno, name='detalhes_aluno'),
+    path('professor/aluno/<int:aluno_id>/adicionar-relatorio/', views.adicionar_relatorio, name='adicionar_relatorio'),
+    path('api/filtrar-alunos/', views.filtrar_alunos_api, name='filtrar_alunos_api'),
+]

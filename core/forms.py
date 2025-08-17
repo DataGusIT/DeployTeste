@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import CustomUser
+from .models import CustomUser, RelatorioDesempenho
 
 # =============================================================================
 # FORMULÁRIOS DE USUÁRIOS
@@ -112,3 +112,29 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ['first_name', 'last_name', 'email']
+
+# =============================================================================
+# NOVO FORMULÁRIO: RELATÓRIO DE DESEMPENHO
+# =============================================================================
+
+class RelatorioDesempenhoForm(forms.ModelForm):
+    titulo = forms.CharField(
+        label='Título do Relatório',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control', 
+            'placeholder': 'Ex: Progresso na comunicação social'
+        })
+    )
+    relato = forms.CharField(
+        label='Relato Detalhado',
+        widget=forms.Textarea(attrs={
+            'class': 'form-control', 
+            'rows': 8,
+            'placeholder': 'Descreva aqui o desempenho, progressos, desafios e atividades realizadas pelo aluno.'
+        })
+    )
+
+    class Meta:
+        model = RelatorioDesempenho
+        # O professor e o aluno serão definidos na view, não no formulário
+        fields = ['titulo', 'relato']
