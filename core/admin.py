@@ -8,6 +8,39 @@ import os
 from django import forms
 
 # =============================================================================
+# FUNÇÃO AUXILIAR DE UPLOAD (REUTILIZÁVEL)
+# =============================================================================
+# É uma boa prática mover a lógica de upload para uma função que pode ser chamada
+# por qualquer painel de administração.
+def _upload_to_supabase(file_obj, bucket_name, sub_folder=''):
+    """
+    Faz o upload de um arquivo para um bucket específico no Supabase.
+    Retorna a URL pública e uma mensagem de erro (se houver).
+    """
+    try:
+        url, key = os.environ.get("SUPABASE_URL"), os.environ.get("SUPABASE_KEY")
+        supabase: Client = create_client(url, key)
+        
+        file_ext = file_obj.name.split('.')[-1]
+        path_prefix = f"{sub_folder}/" if sub_folder else ""
+        
+        # Cria um nome de arquivo único para evitar conflitos
+        path_on_bucket = f"public/{path_prefix}{uuid.uuid4()}.{file_ext}"
+        
+        # Realiza o upload
+        supabase.storage.from_(bucket_name).upload(
+            file=file_obj.read(), 
+            path=path_on_bucket, 
+            file_options={"content-type": file_obj.content_type}
+        )
+        
+        # Retorna a URL pública do arquivo
+        return supabase.storage.from_(bucket_name).get_public_url(path_on_bucket), None
+    except Exception as e:
+        # Em caso de erro, retorna None e a exceção
+        return None, e
+
+# =============================================================================
 # ADMINISTRAÇÃO DE USUÁRIOS
 # =============================================================================
 
@@ -31,16 +64,22 @@ class TurmaAdmin(admin.ModelAdmin):
     list_display = ('nome',)
     search_fields = ('nome',)
 
+class AlunoAdminForm(forms.ModelForm):
+    laudo_upload = forms.FileField(label="Novo Laudo (Substitui o atual)", required=False)
+
+    class Meta:
+        model = Aluno
+        fields = '__all__'
+
 @admin.register(Aluno)
 class AlunoAdmin(admin.ModelAdmin):
-    # MODIFICADO: Adicionamos os novos campos
+    form = AlunoAdminForm  # Usa o formulário personalizado
     list_display = ('nome_completo', 'turma', 'nivel_autismo', 'data_nascimento', 'data_cadastro')
     search_fields = ('nome_completo',)
-    # MODIFICADO: Adicionamos 'nivel_autismo' ao filtro
     list_filter = ('turma', 'nivel_autismo', 'data_cadastro',)
     autocomplete_fields = ['turma']
+    readonly_fields = ('laudo_url',) # Deixa o campo de URL apenas para leitura
 
-    # NOVO: Organizando o formulário de edição com fieldsets
     fieldsets = (
         ('Informações Pessoais', {
             'fields': ('nome_completo', 'data_nascimento')
@@ -49,9 +88,29 @@ class AlunoAdmin(admin.ModelAdmin):
             'fields': ('turma',)
         }),
         ('Informações de Diagnóstico', {
-            'fields': ('nivel_autismo', 'laudo')
+            # Alterado 'laudo' para os novos campos
+            'fields': ('nivel_autismo', 'laudo_upload', 'laudo_url')
         }),
     )
+
+    def save_model(self, request, obj, form, change):
+        # Verifica se um novo arquivo de laudo foi enviado
+        if 'laudo_upload' in form.cleaned_data and form.cleaned_data['laudo_upload']:
+            laudo_file = form.cleaned_data['laudo_upload']
+            
+            # Chama a função de upload para o bucket 'arquivos-producao'
+            public_url, error = _upload_to_supabase(
+                laudo_file, 
+                bucket_name="arquivos-producao", 
+                sub_folder='laudos_alunos'
+            )
+            
+            if public_url:
+                obj.laudo_url = public_url # Salva a nova URL no objeto
+            else:
+                self.message_user(request, f"Ocorreu um erro ao salvar o laudo: {error}", level='error')
+        
+        super().save_model(request, obj, form, change)
 
 @admin.register(RelatorioDesempenho)
 class RelatorioDesempenhoAdmin(admin.ModelAdmin):
@@ -180,24 +239,12 @@ class ContatoAdmin(admin.ModelAdmin):
         ('Informações Adicionais', { 'fields': ('especialidades', 'convenios', 'observacoes'), 'classes': ('collapse',) }),
     )
 
-    # Função auxiliar de upload
-    def _upload_to_supabase(self, imagem_file, sub_folder=''):
-        try:
-            url, key = os.environ.get("SUPABASE_URL"), os.environ.get("SUPABASE_KEY")
-            supabase: Client = create_client(url, key)
-            bucket_name: str = "fotos-contatos"
-            file_ext = imagem_file.name.split('.')[-1]
-            path_prefix = f"{sub_folder}/" if sub_folder else ""
-            path_on_bucket = f"public/{path_prefix}{uuid.uuid4()}.{file_ext}"
-            supabase.storage.from_(bucket_name).upload(file=imagem_file.read(), path=path_on_bucket, file_options={"content-type": imagem_file.content_type})
-            return supabase.storage.from_(bucket_name).get_public_url(path_on_bucket), None
-        except Exception as e:
-            return None, e
-
     # Salva a IMAGEM PRINCIPAL
     def save_model(self, request, obj, form, change):
         if 'imagem_upload' in form.cleaned_data and form.cleaned_data['imagem_upload']:
-            public_url, error = self._upload_to_supabase(form.cleaned_data['imagem_upload'], sub_folder='main')
+            imagem_file = form.cleaned_data['imagem_upload']
+            # Usa a nova função, especificando o bucket correto
+            public_url, error = _upload_to_supabase(imagem_file, bucket_name="fotos-contatos", sub_folder='main')
             if public_url:
                 obj.imagem_url = public_url
             else:
@@ -210,7 +257,9 @@ class ContatoAdmin(admin.ModelAdmin):
         for i, instance in enumerate(instances):
             file_upload_key = f'{formset.prefix}-{i}-imagem_upload'
             if file_upload_key in request.FILES:
-                public_url, error = self._upload_to_supabase(request.FILES[file_upload_key], sub_folder='gallery')
+                imagem_file = request.FILES[file_upload_key]
+                # Usa a nova função, especificando o bucket correto
+                public_url, error = _upload_to_supabase(imagem_file, bucket_name="fotos-contatos", sub_folder='gallery')
                 if public_url:
                     instance.imagem_url = public_url
                 else:
@@ -259,20 +308,31 @@ class CategoriaFerramentaAdmin(admin.ModelAdmin):
     list_display = ('nome', 'icone')
     search_fields = ('nome',)
 
+# --- NOVO FORMULÁRIO PARA O MODELO FERRAMENTA ---
+class FerramentaAdminForm(forms.ModelForm):
+    imagem_capa_upload = forms.ImageField(label="Nova Imagem de Capa (Substitui a atual)", required=False)
+    arquivo_pdf_upload = forms.FileField(label="Novo Arquivo PDF (Substitui o atual)", required=False)
+
+    class Meta:
+        model = Ferramenta
+        fields = '__all__'
+
 @admin.register(Ferramenta)
 class FerramentaAdmin(admin.ModelAdmin):
+    form = FerramentaAdminForm # Usa o formulário personalizado
     list_display = ('nome', 'categoria', 'autor', 'publico_alvo', 'apenas_para_professores', 'eh_gratuita')
     list_filter = ('categoria', 'apenas_para_professores', 'eh_gratuita', 'publico_alvo')
     search_fields = ('nome', 'descricao', 'autor')
     autocomplete_fields = ['categoria']
+    readonly_fields = ('imagem_capa_url', 'arquivo_pdf_url') # Deixa os campos de URL apenas para leitura
 
-    # Organizando o formulário de edição para melhor usabilidade
     fieldsets = (
         ('Informações Principais', {
             'fields': ('nome', 'categoria', 'descricao', 'autor')
         }),
         ('Arquivos e Imagens', {
-            'fields': ('imagem_capa', 'arquivo_pdf')
+            # Alterado para os novos campos de upload e URL
+            'fields': ('imagem_capa_upload', 'imagem_capa_url', 'arquivo_pdf_upload', 'arquivo_pdf_url')
         }),
         ('Detalhes Pedagógicos', {
             'fields': ('publico_alvo', 'habilidades_desenvolvidas')
@@ -281,6 +341,36 @@ class FerramentaAdmin(admin.ModelAdmin):
             'fields': ('apenas_para_professores', 'eh_gratuita', 'classificacao', 'icone_classe')
         }),
     )
+    
+    def save_model(self, request, obj, form, change):
+        # Verifica se uma nova imagem de capa foi enviada
+        if 'imagem_capa_upload' in form.cleaned_data and form.cleaned_data['imagem_capa_upload']:
+            capa_file = form.cleaned_data['imagem_capa_upload']
+            public_url, error = _upload_to_supabase(
+                capa_file, 
+                bucket_name="arquivos-producao", 
+                sub_folder='ferramentas_capas'
+            )
+            if public_url:
+                obj.imagem_capa_url = public_url
+            else:
+                self.message_user(request, f"Erro ao salvar a imagem de capa: {error}", level='error')
+
+        # Verifica se um novo arquivo PDF foi enviado
+        if 'arquivo_pdf_upload' in form.cleaned_data and form.cleaned_data['arquivo_pdf_upload']:
+            pdf_file = form.cleaned_data['arquivo_pdf_upload']
+            public_url, error = _upload_to_supabase(
+                pdf_file, 
+                bucket_name="arquivos-producao", 
+                sub_folder='ferramentas_pdfs'
+            )
+            if public_url:
+                obj.arquivo_pdf_url = public_url
+            else:
+                self.message_user(request, f"Erro ao salvar o arquivo PDF: {error}", level='error')
+        
+        super().save_model(request, obj, form, change)
+
 
 @admin.register(UserDownload)
 class UserDownloadAdmin(admin.ModelAdmin):

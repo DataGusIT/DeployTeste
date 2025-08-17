@@ -109,11 +109,11 @@ class Aluno(models.Model):
     )
 
     # NOVO CAMPO: LAUDO
-    laudo = models.FileField(
-        upload_to='laudos_alunos/', # Os arquivos serão salvos na pasta 'media/laudos_alunos/'
+    laudo_url = models.URLField(
+        max_length=1024,
+        blank=True,
         null=True,
-        blank=True, # Torna o campo opcional
-        verbose_name='Laudo (PDF ou Imagem)'
+        verbose_name='Laudo (URL do Arquivo)'
     )
     
     class Meta:
@@ -344,20 +344,18 @@ class Ferramenta(models.Model):
     apenas_para_professores = models.BooleanField('Apenas para professores?', default=False)
     
     # --- NOVOS CAMPOS ---
-    imagem_capa = models.ImageField(
-        upload_to='ferramentas_capas/',
+    imagem_capa_url = models.URLField(
+        max_length=1024,
         blank=True,
         null=True,
-        verbose_name="Imagem de Capa",
-        help_text="Imagem que aparecerá no card da ferramenta."
+        verbose_name="URL da Imagem de Capa"
     )
     
-    arquivo_pdf = models.FileField(
-        upload_to='ferramentas_pdfs/',
+    arquivo_pdf_url = models.URLField(
+        max_length=1024,
         blank=True,
         null=True,
-        verbose_name="Arquivo PDF",
-        help_text="O arquivo PDF da ferramenta para download."
+        verbose_name="URL do Arquivo PDF"
     )
 
     publico_alvo = models.CharField(

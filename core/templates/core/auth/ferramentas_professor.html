@@ -32,8 +32,8 @@
                             <!-- CARD DA FERRAMENTA -->
                             <div class="update-card w-100 animate-fade-up delay-1">
                                 <div class="update-image">
-                                    {% if ferramenta.imagem_capa %}
-                                        <img src="{{ ferramenta.imagem_capa.url }}" alt="{{ ferramenta.nome }}" class="img-fluid" style="height: 220px; object-fit: cover;">
+                                    {% if ferramenta.imagem_capa_url %} <!-- MUDANÇA AQUI -->
+                                        <img src="{{ ferramenta.imagem_capa_url }}" alt="{{ ferramenta.nome }}" class="img-fluid" style="height: 220px; object-fit: cover;"> <!-- MUDANÇA AQUI -->
                                     {% else %}
                                         <img src="{% static 'img/default-contact.jpg' %}" alt="Imagem padrão" class="img-fluid" style="height: 220px; object-fit: cover;">
                                     {% endif %}
@@ -61,8 +61,8 @@
                                         </div>
                                     {% endif %}
                                     
-                                    {% if ferramenta.arquivo_pdf %}
-                                        <a href="{{ ferramenta.arquivo_pdf.url }}" class="btn btn-primary w-100 mt-auto" download>
+                                     {% if ferramenta.arquivo_pdf_url %} <!-- MUDANÇA AQUI -->
+                                        <a href="{{ ferramenta.arquivo_pdf_url }}" class="btn btn-primary w-100 mt-auto" download> <!-- MUDANÇA AQUI -->
                                             <i class="fas fa-download me-2"></i>Baixar PDF
                                         </a>
                                     {% else %}

@@ -50,8 +50,8 @@
                 <i class="fas fa-file-medical text-primary fa-lg me-3 mt-1"></i>
                 <div>
                     <strong class="text-dark">Laudo Médico:</strong><br>
-                    {% if aluno.laudo %}
-                        <a href="{{ aluno.laudo.url }}" target="_blank" class="feature-link">
+                    {% if aluno.laudo_url %}  <!-- MUDANÇA AQUI -->
+                        <a href="{{ aluno.laudo_url }}" target="_blank" class="feature-link"> <!-- MUDANÇA AQUI -->
                             Visualizar Laudo <i class="fas fa-external-link-alt ms-1"></i>
                         </a>
                     {% else %}
