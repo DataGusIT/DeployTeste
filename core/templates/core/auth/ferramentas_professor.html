@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load query_tags %}  {# Certifique-se de que sua taglib de query está carregada #}
 
 {% block content %}
 <!-- A cor de fundo é a variável do seu tema -->
@@ -15,68 +16,139 @@
             </p>
         </div>
 
-        {% if categorias_com_ferramentas %}
-            {% for categoria in categorias_com_ferramentas %}
-                <div class="mb-5" id="categoria-{{ categoria.id }}">
-                    <!-- CABEÇALHO DA CATEGORIA -->
-                    <div class="d-flex align-items-center mb-4 animate-fade-up">
-                        <div class="feature-icon me-3">
-                            <i class="{{ categoria.icone|default:'fas fa-folder-open' }}"></i>
-                        </div>
-                        <h3 class="feature-title mb-0 fs-2">{{ categoria.nome }}</h3>
-                    </div>
+        {# MUDANÇA 1: A condição agora verifica o novo dicionário paginado #}
+        {% if ferramentas_por_categoria_paginada %}
+            
+            {# MUDANÇA 2: O loop principal agora itera sobre o dicionário paginado #}
+            {% for categoria, dados in ferramentas_por_categoria_paginada.items %}
+                {# MUDANÇA 3: Usamos 'with' para acessar facilmente os objetos paginados #}
+                {% with ferramentas_page_obj=dados.ferramentas_page_obj query_param_name=dados.query_param_name %}
 
-                    <div class="row g-4">
-                        {% for ferramenta in categoria.ferramentas.all %}
-                        <div class="col-md-6 col-lg-4 d-flex align-items-stretch">
-                            <!-- CARD DA FERRAMENTA -->
-                            <div class="update-card w-100 animate-fade-up delay-1">
-                                <div class="update-image">
-                                    {% if ferramenta.imagem_capa_url %} <!-- MUDANÇA AQUI -->
-                                        <img src="{{ ferramenta.imagem_capa_url }}" alt="{{ ferramenta.nome }}" class="img-fluid" style="height: 220px; object-fit: cover;"> <!-- MUDANÇA AQUI -->
-                                    {% else %}
-                                        <img src="{% static 'img/default-contact.jpg' %}" alt="Imagem padrão" class="img-fluid" style="height: 220px; object-fit: cover;">
-                                    {% endif %}
-                                    
-                                    {% if ferramenta.publico_alvo %}
-                                       <div class="update-category">{{ ferramenta.get_publico_alvo_display }}</div>
-                                    {% endif %}
-                                    
-                                    {% if not ferramenta.eh_gratuita %}
-                                        <span class="badge position-absolute top-0 start-0 m-3" style="background-color: var(--accent); color: var(--dark); font-size: 0.8rem; padding: 6px 12px;">
-                                            <i class="fas fa-star me-1"></i>Premium
-                                        </span>
-                                    {% endif %}
+                    {# Só exibe a categoria se ela tiver ferramentas nesta página específica #}
+                    {% if ferramentas_page_obj %}
+                        <div class="mb-5" id="categoria-{{ categoria.id }}">
+                            <!-- CABEÇALHO DA CATEGORIA -->
+                            <div class="d-flex align-items-center mb-4 animate-fade-up">
+                                <div class="feature-icon me-3">
+                                    <i class="{{ categoria.icone|default:'fas fa-folder-open' }}"></i>
                                 </div>
-                                
-                                <div class="update-content d-flex flex-column">
-                                    <span class="update-date">Por <strong>{{ ferramenta.autor|default:"Autor Desconhecido" }}</strong></span>
-                                    <h5 class="update-title">{{ ferramenta.nome }}</h5>
-                                    <p class="update-excerpt flex-grow-1">{{ ferramenta.descricao|truncatechars:100 }}</p>
-                                    
-                                    {% if ferramenta.habilidades_desenvolvidas %}
-                                        <div class="small text-muted mb-3">
-                                            <i class="fas fa-brain me-2 text-primary"></i>
-                                            <strong>Habilidades:</strong> {{ ferramenta.habilidades_desenvolvidas|truncatechars:35 }}
-                                        </div>
-                                    {% endif %}
-                                    
-                                     {% if ferramenta.arquivo_pdf_url %} <!-- MUDANÇA AQUI -->
-                                        <a href="{{ ferramenta.arquivo_pdf_url }}" class="btn btn-primary w-100 mt-auto" download> <!-- MUDANÇA AQUI -->
-                                            <i class="fas fa-download me-2"></i>Baixar PDF
-                                        </a>
-                                    {% else %}
-                                        <button class="btn btn-secondary w-100 mt-auto" disabled style="background-color: var(--gray-300); border: none;">
-                                            <i class="fas fa-times-circle me-2"></i>Indisponível
-                                        </button>
-                                    {% endif %}
-                                </div>
+                                <h3 class="feature-title mb-0 fs-2">{{ categoria.nome }}</h3>
                             </div>
+
+                            <div class="row g-4">
+                                {# MUDANÇA 4: O loop interno agora itera sobre os itens da página atual #}
+                                {% for ferramenta in ferramentas_page_obj %}
+                                <div class="col-md-6 col-lg-4 d-flex align-items-stretch">
+                                    <!-- CARD DA FERRAMENTA -->
+                                    <div class="update-card w-100 animate-fade-up delay-1">
+                                        <div class="update-image">
+                                            {% if ferramenta.imagem_capa_url %}
+                                                <img src="{{ ferramenta.imagem_capa_url }}" alt="{{ ferramenta.nome }}" class="img-fluid" style="height: 220px; object-fit: cover;">
+                                            {% else %}
+                                                <img src="{% static 'img/default-contact.jpg' %}" alt="Imagem padrão" class="img-fluid" style="height: 220px; object-fit: cover;">
+                                            {% endif %}
+                                            
+                                            {% if ferramenta.publico_alvo %}
+                                               <div class="update-category">{{ ferramenta.get_publico_alvo_display }}</div>
+                                            {% endif %}
+                                            
+                                            {% if not ferramenta.eh_gratuita %}
+                                                <span class="badge position-absolute top-0 start-0 m-3" style="background-color: var(--accent); color: var(--dark); font-size: 0.8rem; padding: 6px 12px;">
+                                                    <i class="fas fa-star me-1"></i>Premium
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="update-content d-flex flex-column">
+                                            <span class="update-date">Por <strong>{{ ferramenta.autor|default:"Autor Desconhecido" }}</strong></span>
+                                            <h5 class="update-title">{{ ferramenta.nome }}</h5>
+                                            <p class="update-excerpt flex-grow-1">{{ ferramenta.descricao|truncatechars:100 }}</p>
+                                            
+                                            {% if ferramenta.habilidades_desenvolvidas %}
+                                                <div class="small text-muted mb-3">
+                                                    <i class="fas fa-brain me-2 text-primary"></i>
+                                                    <strong>Habilidades:</strong> {{ ferramenta.habilidades_desenvolvidas|truncatechars:35 }}
+                                                </div>
+                                            {% endif %}
+                                            
+                                             {% if ferramenta.arquivo_pdf_url %}
+                                                <a href="{{ ferramenta.arquivo_pdf_url }}" class="btn btn-primary w-100 mt-auto" download>
+                                                    <i class="fas fa-download me-2"></i>Baixar PDF
+                                                </a>
+                                            {% else %}
+                                                <button class="btn btn-secondary w-100 mt-auto" disabled style="background-color: var(--gray-300); border: none;">
+                                                    <i class="fas fa-times-circle me-2"></i>Indisponível
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- ============================================= -->
+                            <!--  MUDANÇA 5: PAGINAÇÃO DAS FERRAMENTAS (ANINHADA) -->
+                            <!-- ============================================= -->
+                            {% if ferramentas_page_obj.paginator.num_pages > 1 %}
+                            <nav aria-label="Navegação de ferramentas para {{ categoria.nome }}" class="mt-4">
+                                <ul class="pagination pagination-sm justify-content-center">
+                                    {% if ferramentas_page_obj.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?{% build_query query_param_name ferramentas_page_obj.previous_page_number %}#categoria-{{ categoria.id }}">&laquo;</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1">&laquo;</a></li>
+                                    {% endif %}
+
+                                    {% for i in ferramentas_page_obj.paginator.page_range %}
+                                        {% if ferramentas_page_obj.number == i %}
+                                            <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                                        {% else %}
+                                            <li class="page-item"><a class="page-link" href="?{% build_query query_param_name i %}#categoria-{{ categoria.id }}">{{ i }}</a></li>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {% if ferramentas_page_obj.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?{% build_query query_param_name ferramentas_page_obj.next_page_number %}#categoria-{{ categoria.id }}">&raquo;</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1">&raquo;</a></li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                            {% endif %}
+                            <!-- ============================================= -->
                         </div>
-                        {% endfor %}
-                    </div>
-                </div>
+                    {% endif %}
+                {% endwith %}
             {% endfor %}
+
+            <!-- ======================================================= -->
+            <!--   MUDANÇA 6: PAGINAÇÃO PRINCIPAL DAS CATEGORIAS         -->
+            <!-- ======================================================= -->
+            {% if page_obj.has_other_pages %}
+            <nav aria-label="Navegação das páginas de categorias" class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item main-pagination-item">
+                            <a class="page-link" href="?{% query_transform page=page_obj.previous_page_number %}">&laquo; Categorias Anteriores</a>
+                        </li>
+                    {% endif %}
+                    
+                    <li class="page-item main-pagination-item disabled">
+                        <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                    </li>
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item main-pagination-item">
+                            <a class="page-link" href="?{% query_transform page=page_obj.next_page_number %}">Próximas Categorias &raquo;</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
         {% else %}
             <!-- MENSAGEM DE 'NENHUMA FERRAMENTA' (COM FUNDO TRANSPARENTE) -->
             <div class="text-center py-5">
@@ -95,5 +167,135 @@
 
 {% block extra_css %}
 {{ block.super }}
-<!-- CSS customizado removido -->
+{# MUDANÇA 7: Adicionado o CSS necessário para a paginação #}
+<style>
+/*
+=============================================================================
+ESTILOS DE PAGINAÇÃO
+=============================================================================
+*/
+
+/* --- A. ESTILOS GERAIS DO CONTAINER --- */
+.pagination {
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: center;
+    gap: 8px; 
+    list-style: none;
+    padding-left: 0;
+}
+
+.pagination .page-item {
+    margin: 0 !important;
+}
+
+/* --- B. ESTILOS PARA PAGINAÇÃO NUMÉRICA (CÍRCULOS) --- */
+.pagination .page-item:not(.main-pagination-item) .page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-weight: 600;
+    border: 2px solid var(--gray-200, #e9ecef);
+    color: var(--primary, #6A3EA1);
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+/* Hover para botões numéricos */
+.pagination .page-item:not(.main-pagination-item):not(.active):not(.disabled) .page-link:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary, #6A3EA1);
+    box-shadow: 0 5px 15px rgba(106, 62, 161, 0.15);
+}
+
+/* Estilo ATIVO para botões numéricos */
+.pagination .page-item:not(.main-pagination-item).active .page-link {
+    background: linear-gradient(45deg, var(--primary, #6A3EA1), var(--primary-light, #8E44AD));
+    color: #fff;
+    border-color: var(--primary, #6A3EA1);
+    box-shadow: 0 5px 15px rgba(106, 62, 161, 0.3);
+    transform: scale(1.05);
+}
+
+/* --- C. ESTILOS PARA PAGINAÇÃO DE TEXTO (PÍLULAS) --- */
+.main-pagination-item .page-link {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    border-radius: 50px;
+    padding: 0.5rem 1.2rem;
+    white-space: nowrap;
+    font-weight: 500;
+    border: 2px solid var(--gray-200, #e9ecef);
+    color: var(--primary, #6A3EA1);
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+/* Efeito de hover específico para as pílulas */
+.page-item.main-pagination-item:not(.disabled) .page-link:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary, #6A3EA1);
+    background-color: var(--primary, #6A3EA1);
+    color: #fff;
+    box-shadow: 0 5px 15px rgba(106, 62, 161, 0.2);
+}
+
+.main-pagination-item.active .page-link,
+.main-pagination-item.disabled .page-link {
+    transform: none;
+}
+
+/* Estilo para pílula ATIVA */
+.main-pagination-item.active .page-link {
+    background: linear-gradient(45deg, var(--primary, #6A3EA1), var(--primary-light, #8E44AD));
+    color: #fff;
+    border-color: var(--primary, #6A3EA1);
+}
+
+/* Estilo DESABILITADO para todos os tipos de paginação */
+.pagination .page-item.disabled .page-link {
+    background-color: var(--gray-100, #f8f9fa);
+    color: var(--gray-500, #adb5bd);
+    border-color: var(--gray-200, #e9ecef);
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+/*
+=============================================================================
+AJUSTES RESPONSIVOS PARA PAGINAÇÃO
+=============================================================================
+*/
+@media (max-width: 768px) {
+    .pagination:has(.main-pagination-item) {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .pagination:has(.main-pagination-item) .main-pagination-item {
+      width: 90%;
+      max-width: 320px;
+    }
+
+    .pagination:has(.main-pagination-item) .main-pagination-item .page-link {
+      display: block;
+      text-align: center;
+      width: 100%;
+    }
+
+    .pagination .page-item:not(.main-pagination-item) .page-link {
+        width: 38px;
+        height: 38px;
+        font-size: 0.9rem;
+    }
+}
+</style>
 {% endblock %}

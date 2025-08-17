@@ -153,15 +153,54 @@ def adicionar_relatorio(request, aluno_id):
 @login_required
 @user_passes_test(is_professor, login_url='/login/', redirect_field_name=None)
 def ferramentas_professor(request):
-    """Lista TODAS as ferramentas para a área do professor."""
-    # Esta view não precisa de filtro, pois o professor pode ver tudo.
+    """
+    Lista TODAS as ferramentas para a área do professor com paginação aninhada.
+    - Paginação principal para CATEGORIAS (3 por página).
+    - Paginação secundária para FERRAMENTAS dentro de cada categoria (3 por página).
+    """
+    # 1. PAGINAÇÃO PRINCIPAL (CATEGORIAS)
     categorias_com_ferramentas = CategoriaFerramenta.objects.annotate(
         num_ferramentas=Count('ferramentas')
-    ).filter(num_ferramentas__gt=0).prefetch_related('ferramentas')
+    ).filter(num_ferramentas__gt=0).order_by('nome')
     
+    main_paginator = Paginator(categorias_com_ferramentas, 3)  # 3 categorias por página
+    main_page_number = request.GET.get('page')
+    main_page_obj = main_paginator.get_page(main_page_number)
+    categorias_na_pagina = main_page_obj.object_list
+
+    # 2. BUSCAR TODAS AS FERRAMENTAS PARA AS CATEGORIAS DA PÁGINA ATUAL
+    # CORREÇÃO: Usando 'categoria__in' ao invés de 'tipo__in'
+    todas_ferramentas_da_pagina = Ferramenta.objects.filter(
+        categoria__in=categorias_na_pagina
+    ).order_by('nome')
+    
+    ferramentas_agrupadas = defaultdict(list)
+    for ferramenta in todas_ferramentas_da_pagina:
+        # CORREÇÃO: Agrupando por 'ferramenta.categoria' ao invés de 'ferramenta.tipo'
+        ferramentas_agrupadas[ferramenta.categoria].append(ferramenta)
+
+    # 3. CRIAR PAGINADORES ANINHADOS PARA CADA CATEGORIA
+    dados_pagina_atual = OrderedDict()
+    for categoria in categorias_na_pagina:
+        lista_de_ferramentas = ferramentas_agrupadas.get(categoria, [])
+        ferramenta_paginator = Paginator(lista_de_ferramentas, 3)  # 3 ferramentas por página
+        
+        # Cria um nome de parâmetro de URL único para este paginador
+        query_param_name = f"cat_fer_{categoria.id}_page"
+        ferramenta_page_number = request.GET.get(query_param_name)
+        ferramenta_page_obj = ferramenta_paginator.get_page(ferramenta_page_number)
+        
+        dados_pagina_atual[categoria] = {
+            'ferramentas_page_obj': ferramenta_page_obj,
+            'query_param_name': query_param_name
+        }
+
+    # 4. PREPARAR O CONTEXTO FINAL
     context = {
         'title': 'Ferramentas do Professor',
-        'categorias_com_ferramentas': categorias_com_ferramentas,
+        'ferramentas_por_categoria_paginada': dados_pagina_atual,
+        'page_obj': main_page_obj,  # Paginador principal
+        'sem_ferramentas': not categorias_com_ferramentas.exists()
     }
     
     return render(request, 'core/auth/ferramentas_professor.html', context)
