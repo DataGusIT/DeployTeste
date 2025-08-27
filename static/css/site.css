@@ -361,6 +361,8 @@ a:hover {
 /* About Section */
 .about-section {
     padding: 5rem 0;
+    overflow-x: hidden;
+    /* Adicione esta linha */
 }
 
 .about-image-container {
