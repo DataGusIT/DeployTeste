@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<!-- Hero Section -->
+<!-- Hero Section - Presumindo que você tenha essa seção em seu template original -->
 <section class="hero-section">
     <div class="hero-overlay"></div>
     <div class="container position-relative">
@@ -202,19 +202,17 @@
 <section class="about-section py-5 mt-4">
     <div class="container">
         <div class="row align-items-center">
-            <div class="col-lg-6 d-flex flex-column justify-content-center animate__animated" data-animation="animate__fadeInLeft">
-                <span class="badge bg-white text-primary fs-6 mb-3 px-3 py-2">Projeto TCC</span>
-                <h1 class="display-4 fw-bold text-white mb-4">Apoio e informação para <span
-                        class="highlight-text">Transtorno do Espectro Autista</span></h1>
-                <p class="lead text-white mb-4">
-                    Um espaço com informações centralizadas e recursos para facilitar o entendimento e o apoio ao autismo na escola.
-                </p>
-                <div class="d-flex flex-wrap gap-3 justify-content-start">
-                    <a href="#recursos" class="btn btn-primary btn-lg">
-                        Explorar recursos
-                    </a>
-                    <a href="{% url 'sobre' %}" class="btn btn-outline-light btn-lg">
-                        Conhecer projeto
+            <div class="col-lg-6 mb-4 mb-lg-0 order-lg-2 animate__animated" data-animation="animate__fadeInRight">
+                <div class="section-header text-center mb-4">
+                    <span class="section-subtitle">Sobre este projeto</span>
+                    <h2 class="section-title">Feito pensando em vocês</h2>
+                    <div class="section-divider"></div>
+                </div>
+                <p>Este projeto de TCC foi desenvolvido para apoiar os funcionários sobre o autismo e no acolhimento dos alunos.</p>
+                <p>A proposta nasceu da necessidade de reunir, em um único espaço, informações simples, práticas e acessíveis sobre os alunos autistas, sem complicações.</p>
+                <div class="mt-4 text-center">
+                    <a href="{% url 'sobre' %}" class="btn btn-primary">
+                        Conhecer mais sobre o projeto
                     </a>
                 </div>
             </div>
