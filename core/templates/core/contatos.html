@@ -33,56 +33,44 @@
 </section>
 
 <!-- ================================== -->
-<!-- SEÇÃO FILTROS - Sistema de busca  -->
+<!-- SEÇÃO FILTROS - REESTILIZADA     -->
 <!-- ================================== -->
 <section id="filtro-section" class="py-5 bg-light">
     <div class="container">
-        <div class="row">
-            <div class="col-lg-10 mx-auto">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-4">
-                        <h4 class="card-title mb-4 text-primary">
-                            <i class="fas fa-filter me-2"></i>Encontre o apoio que você precisa
-                        </h4>
-                        <div class="row g-3">
+        <!-- Estrutura de layout para centralizar o card -->
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-9">
+                <!-- O NOVO CARD DE FILTRO -->
+                <div class="filter-card">
+                    <div class="filter-card-header">
+                        <h5 class="mb-0"><i class="fas fa-filter me-2 text-primary"></i>Encontre o apoio que você precisa</h5>
+                        <button id="btn-limpar-filtros" class="btn-reset">
+                            <i class="fas fa-times me-2"></i>Limpar Filtros
+                        </button>
+                    </div>
+                    <div class="filter-card-body">
+                        <div class="row g-3 align-items-center">
                             <div class="col-md-4">
-                                <label class="form-label">Tipo de contato</label>
-                                <select class="form-select" id="filtroTipo">
-                                    <option value="todos">Todos os tipos</option>
-                                    <option value="clinica">Clínicas</option>
-                                    <option value="profissional">Profissionais</option>
-                                    <option value="associacao">Associações</option>
-                                    <option value="escola">Escolas</option>
-                                    <option value="apoio">Grupos de Apoio</option>
-                                    <option value="emergencia">Emergência</option>
+                                <label for="filtro-categoria" class="form-label">Tipo de contato</label>
+                                <select id="filtro-categoria" class="form-select">
+                                    <option value="todos" selected>Todas as categorias</option>
+                                    {# Assumindo que você passa 'categorias' para o template #}
+                                    {% for categoria in categorias %}
+                                    <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Atendimento</label>
-                                <select class="form-select" id="filtroAtendimento">
-                                    <option value="todos">Todos os tipos</option>
+                                <label for="filtro-atendimento" class="form-label">Atendimento</label>
+                                <select id="filtro-atendimento" class="form-select">
+                                    <option value="todos" selected>Todos</option>
                                     <option value="presencial">Presencial</option>
                                     <option value="online">Online</option>
-                                    <option value="ambos">Ambos</option>
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Localização</label>
-                                <select class="form-select" id="filtroLocalizacao">
-                                    <option value="todos">Todas as localidades</option>
-                                    <option value="SP">São Paulo</option>
-                                    <option value="RJ">Rio de Janeiro</option>
-                                    <option value="MG">Minas Gerais</option>
-                                    <option value="outros">Outros estados</option>
-                                </select>
-                            </div>
-                            <div class="col-12 text-end">
-                                <button type="button" class="btn btn-primary px-4" id="btnFiltrar">
-                                    <i class="fas fa-search me-2"></i>Filtrar resultados
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary px-4" id="btnLimpar">
-                                    <i class="fas fa-times me-2"></i>Limpar
-                                </button>
+                                <label for="filtro-localizacao" class="form-label">Localização (Estado)</label>
+                                <input type="text" id="filtro-localizacao" class="form-control" placeholder="Digite a sigla do estado (Ex: SP)">
                             </div>
                         </div>
                     </div>
@@ -377,19 +365,47 @@
 {% block extra_js %}
 <script>
     $(document).ready(function () {
-        $("#btnFiltrar").click(function () {
-            const tipoFiltro = $("#filtroTipo").val();
-            const atendimentoFiltro = $("#filtroAtendimento").val();
-            const localizacaoFiltro = $("#filtroLocalizacao").val();
+        // ===============================================
+        // NOVA LÓGICA DE FILTRAGEM DINÂMICA
+        // ===============================================
+        let searchTimeout;
+
+        function applyFilters() {
+            const categoria = $('#filtro-categoria').val();
+            const atendimento = $('#filtro-atendimento').val();
+            const localizacao = $('#filtro-localizacao').val().trim();
+            
+            // Constrói a URL base
             let url = "{% url 'contatos' %}?";
-            if (tipoFiltro && tipoFiltro !== "todos") url += `tipo=${tipoFiltro}&`;
-            if (atendimentoFiltro && atendimentoFiltro !== "todos") url += `atendimento=${atendimentoFiltro}&`;
-            if (localizacaoFiltro && localizacaoFiltro !== "todos") url += `localizacao=${localizacaoFiltro}&`;
-            window.location.href = url;
+            const params = new URLSearchParams();
+
+            if (categoria && categoria !== 'todos') {
+                params.append('categoria', categoria);
+            }
+            if (atendimento && atendimento !== 'todos') {
+                params.append('atendimento', atendimento);
+            }
+            if (localizacao) {
+                params.append('localizacao', localizacao);
+            }
+            
+            // Redireciona para a URL com os filtros
+            window.location.href = url + params.toString();
+        }
+
+        // Eventos que disparam a filtragem
+        $('#filtro-categoria, #filtro-atendimento').on('change', function() {
+            applyFilters();
         });
 
-        $("#btnLimpar").click(function () {
-            window.location.href = "{% url 'contatos' %}";
+        $('#filtro-localizacao').on('keyup', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(applyFilters, 500); // Espera 500ms antes de buscar
+        });
+
+        // Evento para o botão de limpar filtros
+        $('#btn-limpar-filtros').on('click', function() {
+            window.location.href = "{% url 'contatos' %}"; // Simplesmente recarrega a página
         });
 
         $("#btnEnviarSugestao").click(function () {
@@ -1391,5 +1407,80 @@ ESTRUTURA GERAL DO CSS
         font-size: 0.9rem;
     }
 }
+
+ /* 
+    =================================================================
+    ESTILOS DA SEÇÃO DE FILTROS (COPIADO DA ÁREA DO PROFESSOR)
+    =================================================================
+    */
+    .filter-card {
+        background-color: #fff;
+        border-radius: 16px;
+        box-shadow: var(--card-shadow, 0 8px 25px rgba(0,0,0,0.07));
+        border: none;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    .filter-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background-color: var(--primary-very-light, #f8f5fc);
+        border-bottom: 1px solid var(--gray-200, #e9ecef);
+    }
+    .filter-card-header h5 {
+        color: var(--primary-dark, #4a2b70);
+        font-weight: 600;
+    }
+    .btn-reset {
+        background: none;
+        border: none;
+        color: var(--gray-600, #6c757d);
+        font-weight: 500;
+        font-size: 0.9rem;
+        padding: 0.25rem 0.5rem;
+        transition: all 0.3s ease;
+        border-radius: 50px;
+    }
+    .btn-reset:hover {
+        color: var(--primary, #6A3EA1);
+        background-color: rgba(106, 62, 161, 0.1);
+    }
+    .filter-card-body {
+        padding: 1.5rem;
+    }
+    .form-label {
+        font-weight: 500;
+        color: var(--gray-700, #495057);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    .form-control,
+    .form-select {
+        border-radius: 50px !important;
+        border: 1px solid var(--gray-300, #ced4da);
+        background-color: var(--body-bg, #f8f9fa);
+        padding: 0.6rem 1.2rem;
+        height: 48px;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+    .form-control:focus,
+    .form-select:focus {
+        background-color: #fff;
+        border-color: var(--primary, #6A3EA1);
+        box-shadow: 0 0 0 3px rgba(106, 62, 161, 0.15);
+    }
+    .input-group .form-control {
+        border-radius: 0 50px 50px 0 !important;
+    }
+    .input-group .input-group-text {
+        background: transparent;
+        border: 1px solid var(--gray-300, #ced4da);
+        border-right: 0;
+        border-radius: 50px 0 0 50px;
+        color: var(--primary, #6A3EA1);
+    }
 </style>
 {% endblock %}
