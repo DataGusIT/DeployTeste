@@ -683,9 +683,8 @@ def register_view(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # MODIFICAÇÃO IMPORTANTE: Para a herança multi-tabela funcionar corretamente,
-            # precisamos criar o objeto CustomUser explicitamente após criar o User.
-            CustomUser.objects.create(user_ptr_id=user.pk)
+            # A linha extra foi removida. 'user' aqui já é a instância
+            # do CustomUser pronta para ser usada.
             
             username = form.cleaned_data.get('username')
             messages.success(
@@ -703,7 +702,6 @@ def register_view(request):
         form = CustomUserCreationForm()
     
     return render(request, 'core/auth/register.html', {'form': form})
-
 
 def login_view(request):
     """Login de usuários"""
