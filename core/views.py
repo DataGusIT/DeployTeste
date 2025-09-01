@@ -150,6 +150,62 @@ def adicionar_relatorio(request, aluno_id):
     }
     return render(request, 'core/auth/adicionar_relatorio.html', context)
 
+# NOVA VIEW PARA EDITAR
+@login_required
+@user_passes_test(is_professor, login_url='/login/', redirect_field_name=None)
+def editar_relatorio(request, relatorio_id):
+    """Formulário para editar um relatório existente."""
+    relatorio = get_object_or_404(RelatorioDesempenho, id=relatorio_id)
+    aluno = relatorio.aluno
+
+    # Verificação de segurança: Apenas o autor pode editar.
+    if relatorio.professor != request.user.customuser:
+        messages.error(request, 'Você não tem permissão para editar este relatório.')
+        return redirect('detalhes_aluno', aluno_id=aluno.id)
+
+    if request.method == 'POST':
+        form = RelatorioDesempenhoForm(request.POST, instance=relatorio)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Relatório atualizado com sucesso!')
+            return redirect('detalhes_aluno', aluno_id=aluno.id)
+    else:
+        form = RelatorioDesempenhoForm(instance=relatorio)
+
+    context = {
+        'title': f'Editar Relatório para {aluno.nome_completo}',
+        'form': form,
+        'aluno': aluno,
+        'relatorio': relatorio
+    }
+    return render(request, 'core/auth/editar_relatorio.html', context)
+
+# NOVA VIEW PARA APAGAR
+@login_required
+@user_passes_test(is_professor, login_url='/login/', redirect_field_name=None)
+def apagar_relatorio(request, relatorio_id):
+    """Página de confirmação e lógica para apagar um relatório."""
+    relatorio = get_object_or_404(RelatorioDesempenho, id=relatorio_id)
+    aluno = relatorio.aluno
+
+    # Verificação de segurança: Apenas o autor pode apagar.
+    if relatorio.professor != request.user.customuser:
+        messages.error(request, 'Você não tem permissão para apagar este relatório.')
+        return redirect('detalhes_aluno', aluno_id=aluno.id)
+
+    if request.method == 'POST':
+        relatorio.delete()
+        messages.success(request, 'Relatório apagado com sucesso.')
+        return redirect('detalhes_aluno', aluno_id=aluno.id)
+
+    context = {
+        'title': 'Confirmar Exclusão',
+        'relatorio': relatorio,
+        'aluno': aluno
+    }
+    return render(request, 'core/auth/apagar_relatorio_confirm.html', context)
+
+
 @login_required
 @user_passes_test(is_professor, login_url='/login/', redirect_field_name=None)
 def ferramentas_professor(request):

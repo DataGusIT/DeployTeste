@@ -7,7 +7,7 @@
     <title>{% if title %}{{ title }} - {% endif %}CentroEspectro</title>
 
     {% load static %}
-    <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.ico' %}" />
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon/favicon.ico' %}" />
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
@@ -19,458 +19,187 @@
     <link rel="stylesheet" href="{% static 'css/site.css' %}" />
     
     <style>
-        /* [Seus estilos CSS existentes - mantidos como estão] */
-        /* Header & Navigation - mantido igual */
+        /* ================================================================== */
+        /* CSS GERAL E VARIÁVEIS */
+        /* ================================================================== */
+        :root {
+            --primary: #6A3EA1;
+            --primary-light: #8E63B8;
+            --primary-dark: #552A8A;
+            --gray-700: #4a5568;
+            --text-dark: #2d3748;
+            --danger-red: #e53e3e;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body.menu-open {
+            overflow: hidden;
+        }
+
+
+        /* ================================================================== */
+        /* HEADER & NAVEGAÇÃO DESKTOP (A partir de 992px) */
+        /* ================================================================== */
         .navbar {
             background-color: #fff;
             box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
             padding: 0.7rem 0;
+            z-index: 1030;
         }
-
         .navbar .container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: flex; align-items: center; justify-content: space-between;
         }
-
         .navbar-brand {
-            font-weight: 700;
-            font-size: 1.4rem;
-            color: var(--primary) !important;
-            display: flex;
-            align-items: center;
-            padding-right: 4.5rem;
+            font-weight: 700; font-size: 1.4rem; color: var(--primary) !important;
         }
-
-        .navbar-brand span {
-            background: linear-gradient(45deg, var(--primary) 30%, var(--primary-light) 90%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
         .navbar-brand .logo-icon {
-            color: var(--primary);
-            margin-right: 0.5rem;
-            font-size: 1.8rem;
+            color: var(--primary); margin-right: 0.5rem; font-size: 1.8rem;
         }
-
-        .navbar-collapse {
-            display: flex;
-            justify-content: space-between;
-            flex-grow: 1;
-        }
-
-        .navbar-nav .nav-item {
-            padding: 0 8px;
-        }
-
-        .navbar-nav.me-auto {
-            margin-right: auto !important;
-            margin-left: 2rem !important;
-        }
-
         .nav-link {
-            color: var(--gray-700) !important;
-            font-weight: 500;
-            padding: 0.7rem 1rem !important;
-            transition: all 0.3s ease;
-            border-radius: 6px;
+            color: var(--gray-700) !important; font-weight: 500; padding: 0.7rem 1rem !important; transition: all 0.3s ease; border-radius: 6px; display: flex; align-items: center;
         }
-
         .nav-link:hover {
-            color: var(--primary) !important;
-            background-color: rgba(106, 62, 161, 0.04);
+            color: var(--primary) !important; background-color: rgba(106, 62, 161, 0.04);
         }
-
         .nav-link.active {
-            color: var(--primary) !important;
-            background-color: rgba(106, 62, 161, 0.08);
+            color: var(--primary) !important; background-color: rgba(106, 62, 161, 0.08);
         }
-
+        
         .nav-icon {
-            margin-right: 0.5rem;
-            font-size: 1.1rem;
+            margin-right: 0.6rem;
             color: var(--primary-light);
+            font-size: 1.1rem;
         }
 
-       /* Substitua o CSS do navbar-toggler existente por este código */
 
-        /* Hamburger Menu Moderno */
+        /* ================================================================== */
+        /* BOTÃO HAMBÚRGUER (ÍCONE DO MENU MOBILE) */
+        /* ================================================================== */
         .navbar-toggler {
-            border: none;
-            padding: 8px;
-            background: none;
-            position: relative;
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            border: none; padding: 8px; background: transparent; position: relative; width: 40px; height: 40px; transition: all 0.3s ease; z-index: 1051;
         }
-
-        .navbar-toggler:focus {
-            box-shadow: none;
-            outline: none;
-        }
-
-        .navbar-toggler:hover {
-            background-color: rgba(106, 62, 161, 0.08);
-        }
-
-        /* Esconder o ícone padrão do Bootstrap */
-        .navbar-toggler-icon {
-            display: none;
-        }
-
-        /* Container do hamburger */
-        .hamburger {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-        }
-
-        /* Linhas do hamburger */
+        .navbar-toggler:focus { box-shadow: none; outline: none; }
+        .navbar-toggler:hover { background-color: rgba(106, 62, 161, 0.08); }
+        .navbar-toggler-icon { display: none; }
         .hamburger span {
-            display: block;
-            width: 100%;
-            height: 2px;
-            background-color: var(--primary);
-            border-radius: 2px;
-            transition: all 0.25s ease-in-out;
-            transform-origin: center;
-            will-change: transform, opacity;
+            display: block; width: 24px; height: 2.5px; background-color: var(--primary); border-radius: 2px; transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55); transform-origin: center;
         }
+        .hamburger span:nth-child(1) { margin-bottom: 5px; }
+        .hamburger span:nth-child(2) { margin-bottom: 5px; }
+        body.menu-open .hamburger span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+        body.menu-open .hamburger span:nth-child(2) { opacity: 0; transform: scale(0); }
+        body.menu-open .hamburger span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
 
-        .hamburger span:nth-child(1) {
-            margin-bottom: 4px;
-        }
-
-        .hamburger span:nth-child(2) {
-            margin-bottom: 4px;
-        }
-
-        /* Animação quando o menu está aberto */
-        .navbar-toggler[aria-expanded="true"] .hamburger span:nth-child(1) {
-            transform: translateY(6px) rotate(45deg);
-        }
-
-        .navbar-toggler[aria-expanded="true"] .hamburger span:nth-child(2) {
-            opacity: 0;
-            transform: scale(0);
-        }
-
-        .navbar-toggler[aria-expanded="true"] .hamburger span:nth-child(3) {
-            transform: translateY(-6px) rotate(-45deg);
-        }
-
-        /* Animação quando o menu está fechado - CORREÇÃO DA TRAVADINHA */
-        .navbar-toggler[aria-expanded="false"] .hamburger span:nth-child(1) {
-            transform: translateY(0) rotate(0deg);
-        }
-
-        .navbar-toggler[aria-expanded="false"] .hamburger span:nth-child(2) {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .navbar-toggler[aria-expanded="false"] .hamburger span:nth-child(3) {
-            transform: translateY(0) rotate(0deg);
-        }
-
-        /* Melhorias no menu mobile */
-        @media (max-width: 991px) {
+        /* ================================================================== */
+        /* NOVO MENU OVERLAY RESPONSIVO (Até 991.98px) */
+        /* ================================================================== */
+        @media (max-width: 991.98px) {
             .navbar-collapse {
-                flex-direction: column;
-                align-items: flex-start;
-                background-color: white;
-                border-radius: 12px;
-                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-                padding: 1.5rem;
-                margin-top: 1rem;
-                border: 1px solid rgba(106, 62, 161, 0.1);
-                backdrop-filter: blur(10px);
-                animation: slideDown 0.3s ease-out;
+                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #ffffff; z-index: 1045; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 3rem; opacity: 0; visibility: hidden; transform: scale(0.98); transition: opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), visibility 0.3s; will-change: transform, opacity;
             }
-
-            @keyframes slideDown {
-                from {
-                    opacity: 0;
-                    transform: translateY(-10px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
+            .navbar-collapse:not(.show) { display: none; }
+            body.menu-open .navbar-collapse {
+                opacity: 1; visibility: visible; transform: scale(1); display: flex;
             }
-
-            .navbar-nav.mx-auto {
-                margin-left: 0 !important;
-                margin-right: 0 !important;
-                width: 100%;
+            .navbar-nav {
+                list-style: none; padding-left: 0; margin: 0 !important; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
             }
-
-            .navbar-nav:last-child {
-                margin-top: 1.5rem;
-                margin-left: 0;
-                width: 100%;
-                padding-top: 1rem;
-                border-top: 1px solid rgba(106, 62, 161, 0.1);
+            .navbar-nav:last-child { border-top: none; }
+            .nav-item {
+                width: 100%; max-width: 320px; text-align: center;
             }
-
-            .navbar-nav:last-child .nav-item {
-                width: 100%;
+            .navbar-nav.mx-auto .nav-link {
+                font-size: 1.5rem !important; font-weight: 500 !important; color: var(--text-dark) !important; justify-content: center;
             }
-
-            .navbar-nav:last-child .btn {
-                margin-top: 0.5rem;
-                width: 100%;
-                display: block;
-                text-align: center;
-                justify-content: center;
+            .navbar-nav.mx-auto .nav-link:hover, .navbar-nav.mx-auto .nav-link.active {
+                color: var(--primary) !important; background: transparent !important;
             }
+            .nav-icon { display: none; } 
+            @media (min-width: 992px) { .nav-icon { display: inline-block; } }
 
-            .nav-link {
-                padding: 0.8rem 1rem !important;
-                border-radius: 8px;
-                margin-bottom: 0.3rem;
-                transition: all 0.3s ease;
+            .nav-item.dropdown {
+                display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
             }
-
-            .nav-link:hover {
-                background-color: rgba(106, 62, 161, 0.08);
-                transform: translateX(5px);
-            }
-        }
-
-        @media (max-width: 991px) {
-            .navbar-collapse {
-                flex-direction: column;
-                align-items: flex-start;
-                background-color: white;
-                border-radius: 10px;
-                box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-                padding: 1rem;
-                margin-top: 0.5rem;
-            }
-
-            .navbar-nav.mx-auto {
-                margin-left: 0 !important;
-                width: 100%;
-            }
-
-            .navbar-nav:last-child {
-                margin-top: 1rem;
-                margin-left: 0;
-                width: 100%;
-            }
-
-            .navbar-nav:last-child .nav-item {
-                width: 100%;
-            }
-
-            .navbar-nav:last-child .btn {
-                margin-top: 0.5rem;
-                width: 100%;
-                display: block;
-                text-align: center;
-            }
-
-            .nav-link {
-                padding: 0.7rem 1rem !important;
-            }
-        }
-
-        /* Main Content */
-        main {
-            min-height: calc(100vh - 180px);
-        }
-
-        .container {
-            max-width: 1280px;
-        }
-
-        /* Buttons */
-        .btn {
-            border-radius: 6px;
-            padding: 0.6rem 1.5rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary {
-            background: linear-gradient(45deg, var(--primary) 30%, var(--primary-light) 90%);
-            border: none;
-            box-shadow: 0 4px 10px rgba(106, 62, 161, 0.2);
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(45deg, var(--primary-dark) 30%, var(--primary) 90%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(106, 62, 161, 0.3);
-        }
-
-        .btn-outline-primary {
-            color: var(--primary);
-            border: 2px solid var(--primary);
-            background: transparent;
-        }
-
-        .btn-outline-primary:hover {
-            background-color: var(--primary);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-       /* Dropdown de Usuário Moderno */
-        .nav-item.dropdown {
-            position: relative;
-        }
-
-        .dropdown-toggle {
-            background: rgba(106, 62, 161, 0.04);
-            border-radius: 20px;
-            padding: 0.6rem 1.2rem !important;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(106, 62, 161, 0.08);
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-        }
-
-        .dropdown-toggle:hover {
-            background: rgba(106, 62, 161, 0.08);
-            border-color: rgba(106, 62, 161, 0.15);
-            transform: translateY(-1px);
-        }
-
-        .dropdown-toggle::after {
-            margin-left: 0.8rem;
-            border-top: 3px solid rgba(106, 62, 161, 0.6);
-            border-right: 3px solid transparent;
-            border-left: 3px solid transparent;
-            transition: transform 0.3s ease;
-        }
-
-        .dropdown-toggle[aria-expanded="true"]::after {
-            transform: rotate(180deg);
-        }
-
-        /* Menu Dropdown */
-        .dropdown-menu {
-            background: white;
-            border: 1px solid rgba(106, 62, 161, 0.08);
-            border-radius: 10px;
-            box-shadow: 0 8px 25px rgba(106, 62, 161, 0.08);
-            padding: 0.5rem 0;
-            margin-top: 0.5rem;
-            min-width: 200px;
-            backdrop-filter: blur(10px);
-            animation: slideDown 0.3s ease-out;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        /* Items do Dropdown */
-        .dropdown-item {
-            padding: 0.7rem 1.2rem;
-            font-weight: 500;
-            color: var(--gray-700);
-            border-radius: 0;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .dropdown-item:hover {
-            background: rgba(106, 62, 161, 0.04);
-            color: var(--primary);
-            transform: translateX(3px);
-        }
-
-        .dropdown-item:focus {
-            background: rgba(106, 62, 161, 0.06);
-            color: var(--primary);
-            outline: none;
-        }
-
-        .dropdown-item i {
-            font-size: 0.9rem;
-            width: 18px;
-            margin-right: 0.7rem;
-            opacity: 0.7;
-            transition: all 0.3s ease;
-        }
-
-        .dropdown-item:hover i {
-            color: var(--primary);
-            opacity: 1;
-            transform: scale(1.05);
-        }
-
-        /* Divider */
-        .dropdown-divider {
-            border-top: 1px solid rgba(106, 62, 161, 0.06);
-            margin: 0.3rem 0.8rem;
-        }
-
-        /* Ícone do usuário no nav-link */
-        .nav-link .nav-icon {
-            font-size: 1rem;
-            margin-right: 0.5rem;
-            color: rgba(106, 62, 161, 0.7);
-            opacity: 0.8;
-        }
-
-        /* Responsividade para mobile */
-        @media (max-width: 991px) {
             .dropdown-toggle {
-                background: transparent;
-                border-radius: 8px;
-                padding: 0.7rem 1rem !important;
-                width: 100%;
-                justify-content: flex-start;
+                background: transparent !important; border: none !important; font-size: 1.8rem !important; font-weight: 600 !important; color: var(--primary) !important; padding: 0 !important;
             }
-            
-            .dropdown-toggle::after {
-                margin-left: auto;
-            }
-            
+            .dropdown-toggle::after { display: none !important; }
             .dropdown-menu {
-                position: static !important;
-                float: none;
-                width: 100%;
-                margin-top: 0.5rem;
-                border: 1px solid rgba(106, 62, 161, 0.1);
-                transform: none !important;
-                box-shadow: 0 5px 15px rgba(106, 62, 161, 0.1);
+                display: flex !important; flex-direction: column; gap: 1.2rem; position: static !important; transform: none !important; background: transparent !important; border: none !important; box-shadow: none !important; width: auto !important; padding: 0 !important; margin: 0 !important; text-align: center;
             }
-            
             .dropdown-item {
-                padding: 0.9rem 1.5rem;
+                font-size: 1.1rem !important; font-weight: 500 !important; color: var(--text-dark) !important; padding: 0.2rem !important; background: transparent !important; display: flex; align-items: center; justify-content: center; gap: 0.8rem; transition: color 0.2s ease-in-out;
             }
-            
-            .dropdown-item:hover {
-                transform: translateX(8px);
+            .dropdown-item i {
+                font-size: 1rem; width: 20px; text-align: center; color: var(--primary);
+            }
+            .dropdown-item:hover { color: var(--primary) !important; }
+            .dropdown-divider {
+                display: block; width: 150px; margin: 0.5rem auto; border-color: rgba(0, 0, 0, 0.1);
+            }
+            .dropdown-item-logout { color: var(--gray-700) !important; }
+            .dropdown-item-logout i { color: var(--gray-700); transition: color 0.2s ease-in-out; }
+            .dropdown-item-logout:hover { color: var(--danger-red) !important; }
+            .dropdown-item-logout:hover i { color: var(--danger-red); }
+
+            .navbar-nav:last-child .nav-item > a {
+                padding: 0.75rem 1rem;
+                font-size: 1.2rem !important;
+                font-weight: 500 !important;
+                border-radius: 8px;
+                border: 2px solid;
+                transition: all 0.3s ease-in-out;
+            }
+            .navbar-nav:last-child .nav-item .nav-link {
+                background: transparent !important;
+                border-color: var(--primary);
+                color: var(--primary) !important;
+            }
+            .navbar-nav:last-child .nav-item .nav-link:hover {
+                background: var(--primary) !important;
+                color: white !important;
+            }
+            .navbar-nav:last-child .nav-item .btn {
+                background: linear-gradient(45deg, var(--primary) 30%, var(--primary-light) 90%) !important;
+                border-color: transparent;
+                color: white !important;
+            }
+            .navbar-nav:last-child .nav-item .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(106, 62, 161, 0.3);
             }
         }
+        
+        /* Dropdown de Usuário (Desktop) */
+        @media (min-width: 992px) {
+            .nav-item.dropdown { position: relative; }
+            .dropdown-toggle { background: rgba(106, 62, 161, 0.04); border-radius: 20px; padding: 0.6rem 1.2rem !important; font-weight: 500; border: 1px solid rgba(106, 62, 161, 0.08); }
+            .dropdown-toggle:hover { background: rgba(106, 62, 161, 0.08); transform: translateY(-1px); }
+            .dropdown-toggle::after { margin-left: 0.8rem; border-top: 3px solid; transition: transform 0.3s ease; }
+            .dropdown-toggle[aria-expanded="true"]::after { transform: rotate(180deg); }
+            .dropdown-menu { background: white; border: 1px solid rgba(106, 62, 161, 0.08); border-radius: 10px; box-shadow: 0 8px 25px rgba(106, 62, 161, 0.08); padding: 0.5rem 0; margin-top: 0.5rem; min-width: 200px; }
+            .dropdown-item { padding: 0.7rem 1.2rem; font-weight: 500; color: var(--gray-700); }
+            .dropdown-item:hover { background: rgba(106, 62, 161, 0.04); color: var(--primary); transform: translateX(3px); }
+            .dropdown-item i { margin-right: 0.7rem; }
+            .dropdown-divider { margin: 0.3rem 0.8rem; }
+        }
 
-        /* Back to top button - CORRIGIDO */
+        /* ================================================================== */
+        /* FOOTER & OUTROS ESTILOS */
+        /* ================================================================== */
+        main { min-height: calc(100vh - 180px); }
+        .btn { border-radius: 6px; padding: 0.6rem 1.5rem; font-weight: 500; transition: all 0.3s ease; }
+        .btn-primary { background: linear-gradient(45deg, var(--primary) 30%, var(--primary-light) 90%); border: none; box-shadow: 0 4px 10px rgba(106, 62, 161, 0.2); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(106, 62, 161, 0.3); }
+        
+        /* --- BOTÃO BACK TO TOP MELHORADO --- */
+        @keyframes bounceArrow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
         .back-to-top {
             position: fixed;
             bottom: 25px;
@@ -478,188 +207,55 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: var(--primary);
+            background: linear-gradient(45deg, var(--primary), var(--primary-light));
             color: white;
             border: none;
-            box-shadow: 0 4px 15px rgba(106, 62, 161, 0.4);
+            box-shadow: 0 5px 20px rgba(106, 62, 161, 0.3);
             z-index: 1000;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             opacity: 0;
             visibility: hidden;
-            transform: translateY(20px);
-            text-decoration: none;
+            transform: translateY(20px) scale(0.9);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
         }
-
         .back-to-top.show {
             opacity: 1;
             visibility: visible;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
         }
-
         .back-to-top:hover {
-            background: var(--primary-dark);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(106, 62, 161, 0.5);
-            color: white;
+            background: linear-gradient(45deg, var(--primary-dark), var(--primary));
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(106, 62, 161, 0.4);
         }
-
-        /* Accessibility */
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border-width: 0;
+        .back-to-top i {
+            animation: bounceArrow 1.5s infinite ease-in-out;
         }
-
-        /* Footer Simplificado */
-        .footer {
-            background-color: #f8f9fa;
-            border-top: 3px solid var(--primary);
-            padding: 40px 0 20px 0;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .footer-content {
-            text-align: center;
-            color: #6c757d;
-        }
-
-        .footer-logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .footer-logo .logo-icon {
-            color: var(--primary);
-            margin-right: 10px;
-            font-size: 1.5rem;
-        }
-
-        .footer-logo span {
-            font-size: 1.3rem;
-            font-weight: 600;
-            background: linear-gradient(45deg, var(--primary) 30%, var(--primary-light) 90%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .footer-description {
-            max-width: 600px;
-            margin: 0 auto 25px auto;
-            color: #6c757d;
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-
+        
+        .footer { background-color: #f8f9fa; border-top: 3px solid var(--primary); padding: 40px 0 20px 0; }
+        .footer-content { text-align: center; color: #6c757d; }
+        .footer-logo { display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+        .footer-logo .logo-icon { color: var(--primary); margin-right: 10px; font-size: 1.5rem; }
+        .footer-logo span { font-size: 1.3rem; font-weight: 600; }
+        .footer-description { max-width: 600px; margin: 0 auto 25px auto; }
+        
         .footer-links {
             margin-bottom: 25px;
         }
-
         .footer-links a {
-            color: #6c757d;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 0.9rem;
-            transition: color 0.3s ease;
+            display: block; color: #6c757d; text-decoration: none; margin: 8px 0; font-size: 0.95rem; transition: color 0.3s ease;
         }
-
         .footer-links a:hover {
             color: var(--primary);
         }
-
-        .footer-social {
-            margin-bottom: 25px;
-        }
-
-        .footer-social a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 35px;
-            height: 35px;
-            margin: 0 8px;
-            border-radius: 50%;
-            background-color: #e9ecef;
-            color: #6c757d;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .footer-social a:hover {
-            background-color: var(--primary);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .footer-copyright {
-            border-top: 1px solid #dee2e6;
-            padding-top: 20px;
-            font-size: 0.85rem;
-            color: #6c757d;
-        }
-
-        .footer-contact {
-            margin-bottom: 20px;
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-
-        .footer-contact i {
-            color: var(--primary);
-            margin-right: 8px;
-            width: 16px;
-        }
-
-        /* Responsividade */
-        @media (max-width: 768px) {
-            .footer {
-                padding: 30px 0 15px 0;
-            }
-
-            .footer-links a {
-                display: block;
-                margin: 5px 0;
-            }
-
-            .footer-social {
-                margin: 20px 0;
-            }
-
-            .footer-description {
-                font-size: 0.9rem;
-                margin-bottom: 20px;
-            }
-
-            .back-to-top {
-                bottom: 20px;
-                right: 20px;
-                width: 45px;
-                height: 45px;
-            }
-        }
-
-        /* Adicione algum conteúdo para testar o scroll */
-        .demo-content {
-            height: 150vh;
-            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
-            padding: 2rem;
-        }
+        .footer-copyright { border-top: 1px solid #dee2e6; padding-top: 20px; font-size: 0.85rem; }
+        .demo-content { height: 150vh; padding: 2rem; }
     </style>
     
-    <!-- CSS específico da página vem depois -->
     {% block extra_css %}{% endblock %}
 </head>
 
@@ -667,101 +263,49 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-light sticky-top">
             <div class="container">
-                <a class="navbar-brand" href="{% url 'index' %}">
+                <a class="navbar-brand d-flex align-items:center" href="{% url 'index' %}">
                     <i class="fas fa-puzzle-piece logo-icon"></i>
                     <span>CentroEspectro</span>
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                
+                <button class="navbar-toggler" type="button" aria-label="Toggle navigation">
                     <div class="hamburger">
                         <span></span>
                         <span></span>
                         <span></span>
                     </div>
                 </button>
-                <div class="navbar-collapse collapse" id="navbarNav">
-                    <!-- ================================================================== -->
-                    <!-- MODIFICAÇÃO: Classe 'me-auto' alterada para 'mx-auto' para centralizar -->
-                    <!-- MODIFICAÇÃO: Item 'Ferramentas' foi removido -->
-                    <!-- ================================================================== -->
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav mx-auto">
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}"
-                                href="{% url 'index' %}">
-                                <i class="fas fa-home nav-icon"></i>Início
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'duvidas' %}active{% endif %}"
-                                href="{% url 'duvidas' %}">
-                                <i class="fas fa-question-circle nav-icon"></i>Dúvidas
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'contatos' %}active{% endif %}"
-                                href="{% url 'contatos' %}">
-                                <i class="fas fa-address-book nav-icon"></i>Contatos
-                            </a>
-                        </li>
+                        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'index' %}"><i class="fas fa-home nav-icon"></i>Início</a></li>
+                        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'duvidas' %}active{% endif %}" href="{% url 'duvidas' %}"><i class="fas fa-question-circle nav-icon"></i>Dúvidas</a></li>
+                        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'contatos' %}active{% endif %}" href="{% url 'contatos' %}"><i class="fas fa-address-book nav-icon"></i>Contatos</a></li>
                     </ul>
 
-                    <!-- Botões de Autenticação -->
-                    <div class="navbar-nav">
+                    <ul class="navbar-nav">
                         {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-user nav-icon"></i>{{ user.username }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'profile' %}">
-                                        <i class="fas fa-id-card me-2"></i>Meu Perfil
-                                    </a>
-                                </li>
-                                <!-- ================================================================== -->
-                                <!-- MODIFICAÇÃO: LINK PARA ÁREA DO PROFESSOR -->
-                                <!-- ================================================================== -->
+                                <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-id-card"></i>Meu Perfil</a></li>
                                 {% if user.customuser.is_professor %}
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'area_professor' %}">
-                                        <i class="fas fa-chalkboard-teacher me-2"></i>Área do Professor
-                                    </a>
-                                </li>
+                                <li><a class="dropdown-item" href="{% url 'area_professor' %}"><i class="fas fa-chalkboard-teacher"></i>Área do Professor</a></li>
                                 {% endif %}
-                                <!-- ================================================================== -->
-
                                 {% if user.is_staff %}
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'admin:index' %}" target="_blank">
-                                        <i class="fas fa-cogs me-2"></i>Painel Admin
-                                    </a>
-                                </li>
+                                <li><a class="dropdown-item" href="{% url 'admin:index' %}" target="_blank"><i class="fas fa-cogs"></i>Painel Admin</a></li>
                                 {% endif %}
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'logout' %}">
-                                        <i class="fas fa-sign-out-alt me-2"></i>Sair
-                                    </a>
-                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item dropdown-item-logout" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i>Sair</a></li>
                             </ul>
                         </li>
                         {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}"
-                                href="{% url 'login' %}">
-                                <i class="fas fa-sign-in-alt nav-icon"></i>Entrar
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn btn-primary ms-2" href="{% url 'register' %}">
-                                <i class="fas fa-user-plus me-1"></i>Cadastrar
-                            </a>
-                        </li>
+                        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">Entrar</a></li>
+                        <li class="nav-item"><a class="btn btn-primary ms-lg-2" href="{% url 'register' %}"><i class="fas fa-user-plus me-1"></i>Cadastrar</a></li>
                         {% endif %}
-                    </div>
+                    </ul>
                 </div>
             </div>
         </nav>
@@ -769,53 +313,30 @@
     
     <main role="main">
         {% block content %}
-        <!-- Conteúdo da página aqui -->
         <div class="container py-5">
             <h1>Sua página aqui</h1>
             <p>Este é um exemplo de conteúdo para demonstrar o footer simplificado.</p>
-            <!-- Conteúdo adicional para testar o scroll -->
             <div class="demo-content">
                 <h2>Conteúdo de Teste</h2>
                 <p>Role para baixo para ver o botão "Voltar ao Topo" aparecer!</p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-                <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
             </div>
         </div>
         {% endblock %}
-        
-        <!-- ================================================================== -->
-        <!-- O BLOCO DE MENSAGENS ANTIGO FOI REMOVIDO DAQUI -->
-        <!-- O código que estava aqui foi substituído pelo script no final do arquivo. -->
-        <!-- ================================================================== -->
-
     </main>
 
-    <!-- Footer Simplificado -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <!-- Logo -->
                 <div class="footer-logo">
                     <i class="fas fa-puzzle-piece logo-icon"></i>
                     <span>CentroEspectro</span>
                 </div>
-
-                <!-- Descrição -->
-                <p class="footer-description">
-                    Ferramenta de apoio para alunos autistas de uma escola municipal.
-                </p>
-
-                <!-- Links rápidos -->
-                <!-- ================================================================== -->
-                <!-- MODIFICAÇÃO: Link 'Ferramentas' removido -->
-                <!-- ================================================================== -->
+                <p class="footer-description">Ferramenta de apoio para alunos autistas de uma escola municipal.</p>
                 <div class="footer-links">
                     <a href="{% url 'index' %}">Início</a>
                     <a href="{% url 'duvidas' %}">Dúvidas</a>
                     <a href="{% url 'contatos' %}">Contatos</a>
                 </div>
-
-                <!-- Copyright -->
                 <div class="footer-copyright">
                     <p>&copy; 2025 CentroEspectro - Projeto TCC. Todos os direitos reservados.</p>
                 </div>
@@ -823,106 +344,62 @@
         </div>
     </footer>
 
-    <!-- Back to top button - CORRIGIDO -->
     <button id="back-to-top" class="back-to-top" aria-label="Voltar ao topo">
         <i class="fas fa-arrow-up"></i>
     </button>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- ================================================================== -->
-    <!-- MODIFICAÇÃO #1: ADICIONANDO A BIBLIOTECA SWEETALERT2 -->
-    <!-- ================================================================== -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <script src="{% static 'js/site.js' %}"></script>
 
     <script>
-        // Back to top button - JAVASCRIPT CORRIGIDO
-        $(document).ready(function() {
-            const backToTopBtn = $('#back-to-top');
-            
-            // Mostrar/esconder botão baseado no scroll
-            $(window).scroll(function () {
-                if ($(this).scrollTop() > 300) {
-                    backToTopBtn.addClass('show');
-                } else {
-                    backToTopBtn.removeClass('show');
-                }
-            });
+        document.addEventListener('DOMContentLoaded', function() {
+            // SCRIPT DO MENU OVERLAY
+            const navbarToggler = document.querySelector('.navbar-toggler');
+            const navbarCollapse = document.querySelector('.navbar-collapse');
+            const navLinks = document.querySelectorAll('.navbar-collapse a');
 
-            // Ação do clique
-            backToTopBtn.click(function (e) {
-                e.preventDefault();
-                $('html, body').animate({ 
-                    scrollTop: 0 
-                }, 500);
-                return false;
-            });
-
-            // Verificar se já deve mostrar o botão na carga da página
-            if ($(window).scrollTop() > 300) {
-                backToTopBtn.addClass('show');
+            if (navbarCollapse) {
+                navbarCollapse.classList.add('show');
             }
+
+            function toggleMenu() {
+                const isMenuOpen = document.body.classList.toggle('menu-open');
+                navbarToggler.setAttribute('aria-expanded', isMenuOpen);
+            }
+            
+            if (navbarToggler) {
+                navbarToggler.addEventListener('click', toggleMenu);
+            }
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (document.body.classList.contains('menu-open')) {
+                        toggleMenu();
+                    }
+                });
+            });
+
+            // SCRIPT DO BOTÃO "VOLTAR AO TOPO"
+            const backToTopBtn = $('#back-to-top');
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 300) backToTopBtn.addClass('show');
+                else backToTopBtn.removeClass('show');
+            });
+            backToTopBtn.click(() => { $('html, body').animate({ scrollTop: 0 }, 500); });
         });
-        
-        $(document).ready(function() {
-            // Código existente aqui...
-            
-            // Fix para a travadinha do menu hambúrguer
-            const navbarToggler = $('.navbar-toggler');
-            const navbarCollapse = $('#navbarNav');
-            
-            // Garante que a animação funcione corretamente
-            navbarCollapse.on('show.bs.collapse', function() {
-                navbarToggler.attr('aria-expanded', 'true');
-            });
-            
-            navbarCollapse.on('hide.bs.collapse', function() {
-                navbarToggler.attr('aria-expanded', 'false');
-            });
-            
-            // Force o estado inicial correto
-            navbarToggler.attr('aria-expanded', 'false');
-        });
-
-        // Add animation to elements when they become visible
-        function animateOnScroll() {
-            $('.animate__animated').each(function () {
-                const position = $(this).offset().top;
-                const scroll = $(window).scrollTop();
-                const windowHeight = $(window).height();
-
-                if (scroll + windowHeight > position) {
-                    const animation = $(this).data('animation');
-                    $(this).addClass(animation);
-                }
-            });
-        }
-
-        $(window).scroll(animateOnScroll);
-        $(document).ready(animateOnScroll);
     </script>
 
-    <!-- ================================================================== -->
-    <!-- MODIFICAÇÃO #2: SCRIPT PARA EXIBIR AS MENSAGENS COM SWEETALERT2 -->
-    <!-- ================================================================== -->
     {% if messages %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             {% for message in messages %}
             Swal.fire({
-                toast: true,
-                position: 'top-end', // Posição no canto superior direito
-                icon: '{{ message.tags }}', // Ícone (success, error, warning, info)
-                title: '{{ message }}', // O texto da sua mensagem de sucesso
-                showConfirmButton: false, // Não mostrar o botão "OK"
-                timer: 4000, // A notificação desaparecerá após 4 segundos
-                timerProgressBar: true, // Mostra uma barra de progresso do tempo
+                toast: true, position: 'top-end', icon: '{{ message.tags }}', title: '{{ message }}', showConfirmButton: false, timer: 4000, timerProgressBar: true,
                 didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    toast.addEventListener('mouseenter', Swal.stopTimer);
+                    toast.addEventListener('mouseleave', Swal.resumeTimer);
                 }
             });
             {% endfor %}

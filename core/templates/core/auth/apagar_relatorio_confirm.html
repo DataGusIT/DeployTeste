@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="container py-5 animate-fade-up">
+
+    <!-- CABEÇALHO DA PÁGINA -->
+    <div class="section-header text-center mb-5">
+        <span class="section-subtitle">Ação Irreversível</span>
+        <h1 class="section-title">Confirmar Exclusão de Relatório</h1>
+        <div class="section-divider"></div>
+    </div>
+
+    <!-- CONTAINER DE CONFIRMAÇÃO -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="feature-card text-center">
+                <div class="feature-icon mb-4" style="width: 80px; height: 80px; font-size: 2.2rem; background-color: var(--danger-light); color: var(--danger);">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                
+                <h4 class="mb-3">Você tem certeza?</h4>
+                <p class="section-description">
+                    Você está prestes a apagar permanentemente o relatório:
+                </p>
+                <p class="fw-bold fs-5 my-4">"{{ relatorio.titulo }}"</p>
+                <p class="section-description">
+                    Esta ação não pode ser desfeita.
+                </p>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-center mt-5">
+                        <a href="{% url 'detalhes_aluno' aluno.id %}" class="btn btn-outline-primary btn-lg me-3">
+                            <i class="fas fa-times me-2"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger btn-lg">
+                            <i class="fas fa-trash-alt me-2"></i> Sim, Apagar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
