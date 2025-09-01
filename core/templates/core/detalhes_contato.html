@@ -4,118 +4,134 @@
 {% block title %}{{ contato.nome }} - Detalhes{% endblock %}
 
 {% block content %}
-
-<!-- HERO HEADER -->
-<div class="hero-section text-white text-center py-5">
-    <div class="container">
+<div class="container-fluid py-5" style="background: linear-gradient(135deg, var(--primary-very-light) 0%, var(--body-bg) 100%);">
+    
+    <!-- Breadcrumb -->
+    <div class="container mb-4">
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb-custom justify-content-center">
-                <li class="breadcrumb-item"><a href="/">Home</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'contatos' %}">Contatos</a></li>
+            <ol class="breadcrumb bg-transparent p-0">
+                <li class="breadcrumb-item"><a href="/" class="text-primary">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'contatos' %}" class="text-primary">Contatos</a></li>
                 <li class="breadcrumb-item active" aria-current="page">{{ contato.nome }}</li>
             </ol>
         </nav>
-        <h1 class="display-4 fw-bold mt-3">{{ contato.nome }}</h1>
-        <p class="lead">{{ contato.categoria.nome }}</p>
     </div>
-</div>
 
-
-<div class="container py-5">
-    <div class="row">
-        <!-- Coluna Principal (Esquerda) -->
-        <div class="col-lg-8">
-
-            <!-- Card Principal com Imagem e Ações -->
-            <div class="card feature-card mb-4 p-2 p-md-4">
-                <div class="row g-4 align-items-center">
-                    <div class="col-md-4 text-center">
-                        {% if contato.imagem_url %}
-                            <img src="{{ contato.imagem_url }}" alt="{{ contato.nome }}" class="img-fluid rounded-3 shadow-lg" style="max-height: 250px; width: 100%; object-fit: cover; border: 4px solid var(--primary-very-light);">
-                        {% else %}
-                            <img src="{% static 'img/default-contact.jpg' %}" alt="{{ contato.nome }}" class="img-fluid rounded-3 shadow-lg" style="max-height: 250px; width: 100%; object-fit: cover; border: 4px solid var(--primary-very-light);">
+    <div class="container">
+        <!-- Cabeçalho do contato -->
+        <div class="row mb-5 align-items-center animate-fade-up">
+            <div class="col-lg-4 text-center mb-4 mb-lg-0">
+                <div class="contact-header-image">
+                    {# ATUALIZADO: Usando a variável 'imagem_url' do seu ambiente de produção #}
+                    {% if contato.imagem_url %}
+                        <img src="{{ contato.imagem_url }}" 
+                             alt="{{ contato.nome }}" 
+                             class="img-fluid rounded-4 shadow-lg">
+                    {% else %}
+                        <img src="{% static 'img/default-contact.jpg' %}" 
+                             alt="{{ contato.nome }}"
+                             class="img-fluid rounded-4 shadow-lg">
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-lg-8">
+                <div class="contact-header-info">
+                    <span class="section-subtitle mb-3">{{ contato.categoria.nome }}</span>
+                    <h1 class="section-title text-primary mb-3" style="font-size: 2.8rem;">{{ contato.nome }}</h1>
+                    <p class="section-description mb-4">{{ contato.descricao }}</p>
+                    
+                    <div class="mb-4">
+                        {% if contato.atendimento_presencial %}
+                            <span class="badge badge-custom bg-success me-2">
+                                <i class="fas fa-building me-1"></i>Atendimento Presencial
+                            </span>
+                        {% endif %}
+                        {% if contato.atendimento_online %}
+                            <span class="badge badge-custom bg-info">
+                                <i class="fas fa-laptop me-1"></i>Atendimento Online
+                            </span>
                         {% endif %}
                     </div>
-                    <div class="col-md-8">
-                        <h2 class="section-title text-start mb-2">{{ contato.nome }}</h2>
-                        <div class="section-divider my-2" style="margin: 0 !important; width: 50px;"></div>
-                        <p class="text-muted my-3">{{ contato.descricao }}</p>
-
-                        <!-- Tipos de atendimento -->
-                        <div class="mb-3">
-                            {% if contato.atendimento_presencial %}
-                                <span class="badge bg-success me-2 p-2"><i class="fas fa-building me-1"></i> Atendimento Presencial</span>
-                            {% endif %}
-                            {% if contato.atendimento_online %}
-                                <span class="badge bg-info p-2"><i class="fas fa-laptop me-1"></i> Atendimento Online</span>
-                            {% endif %}
-                        </div>
-
-                        <!-- Botões de ação -->
-                        <div class="d-flex flex-wrap gap-2">
-                             <a href="tel:{{ contato.telefone }}" class="btn btn-primary btn-lg">
-                                <i class="fas fa-phone me-2"></i>Ligar
+                    
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="tel:{{ contato.telefone }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-phone me-2"></i>Ligar agora
+                        </a>
+                        {% if contato.whatsapp %}
+                            <a href="https://wa.me/{{ contato.whatsapp }}" target="_blank" class="btn btn-success-custom btn-lg">
+                                <i class="fab fa-whatsapp me-2"></i>WhatsApp
                             </a>
-                            {% if contato.whatsapp %}
-                                <a href="https://wa.me/{{ contato.whatsapp }}" target="_blank" class="btn btn-success text-white" style="background-color: #25D366; border:none;">
-                                    <i class="fab fa-whatsapp me-2"></i>WhatsApp
-                                </a>
-                            {% endif %}
-                            {% if contato.email %}
-                                <a href="mailto:{{ contato.email }}" class="btn btn-secondary text-white" style="background: var(--gray-600); border:none;">
-                                    <i class="fas fa-envelope me-2"></i>E-mail
-                                </a>
-                            {% endif %}
-                        </div>
+                        {% endif %}
+                        {% if contato.email %}
+                            <a href="mailto:{{ contato.email }}" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-envelope me-2"></i>E-mail
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Informações Detalhadas -->
-            <div class="card feature-card mb-4">
-                <div class="card-body p-4">
-                    <h4 class="card-title text-primary mb-4"><i class="fas fa-info-circle me-2"></i>Informações Detalhadas</h4>
+        <div class="row">
+            <!-- Coluna principal -->
+            <div class="col-lg-8">
+                
+                <!-- Informações detalhadas -->
+                <div class="content-card mb-4 animate-fade-up delay-1">
+                    <h4 class="card-title text-primary mb-4">
+                        <i class="fas fa-info-circle me-2"></i>Informações Detalhadas
+                    </h4>
+                    
                     {% if contato.especialidades %}
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <h6 class="fw-bold text-dark">Especialidades:</h6>
-                            <p class="text-muted">{{ contato.especialidades }}</p>
+                            <p class="text-muted mb-0">{{ contato.especialidades }}</p>
                         </div>
                     {% endif %}
-                     {% if contato.convenios %}
-                        <div class="mb-3">
+                    
+                    {% if contato.convenios %}
+                        <div class="mb-4">
                             <h6 class="fw-bold text-dark">Convênios Aceitos:</h6>
-                            <p class="text-muted">{{ contato.convenios }}</p>
+                            <p class="text-muted mb-0">{{ contato.convenios }}</p>
                         </div>
                     {% endif %}
+                    
                     {% if contato.observacoes %}
                         <div>
                             <h6 class="fw-bold text-dark">Observações:</h6>
-                            <p class="text-muted">{{ contato.observacoes|linebreaksbr }}</p>
+                            <p class="text-muted mb-0">{{ contato.observacoes|linebreaksbr }}</p>
                         </div>
                     {% endif %}
                 </div>
-            </div>
 
-            <!-- Galeria de fotos -->
-            {% if contato.fotos.all %}
-                <div class="card feature-card mb-4">
-                    <div class="card-body p-4">
-                        <h4 class="card-title text-primary mb-4"><i class="fas fa-images me-2"></i>Galeria</h4>
+                <!-- Galeria de fotos -->
+                {% if contato.fotos.all %}
+                    <div class="content-card mb-4 animate-fade-up delay-2">
+                        <h4 class="card-title text-primary mb-4">
+                            <i class="fas fa-images me-2"></i>Galeria
+                        </h4>
                         <div class="row g-3">
                             {% for foto in contato.fotos.all %}
                                 <div class="col-md-4">
                                     <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal{{ foto.id }}">
-                                        <img src="{{ foto.imagem_url }}" alt="{{ foto.legenda }}" class="img-fluid rounded-3 gallery-image">
+                                        {# ATUALIZADO: Usando a variável 'imagem_url' do seu ambiente de produção #}
+                                        <img src="{{ foto.imagem_url }}" 
+                                             alt="{{ foto.legenda }}" 
+                                             class="img-fluid rounded-3 gallery-image">
                                     </a>
                                 </div>
-                                <!-- Modal -->
+                                
+                                <!-- Modal para imagem ampliada (versão melhorada de dev) -->
                                 <div class="modal fade" id="imageModal{{ foto.id }}" tabindex="-1" aria-labelledby="imageModalLabel{{ foto.id }}" aria-hidden="true">
                                     <div class="modal-dialog modal-lg modal-dialog-centered">
-                                        <div class="modal-content">
+                                        <div class="modal-content bg-transparent border-0">
+                                            <button type="button" class="btn-close modal-image-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             <div class="modal-body p-0">
-                                                <img src="{{ foto.imagem_url }}" alt="{{ foto.legenda }}" class="img-fluid">
+                                                {# ATUALIZADO: Usando a variável 'imagem_url' do seu ambiente de produção #}
+                                                <img src="{{ foto.imagem_url }}" alt="{{ foto.legenda }}" class="img-fluid rounded-3">
                                                 {% if foto.legenda %}
-                                                    <div class="p-3 bg-light text-center">
+                                                    <div class="p-3 bg-light-subtle text-center rounded-bottom-3">
                                                         <p class="mb-0">{{ foto.legenda }}</p>
                                                     </div>
                                                 {% endif %}
@@ -126,17 +142,19 @@
                             {% endfor %}
                         </div>
                     </div>
-                </div>
-            {% endif %}
+                {% endif %}
 
-            <!-- Mapa -->
-            <div class="card feature-card">
-                <div class="card-body p-4">
-                    <h4 class="card-title text-primary mb-4"><i class="fas fa-map-marked-alt me-2"></i>Localização</h4>
+                <!-- Mapa -->
+                <div class="content-card mb-4 animate-fade-up delay-3">
+                    <h4 class="card-title text-primary mb-4">
+                        <i class="fas fa-map-marked-alt me-2"></i>Localização
+                    </h4>
                     <div class="map-container mb-3">
                         <iframe 
-                            src="https://www.google.com/maps/embed/v1/place?key=SUA_API_KEY&q={{ contato.endereco_para_maps|urlencode }}"
-                            width="100%" height="350" style="border:0;" allowfullscreen="" loading="lazy">
+                            {# ATUALIZADO: Mantendo a chave de API que já estava em produção #}
+                            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBokTpGg0E16-NMOa-UJqVJ_EaJFQRN7xE&q={{ contato.endereco_para_maps|urlencode }}"
+                            width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
                         </iframe>
                     </div>
                     <p class="text-muted mb-0">
@@ -145,88 +163,69 @@
                     </p>
                 </div>
             </div>
-        </div>
 
-        <!-- Sidebar (Direita) -->
-        <div class="col-lg-4">
-            <div class="sidebar-sticky">
-                <!-- Informações de Contato -->
-                <div class="card feature-card mb-4">
-                    <div class="card-body p-4">
-                        <h5 class="card-title text-primary mb-4">Detalhes de Contato</h5>
-                        <ul class="list-unstyled">
-                            <li class="contact-item">
-                                <div class="feature-icon small-icon">
-                                    <i class="fas fa-phone"></i>
-                                </div>
-                                <div>
-                                    <strong>Telefone</strong>
-                                    <a href="tel:{{ contato.telefone }}" class="d-block">{{ contato.telefone }}</a>
-                                </div>
-                            </li>
-                            {% if contato.email %}
-                                <li class="contact-item">
-                                    <div class="feature-icon small-icon">
-                                        <i class="fas fa-envelope"></i>
-                                    </div>
-                                    <div>
-                                        <strong>E-mail</strong>
-                                        <a href="mailto:{{ contato.email }}" class="d-block">{{ contato.email }}</a>
-                                    </div>
-                                </li>
-                            {% endif %}
-                             {% if contato.site %}
-                                <li class="contact-item">
-                                    <div class="feature-icon small-icon">
-                                        <i class="fas fa-globe"></i>
-                                    </div>
-                                    <div>
-                                        <strong>Site</strong>
-                                        <a href="{{ contato.site }}" target="_blank" class="d-block">Visitar site</a>
-                                    </div>
-                                </li>
-                            {% endif %}
-                            <li class="contact-item">
-                                <div class="feature-icon small-icon">
-                                    <i class="fas fa-clock"></i>
-                                </div>
-                                <div>
-                                    <strong>Horário</strong>
-                                    <p class="mb-0">{{ contato.horario_funcionamento }}</p>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Redes Sociais -->
-                {% if contato.facebook or contato.instagram or contato.linkedin or contato.youtube %}
-                    <div class="card feature-card mb-4">
-                        <div class="card-body p-4">
-                            <h5 class="card-title text-primary mb-4">Redes Sociais</h5>
-                            <div class="d-flex flex-wrap gap-2">
-                                {% if contato.facebook %}
-                                    <a href="{{ contato.facebook }}" target="_blank" class="social-btn"><i class="fab fa-facebook-f"></i></a>
-                                {% endif %}
-                                {% if contato.instagram %}
-                                    <a href="{{ contato.instagram }}" target="_blank" class="social-btn"><i class="fab fa-instagram"></i></a>
-                                {% endif %}
-                                {% if contato.linkedin %}
-                                    <a href="{{ contato.linkedin }}" target="_blank" class="social-btn"><i class="fab fa-linkedin-in"></i></a>
-                                {% endif %}
-                                {% if contato.youtube %}
-                                    <a href="{{ contato.youtube }}" target="_blank" class="social-btn"><i class="fab fa-youtube"></i></a>
-                                {% endif %}
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="sticky-sidebar">
+                    <div class="content-card mb-4 animate-fade-up delay-2">
+                        <h5 class="card-title text-primary mb-4">
+                            <i class="fas fa-address-book me-2"></i>Informações de Contato
+                        </h5>
+                        
+                        <div class="contact-item">
+                            <i class="fas fa-phone contact-icon"></i>
+                            <div>
+                                <strong class="text-dark">Telefone:</strong><br>
+                                <a href="tel:{{ contato.telefone }}">{{ contato.telefone }}</a>
                             </div>
                         </div>
-                    </div>
-                {% endif %}
 
-                <!-- Voltar -->
-                <div class="text-center">
-                    <a href="{% url 'contatos' %}" class="btn btn-outline-primary">
-                        <i class="fas fa-arrow-left me-2"></i>Voltar para Contatos
-                    </a>
+                        {% if contato.email %}
+                            <div class="contact-item">
+                                <i class="fas fa-envelope contact-icon"></i>
+                                <div>
+                                    <strong class="text-dark">E-mail:</strong><br>
+                                    <a href="mailto:{{ contato.email }}">{{ contato.email }}</a>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if contato.site %}
+                           <div class="contact-item">
+                                <i class="fas fa-globe contact-icon"></i>
+                                <div>
+                                    <strong class="text-dark">Site:</strong><br>
+                                    <a href="{{ contato.site }}" target="_blank">Visitar site</a>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="contact-item">
+                            <i class="fas fa-clock contact-icon"></i>
+                            <div>
+                                <strong class="text-dark">Horário:</strong><br>
+                                <span class="text-muted">{{ contato.horario_funcionamento }}</span>
+                            </div>
+                        </div>
+
+                        {% if contato.facebook or contato.instagram or contato.linkedin or contato.youtube %}
+                        <div class="mt-4 pt-3 border-top">
+                            <h6 class="fw-bold mb-3 text-dark">Redes Sociais:</h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% if contato.facebook %}<a href="{{ contato.facebook }}" target="_blank" class="btn-social"><i class="fab fa-facebook-f"></i></a>{% endif %}
+                                {% if contato.instagram %}<a href="{{ contato.instagram }}" target="_blank" class="btn-social"><i class="fab fa-instagram"></i></a>{% endif %}
+                                {% if contato.linkedin %}<a href="{{ contato.linkedin }}" target="_blank" class="btn-social"><i class="fab fa-linkedin-in"></i></a>{% endif %}
+                                {% if contato.youtube %}<a href="{{ contato.youtube }}" target="_blank" class="btn-social"><i class="fab fa-youtube"></i></a>{% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="text-center animate-fade-up delay-3">
+                        <a href="{% url 'contatos' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Voltar aos contatos
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -234,113 +233,203 @@
 </div>
 
 <style>
-    /* Estilos específicos para a página de detalhes do contato */
+    /* Estilos completos da versão de desenvolvimento */
 
-    /* Breadcrumb personalizado para o Hero */
-    .breadcrumb-custom {
-        background-color: rgba(255, 255, 255, 0.1);
-        padding: 0.5rem 1rem;
+    /* Cards de Conteúdo */
+    .content-card {
+        background-color: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+        border: 1px solid var(--gray-200);
+    }
+
+    .content-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+    }
+    
+    .content-card .card-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    /* Cabeçalho do Contato */
+    .contact-header-image img {
+        border: 6px solid white;
+        box-shadow: var(--card-shadow);
+        max-height: 350px;
+        width: 100%;
+        object-fit: cover;
+    }
+
+    /* Badges de Atendimento */
+    .badge-custom {
+        font-size: 0.9rem;
+        padding: 0.6em 1em;
         border-radius: 50px;
-        display: inline-flex;
-    }
-    .breadcrumb-custom .breadcrumb-item {
-        color: white;
-    }
-    .breadcrumb-custom .breadcrumb-item a {
-        color: white;
-        text-decoration: none;
-    }
-    .breadcrumb-custom .breadcrumb-item a:hover {
-        text-decoration: underline;
-    }
-    .breadcrumb-custom .breadcrumb-item+.breadcrumb-item::before {
-        content: ">";
-        color: rgba(255, 255, 255, 0.7);
-        padding: 0 0.5rem;
+        font-weight: 500;
     }
 
-    /* Galeria de Imagens */
+    /* Botão customizado para WhatsApp */
+    .btn-success-custom {
+        background: linear-gradient(45deg, #25d366 30%, #128c7e 90%);
+        border: none;
+        color: white;
+        box-shadow: 0 4px 10px rgba(37, 211, 102, 0.2);
+    }
+    .btn-success-custom:hover {
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(37, 211, 102, 0.3);
+    }
+
+    /* Galeria de Fotos */
     .gallery-image {
         cursor: pointer;
         transition: var(--transition);
-        box-shadow: var(--card-shadow);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        height: 200px; /* Adicionado para manter a consistência de altura */
+        width: 100%;
+        object-fit: cover;
     }
     .gallery-image:hover {
         transform: scale(1.05);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    /* Estilo para o botão de fechar do modal da galeria */
+    .modal-image-close {
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        z-index: 1060;
+        background-color: rgba(0, 0, 0, 0.6);
+        border: 2px solid white;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        opacity: 0.9;
+        filter: brightness(0) invert(1);
+    }
+    .modal-image-close:hover {
+        background-color: rgba(0, 0, 0, 0.9);
+        opacity: 1;
     }
 
     /* Mapa */
     .map-container {
-        border-radius: 16px;
+        border-radius: 10px;
         overflow: hidden;
-        box-shadow: var(--card-shadow);
-        border: 1px solid var(--gray-200);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
 
-    /* Sidebar Sticky */
-    .sidebar-sticky {
+    /* Sidebar */
+    .sticky-sidebar {
         position: sticky;
-        top: 20px;
+        top: 2rem;
     }
-
-    /* Itens de Contato na Sidebar */
+    
     .contact-item {
         display: flex;
         align-items: center;
         gap: 1rem;
         padding: 1rem;
-        margin-bottom: 1rem;
-        border-radius: 12px;
         background-color: var(--primary-very-light);
-        border: 1px solid var(--gray-200);
+        border-radius: 10px;
+        margin-bottom: 1rem;
         transition: var(--transition);
+        border-left: 4px solid var(--primary-light);
     }
     .contact-item:hover {
-        transform: translateY(-3px);
-        box-shadow: var(--card-shadow);
-        border-color: var(--primary-light);
+        background-color: var(--primary-light);
+        border-left-color: var(--primary-dark);
     }
-    .contact-item .small-icon {
-        width: 45px;
-        height: 45px;
-        font-size: 1.1rem;
-        margin-bottom: 0;
-        flex-shrink: 0;
+    .contact-item:hover a,
+    .contact-item:hover .text-muted,
+    .contact-item:hover strong {
+        color: white !important;
     }
-    .contact-item a {
-        color: var(--gray-700);
+    .contact-item:hover .contact-icon {
+        color: white !important;
     }
-     .contact-item a:hover {
+    .contact-icon {
+        font-size: 1.2rem;
         color: var(--primary);
+        width: 25px;
+        text-align: center;
     }
 
     /* Botões de Redes Sociais */
-    .social-btn {
+    .btn-social {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        background-color: transparent;
-        border: 2px solid var(--primary);
         color: var(--primary);
+        border: 2px solid var(--gray-200);
+        background-color: var(--gray-100);
         transition: var(--transition);
-        text-decoration: none;
+        font-size: 1.1rem;
     }
-    .social-btn:hover {
-        background-color: var(--primary);
+    .btn-social:hover {
+        background: var(--primary);
+        border-color: var(--primary);
         color: white;
         transform: translateY(-3px);
     }
+    
+    /* Breadcrumb */
+    .breadcrumb {
+        font-size: 0.95rem;
+    }
+    .breadcrumb-item a {
+        font-weight: 500;
+        text-decoration: none;
+    }
+    .breadcrumb-item.active {
+        color: var(--gray-600);
+    }
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--primary);
+        font-weight: bold;
+    }
 
-    /* Ajustes Responsivos */
-    @media (max-width: 992px) {
-        .sidebar-sticky {
+    /* Animações */
+    .animate-fade-up {
+        animation: fadeUp 0.8s ease-out forwards;
+        opacity: 0;
+    }
+    .delay-1 { animation-delay: 0.2s; }
+    .delay-2 { animation-delay: 0.4s; }
+    .delay-3 { animation-delay: 0.6s; }
+
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsividade */
+    @media (max-width: 991.98px) {
+        .sticky-sidebar {
             position: static;
+            top: auto;
+        }
+        /* Ajusta o botão de fechar para telas pequenas */
+        .modal-image-close {
+            top: 10px;
+            right: 10px;
         }
     }
 </style>
-
 {% endblock %}
