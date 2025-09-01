@@ -22,7 +22,6 @@
         <div class="row mb-5 align-items-center animate-fade-up">
             <div class="col-lg-4 text-center mb-4 mb-lg-0">
                 <div class="contact-header-image">
-                    {# ATUALIZADO: Usando a variável 'imagem_url' do seu ambiente de produção #}
                     {% if contato.imagem_url %}
                         <img src="{{ contato.imagem_url }}" 
                              alt="{{ contato.nome }}" 
@@ -105,7 +104,7 @@
                     {% endif %}
                 </div>
 
-                <!-- Galeria de fotos -->
+                <!-- Galeria de fotos ATUALIZADA -->
                 {% if contato.fotos.all %}
                     <div class="content-card mb-4 animate-fade-up delay-2">
                         <h4 class="card-title text-primary mb-4">
@@ -114,32 +113,56 @@
                         <div class="row g-3">
                             {% for foto in contato.fotos.all %}
                                 <div class="col-md-4">
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal{{ foto.id }}">
-                                        {# ATUALIZADO: Usando a variável 'imagem_url' do seu ambiente de produção #}
+                                    <div class="gallery-item">
                                         <img src="{{ foto.imagem_url }}" 
                                              alt="{{ foto.legenda }}" 
-                                             class="img-fluid rounded-3 gallery-image">
-                                    </a>
-                                </div>
-                                
-                                <!-- Modal para imagem ampliada (versão melhorada de dev) -->
-                                <div class="modal fade" id="imageModal{{ foto.id }}" tabindex="-1" aria-labelledby="imageModalLabel{{ foto.id }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg modal-dialog-centered">
-                                        <div class="modal-content bg-transparent border-0">
-                                            <button type="button" class="btn-close modal-image-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            <div class="modal-body p-0">
-                                                {# ATUALIZADO: Usando a variável 'imagem_url' do seu ambiente de produção #}
-                                                <img src="{{ foto.imagem_url }}" alt="{{ foto.legenda }}" class="img-fluid rounded-3">
-                                                {% if foto.legenda %}
-                                                    <div class="p-3 bg-light-subtle text-center rounded-bottom-3">
-                                                        <p class="mb-0">{{ foto.legenda }}</p>
-                                                    </div>
-                                                {% endif %}
-                                            </div>
-                                        </div>
+                                             class="img-fluid rounded-3 gallery-image"
+                                             onclick="openGalleryModal({{ forloop.counter0 }})"
+                                             style="cursor: pointer;"
+                                             data-src="{{ foto.imagem_url }}"
+                                             data-caption="{{ foto.legenda|default:'' }}">
                                     </div>
                                 </div>
                             {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Modal único para galeria MODERNA -->
+                    <div class="modal fade" id="galleryModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down">
+                            <div class="modal-content bg-transparent border-0">
+                                <!-- Botão fechar -->
+                                <button type="button" class="btn-close-gallery" data-bs-dismiss="modal" aria-label="Fechar">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                
+                                <!-- Navegação anterior -->
+                                <button type="button" class="gallery-nav gallery-nav-prev" onclick="changeGalleryImage(-1)">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                
+                                <!-- Navegação próxima -->
+                                <button type="button" class="gallery-nav gallery-nav-next" onclick="changeGalleryImage(1)">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                                
+                                <div class="modal-body d-flex align-items-center justify-content-center p-0">
+                                    <div class="gallery-modal-content text-center">
+                                        <img id="galleryModalImage" 
+                                             src="" 
+                                             alt="" 
+                                             class="img-fluid">
+                                        <div id="galleryModalCaption" class="gallery-caption mt-3">
+                                            <p class="mb-0 text-white"></p>
+                                        </div>
+                                        
+                                        <!-- Indicadores -->
+                                        <div class="gallery-indicators mt-3">
+                                            <span id="galleryCounter" class="text-white-50"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 {% endif %}
@@ -151,7 +174,6 @@
                     </h4>
                     <div class="map-container mb-3">
                         <iframe 
-                            {# ATUALIZADO: Mantendo a chave de API que já estava em produção #}
                             src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBokTpGg0E16-NMOa-UJqVJ_EaJFQRN7xE&q={{ contato.endereco_para_maps|urlencode }}"
                             width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" 
                             referrerpolicy="no-referrer-when-downgrade">
@@ -233,8 +255,6 @@
 </div>
 
 <style>
-    /* Estilos completos da versão de desenvolvimento */
-
     /* Cards de Conteúdo */
     .content-card {
         background-color: white;
@@ -285,37 +305,160 @@
         box-shadow: 0 6px 12px rgba(37, 211, 102, 0.3);
     }
 
-    /* Galeria de Fotos */
-    .gallery-image {
-        cursor: pointer;
-        transition: var(--transition);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        height: 200px; /* Adicionado para manter a consistência de altura */
-        width: 100%;
-        object-fit: cover;
-    }
-    .gallery-image:hover {
-        transform: scale(1.05);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    /* Galeria de Fotos MODERNA */
+    .gallery-item {
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
     }
     
-    /* Estilo para o botão de fechar do modal da galeria */
-    .modal-image-close {
-        position: absolute;
-        top: -20px;
-        right: -20px;
-        z-index: 1060;
-        background-color: rgba(0, 0, 0, 0.6);
-        border: 2px solid white;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        opacity: 0.9;
-        filter: brightness(0) invert(1);
+    .gallery-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 25px rgba(0,0,0,0.15);
     }
-    .modal-image-close:hover {
+    
+    .gallery-image {
+        height: 200px;
+        width: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .gallery-item:hover .gallery-image {
+        transform: scale(1.05);
+    }
+
+    /* Modal da galeria customizado */
+    .modal {
+        z-index: 1055;
+    }
+    
+    .modal-backdrop {
         background-color: rgba(0, 0, 0, 0.9);
-        opacity: 1;
+        z-index: 1050;
+    }
+    
+    .modal-content {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    .modal-body {
+        padding: 0;
+        height: 100vh;
+        position: relative;
+    }
+    
+    .gallery-modal-content {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+    
+    .gallery-modal-content img {
+        max-height: 85vh;
+        max-width: 90vw;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    
+    /* Botão fechar customizado */
+    .btn-close-gallery {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1060;
+        background: rgba(0, 0, 0, 0.7);
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .btn-close-gallery:hover {
+        background: rgba(0, 0, 0, 0.9);
+        transform: scale(1.1);
+        color: white;
+    }
+    
+    /* Navegação da galeria */
+    .gallery-nav {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1060;
+        background: rgba(0, 0, 0, 0.7);
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .gallery-nav:hover {
+        background: rgba(0, 0, 0, 0.9);
+        transform: translateY(-50%) scale(1.1);
+        color: white;
+    }
+    
+    .gallery-nav-prev {
+        left: 20px;
+    }
+    
+    .gallery-nav-next {
+        right: 20px;
+    }
+    
+    /* Legenda da galeria */
+    .gallery-caption {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.7);
+        padding: 10px 20px;
+        border-radius: 20px;
+        max-width: 80%;
+        text-align: center;
+    }
+    
+    .gallery-caption p {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+    
+    /* Indicadores */
+    .gallery-indicators {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.5);
+        padding: 8px 15px;
+        border-radius: 15px;
+        font-size: 0.85rem;
     }
 
     /* Mapa */
@@ -425,11 +568,175 @@
             position: static;
             top: auto;
         }
-        /* Ajusta o botão de fechar para telas pequenas */
-        .modal-image-close {
-            top: 10px;
-            right: 10px;
+        
+        .gallery-image {
+            height: 150px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .gallery-nav {
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+        }
+        
+        .btn-close-gallery {
+            width: 45px;
+            height: 45px;
+            font-size: 1.1rem;
+            top: 15px;
+            right: 15px;
+        }
+        
+        .gallery-nav-prev {
+            left: 15px;
+        }
+        
+        .gallery-nav-next {
+            right: 15px;
+        }
+        
+        .gallery-modal-content img {
+            max-height: 80vh;
+            max-width: 95vw;
+        }
+        
+        .gallery-caption {
+            bottom: 15px;
+            max-width: 90%;
+            padding: 8px 15px;
+        }
+        
+        .gallery-indicators {
+            top: 15px;
         }
     }
 </style>
+
+<!-- Script para galeria modal ATUALIZADO -->
+<script>
+let galleryImages = [];
+let currentImageIndex = 0;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Coleta todas as imagens da galeria
+    const galleryItems = document.querySelectorAll('.gallery-image');
+    galleryImages = Array.from(galleryItems).map(img => ({
+        src: img.dataset.src,
+        caption: img.dataset.caption || '',
+        alt: img.alt
+    }));
+    
+    const galleryModal = document.getElementById('galleryModal');
+    
+    // Fecha modal clicando no backdrop
+    if (galleryModal) {
+        galleryModal.addEventListener('click', function(e) {
+            if (e.target === this || e.target.classList.contains('modal-dialog') || e.target.classList.contains('modal-body')) {
+                const modal = bootstrap.Modal.getInstance(this);
+                if (modal) {
+                    modal.hide();
+                }
+            }
+        });
+        
+        // Navegação por teclado
+        document.addEventListener('keydown', function(e) {
+            if (galleryModal.classList.contains('show')) {
+                switch(e.key) {
+                    case 'Escape':
+                        const modal = bootstrap.Modal.getInstance(galleryModal);
+                        if (modal) modal.hide();
+                        break;
+                    case 'ArrowLeft':
+                        changeGalleryImage(-1);
+                        break;
+                    case 'ArrowRight':
+                        changeGalleryImage(1);
+                        break;
+                }
+            }
+        });
+        
+        // Previne scroll do body quando modal está aberto
+        galleryModal.addEventListener('show.bs.modal', function() {
+            document.body.style.overflow = 'hidden';
+        });
+        
+        galleryModal.addEventListener('hidden.bs.modal', function() {
+            document.body.style.overflow = 'auto';
+        });
+    }
+});
+
+function openGalleryModal(imageIndex) {
+    currentImageIndex = imageIndex;
+    updateGalleryModal();
+    
+    const galleryModal = new bootstrap.Modal(document.getElementById('galleryModal'));
+    galleryModal.show();
+}
+
+function changeGalleryImage(direction) {
+    currentImageIndex += direction;
+    
+    // Loop infinito
+    if (currentImageIndex >= galleryImages.length) {
+        currentImageIndex = 0;
+    } else if (currentImageIndex < 0) {
+        currentImageIndex = galleryImages.length - 1;
+    }
+    
+    updateGalleryModal();
+}
+
+function updateGalleryModal() {
+    if (galleryImages.length === 0) return;
+    
+    const image = galleryImages[currentImageIndex];
+    const modalImage = document.getElementById('galleryModalImage');
+    const modalCaption = document.querySelector('#galleryModalCaption p');
+    const counter = document.getElementById('galleryCounter');
+    
+    if (modalImage) {
+        modalImage.src = image.src;
+        modalImage.alt = image.alt;
+    }
+    
+    if (modalCaption) {
+        modalCaption.textContent = image.caption;
+        document.getElementById('galleryModalCaption').style.display = image.caption ? 'block' : 'none';
+    }
+    
+    if (counter) {
+        counter.textContent = `${currentImageIndex + 1} de ${galleryImages.length}`;
+    }
+    
+    // Mostra/esconde botões de navegação baseado na quantidade de imagens
+    const prevBtn = document.querySelector('.gallery-nav-prev');
+    const nextBtn = document.querySelector('.gallery-nav-next');
+    
+    if (prevBtn && nextBtn) {
+        const showNav = galleryImages.length > 1;
+        prevBtn.style.display = showNav ? 'flex' : 'none';
+        nextBtn.style.display = showNav ? 'flex' : 'none';
+    }
+}
+
+// Dados das imagens gerados pelo Django
+{% if contato.fotos.all %}
+document.addEventListener('DOMContentLoaded', function() {
+    galleryImages = [
+        {% for foto in contato.fotos.all %}
+        {
+            src: "{{ foto.imagem_url }}",
+            caption: "{{ foto.legenda|default:''|escapejs }}",
+            alt: "{{ foto.legenda|default:'Imagem da galeria'|escapejs }}"
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+});
+{% endif %}
+</script>
 {% endblock %}
