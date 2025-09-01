@@ -74,6 +74,44 @@
             font-size: 1.1rem;
         }
 
+        /* --- ESTILOS ATUALIZADOS PARA OS BOTÕES DE LOGIN E CADASTRO (DESKTOP) --- */
+        .navbar-nav .nav-item a.nav-link.login-btn {
+            padding: 0.6rem 1.5rem !important;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(106, 62, 161, 0.25); /* Contorno sutil */
+            background-color: transparent !important;
+        }
+        .navbar-nav .nav-item a.nav-link.login-btn:hover {
+             color: var(--primary) !important;
+             background-color: rgba(106, 62, 161, 0.08);
+             border-color: var(--primary); /* Contorno mais forte no hover */
+        }
+
+        .navbar-nav .nav-item .btn-cadastro {
+            background-color: var(--primary);
+            color: white !important;
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(106, 62, 161, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--primary); /* Borda da mesma cor do fundo para alinhamento */
+        }
+        .navbar-nav .nav-item .btn-cadastro:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark); /* Borda acompanha a cor do fundo no hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(106, 62, 161, 0.3);
+        }
+         .navbar-nav .nav-item .btn-cadastro i {
+            font-size: 1.1em;
+            margin-right: 0.5rem;
+        }
+
 
         /* ================================================================== */
         /* BOTÃO HAMBÚRGUER (ÍCONE DO MENU MOBILE) */
@@ -98,7 +136,7 @@
         /* ================================================================== */
         @media (max-width: 991.98px) {
             .navbar-collapse {
-                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #ffffff; z-index: 1045; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 3rem; opacity: 0; visibility: hidden; transform: scale(0.98); transition: opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), visibility 0.3s; will-change: transform, opacity;
+                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #ffffff; z-index: 1045; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 2rem; /* Aumentado o gap geral */ opacity: 0; visibility: hidden; transform: scale(0.98); transition: opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), visibility 0.3s; will-change: transform, opacity;
             }
             .navbar-collapse:not(.show) { display: none; }
             body.menu-open .navbar-collapse {
@@ -107,7 +145,6 @@
             .navbar-nav {
                 list-style: none; padding-left: 0; margin: 0 !important; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
             }
-            .navbar-nav:last-child { border-top: none; }
             .nav-item {
                 width: 100%; max-width: 320px; text-align: center;
             }
@@ -118,8 +155,44 @@
                 color: var(--primary) !important; background: transparent !important;
             }
             .nav-icon { display: none; } 
-            @media (min-width: 992px) { .nav-icon { display: inline-block; } }
-
+            
+            /* --- NOVOS ESTILOS PARA OS BOTÕES NO MENU MOBILE --- */
+            .navbar-nav:last-child {
+                gap: 1rem; /* Espaçamento entre os botões */
+                margin-top: 1.5rem; /* Espaço acima dos botões */
+            }
+            .navbar-nav:last-child .nav-item a {
+                padding: 0.8rem 1.5rem !important;
+                font-size: 1.1rem !important;
+                font-weight: 500 !important;
+                border-radius: 8px;
+                transition: all 0.3s ease-in-out;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+            }
+            .navbar-nav:last-child .login-btn {
+                border: 2px solid var(--primary) !important;
+                background-color: transparent !important;
+                color: var(--primary) !important;
+            }
+            .navbar-nav:last-child .login-btn:hover {
+                background-color: var(--primary) !important;
+                color: white !important;
+            }
+            .navbar-nav:last-child .btn-cadastro {
+                border: 2px solid var(--primary) !important;
+                background-color: var(--primary) !important;
+                color: white !important;
+            }
+            .navbar-nav:last-child .btn-cadastro:hover {
+                background: var(--primary-dark) !important;
+                border-color: var(--primary-dark) !important;
+                transform: translateY(-2px);
+            }
+            
+            /* --- ESTILOS PARA DROPDOWN MOBILE --- */
             .nav-item.dropdown {
                 display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
             }
@@ -144,37 +217,11 @@
             .dropdown-item-logout i { color: var(--gray-700); transition: color 0.2s ease-in-out; }
             .dropdown-item-logout:hover { color: var(--danger-red) !important; }
             .dropdown-item-logout:hover i { color: var(--danger-red); }
-
-            .navbar-nav:last-child .nav-item > a {
-                padding: 0.75rem 1rem;
-                font-size: 1.2rem !important;
-                font-weight: 500 !important;
-                border-radius: 8px;
-                border: 2px solid;
-                transition: all 0.3s ease-in-out;
-            }
-            .navbar-nav:last-child .nav-item .nav-link {
-                background: transparent !important;
-                border-color: var(--primary);
-                color: var(--primary) !important;
-            }
-            .navbar-nav:last-child .nav-item .nav-link:hover {
-                background: var(--primary) !important;
-                color: white !important;
-            }
-            .navbar-nav:last-child .nav-item .btn {
-                background: linear-gradient(45deg, var(--primary) 30%, var(--primary-light) 90%) !important;
-                border-color: transparent;
-                color: white !important;
-            }
-            .navbar-nav:last-child .nav-item .btn:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 15px rgba(106, 62, 161, 0.3);
-            }
         }
         
         /* Dropdown de Usuário (Desktop) */
         @media (min-width: 992px) {
+            .nav-icon { display: inline-block; }
             .nav-item.dropdown { position: relative; }
             .dropdown-toggle { background: rgba(106, 62, 161, 0.04); border-radius: 20px; padding: 0.6rem 1.2rem !important; font-weight: 500; border: 1px solid rgba(106, 62, 161, 0.08); }
             .dropdown-toggle:hover { background: rgba(106, 62, 161, 0.08); transform: translateY(-1px); }
@@ -302,8 +349,9 @@
                             </ul>
                         </li>
                         {% else %}
-                        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">Entrar</a></li>
-                        <li class="nav-item"><a class="btn btn-primary ms-lg-2" href="{% url 'register' %}"><i class="fas fa-user-plus me-1"></i>Cadastrar</a></li>
+                        <!-- Ícone adicionado aqui -->
+                        <li class="nav-item"><a class="nav-link login-btn {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}"><i class="fas fa-sign-in-alt me-2"></i>Entrar</a></li>
+                        <li class="nav-item"><a class="btn btn-cadastro ms-lg-2" href="{% url 'register' %}"><i class="fas fa-user-plus"></i>Cadastrar</a></li>
                         {% endif %}
                     </ul>
                 </div>

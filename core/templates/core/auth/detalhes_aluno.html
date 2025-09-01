@@ -49,13 +49,19 @@
                 <i class="fas fa-file-medical text-primary fa-lg me-3 mt-1"></i>
                 <div>
                     <strong class="text-dark">Laudo Médico:</strong><br>
-                    {% if aluno.laudo.url %}
-                        <a href="{{ aluno.laudo.url }}" target="_blank" class="feature-link">
+                    
+                    <!-- ================================== -->
+                    <!--     CORREÇÃO APLICADA AQUI       -->
+                    <!-- ================================== -->
+                    {% if aluno.laudo_url %}
+                        <a href="{{ aluno.laudo_url }}" target="_blank" class="feature-link">
                             Visualizar Laudo <i class="fas fa-external-link-alt ms-1"></i>
                         </a>
                     {% else %}
                         <span class="text-muted">Nenhum laudo cadastrado</span>
                     {% endif %}
+                    <!-- FIM DA CORREÇÃO -->
+
                 </div>
             </div>
         </div>
@@ -75,18 +81,25 @@
                     </span>
                 </div>
                 
-                <!-- ================================== -->
-                <!--     MUDANÇA: LÓGICA DE BOTÕES      -->
-                <!-- ================================== -->
                 {% if relatorio.professor == user.customuser %}
                     <!-- Se o professor logado for o autor, mostra os botões de ação -->
-                    <div class="d-flex align-items-center">
-                        <a href="{% url 'editar_relatorio' relatorio.id %}" class="btn btn-sm btn-outline-primary me-2" title="Editar Relatório">
+                    <div class="d-flex align-items-center" style="gap: 0.5rem;">
+                        
+                        <!-- ================================== -->
+                        <!--     MUDANÇA: BOTÕES ESTILIZADOS    -->
+                        <!-- ================================== -->
+                        <a href="{% url 'editar_relatorio' relatorio.id %}" 
+                           class="btn btn-sm btn-outline-primary btn-action-icon" 
+                           data-tooltip="Editar Relatório">
                             <i class="fas fa-pencil-alt"></i>
                         </a>
-                        <a href="{% url 'apagar_relatorio' relatorio.id %}" class="btn btn-sm btn-outline-danger" title="Apagar Relatório">
+                        <a href="{% url 'apagar_relatorio' relatorio.id %}" 
+                           class="btn btn-sm btn-outline-danger btn-action-icon" 
+                           data-tooltip="Apagar Relatório">
                             <i class="fas fa-trash-alt"></i>
                         </a>
+                        <!-- FIM DA MUDANÇA -->
+
                     </div>
                 {% else %}
                     <!-- Senão, mostra o ícone de citação padrão -->
@@ -94,7 +107,6 @@
                         <i class="fas fa-quote-right"></i>
                     </div>
                 {% endif %}
-                <!-- FIM DA MUDANÇA -->
 
             </div>
             <p class="testimonial-text mt-3" style="white-space: pre-wrap;">{{ relatorio.relato }}</p>

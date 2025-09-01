@@ -744,3 +744,88 @@ a:hover {
         transform: translateY(0);
     }
 }
+
+/* ================================== */
+/*     BOTÕES DE AÇÃO ESTILIZADOS     */
+/* ================================== */
+
+/* Base para botões de ação circulares (editar, apagar, etc.) */
+.btn-action-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    /* Garante a forma de círculo perfeito */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    /* Remove o padding padrão para centralizar o ícone */
+    font-size: 0.9rem;
+    /* Ajuste o tamanho do ícone se necessário */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Adiciona uma sombra mais pronunciada no hover do botão de editar */
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+    box-shadow: 0 4px 10px rgba(106, 62, 161, 0.3);
+}
+
+/* Novo estilo para o botão de apagar (danger) */
+.btn-outline-danger {
+    color: var(--danger);
+    border: 2px solid var(--danger);
+    background: transparent;
+}
+
+.btn-outline-danger:hover,
+.btn-outline-danger:focus {
+    background-color: var(--danger);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(244, 67, 54, 0.3);
+    /* Sombra vermelha suave */
+}
+
+/* ================================== */
+/*     TOOLTIPS PERSONALIZADOS        */
+/* ================================== */
+
+/* Contêiner do tooltip */
+[data-tooltip] {
+    position: relative;
+    cursor: pointer;
+}
+
+/* O balão do tooltip */
+[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 120%;
+    /* Posiciona acima do botão */
+    left: 50%;
+    transform: translateX(-50%);
+
+    /* Estilo do balão */
+    background-color: var(--gray-800);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+
+    /* Animação */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+    z-index: 10;
+}
+
+/* Mostra o tooltip ao passar o mouse */
+[data-tooltip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-5px);
+    /* Efeito suave de subida */
+}
