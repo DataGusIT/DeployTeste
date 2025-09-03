@@ -336,25 +336,25 @@
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-user nav-icon"></i>{{ user.username }}
                             </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-    
-                            {% comment %} A linha abaixo só será exibida se o usuário não for um admin {% endcomment %}
-                            {% if not user.is_staff %}
-                            <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-id-card"></i>Meu Perfil</a></li>
-                            {% endif %}
-                            
-                            {% comment %} Adicionamos a verificação 'hasattr' para segurança {% endcomment %}
-                            {% if hasattr(user, 'customuser') and user.customuser.is_professor %}
-                            <li><a class="dropdown-item" href="{% url 'area_professor' %}"><i class="fas fa-chalkboard-teacher"></i>Área do Professor</a></li>
-                            {% endif %}
-                            
-                            {% if user.is_staff %}
-                            <li><a class="dropdown-item" href="{% url 'admin:index' %}" target="_blank"><i class="fas fa-cogs"></i>Painel Admin</a></li>
-                            {% endif %}
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                {% comment %} Exibe o link do perfil apenas para usuários que NÃO são administradores {% endcomment %}
+                                {% if not user.is_staff %}
+                                <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-id-card"></i>Meu Perfil</a></li>
+                                {% endif %}
+                                
+                                {% comment %} CORREÇÃO: Verifica a existência de 'customuser' da forma correta para templates {% endcomment %}
+                                {% if user.customuser and user.customuser.is_professor %}
+                                <li><a class="dropdown-item" href="{% url 'area_professor' %}"><i class="fas fa-chalkboard-teacher"></i>Área do Professor</a></li>
+                                {% endif %}
+                                
+                                {% comment %} Exibe o link do Painel Admin apenas para administradores {% endcomment %}
+                                {% if user.is_staff %}
+                                <li><a class="dropdown-item" href="{% url 'admin:index' %}" target="_blank"><i class="fas fa-cogs"></i>Painel Admin</a></li>
+                                {% endif %}
 
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item dropdown-item-logout" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i>Sair</a></li>
-                        </ul>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item dropdown-item-logout" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i>Sair</a></li>
+                            </ul>
                         </li>
                         {% else %}
                         <!-- Ícone adicionado aqui -->
