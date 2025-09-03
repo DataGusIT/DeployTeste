@@ -217,10 +217,12 @@ a:hover {
 }
 
 .hero-image {
-    border-radius: 20px;
-    max-width: 100%;
-    /* Ajusta o tamanho da imagem */
+    border-radius: 16px;
+    max-width: 60%;
+    /* Ou o valor que você preferir, como 50% ou 70% */
     height: auto;
+    display: block;
+    margin: 0 auto;
 }
 
 .highlight-text {
@@ -371,8 +373,8 @@ a:hover {
 }
 
 .about-image {
-    border-radius: 16px;
-    max-width: 65%;
+    border-radius: 20px;
+    max-width: 80%;
     /* Deixa a imagem menor que a coluna */
     display: block;
     /* Necessário para centralizar com margem automática */
