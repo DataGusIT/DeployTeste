@@ -490,6 +490,10 @@ a:hover {
     box-shadow: var(--card-shadow);
     height: 100%;
     transition: var(--transition);
+    display: flex;
+    /* Adicionado */
+    flex-direction: column;
+    /* Adicionado */
 }
 
 .update-card:hover {
@@ -515,6 +519,12 @@ a:hover {
 
 .update-content {
     padding: 1.5rem;
+    display: flex;
+    /* Adicionado */
+    flex-direction: column;
+    /* Adicionado */
+    flex-grow: 1;
+    /* Adicionado */
 }
 
 .update-date {
@@ -543,6 +553,8 @@ a:hover {
     color: var(--primary);
     display: inline-flex;
     align-items: center;
+    margin-top: auto;
+    /* Adicionado para empurrar para baixo */
 }
 
 .update-link i {
