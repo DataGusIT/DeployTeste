@@ -88,7 +88,19 @@
                                                     </div>
                                                 </h2>
                                                 <div id="collapse-{{ faq.id }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ faq.id }}" data-bs-parent="#accordion-{{ categoria.id }}">
-                                                    <div class="accordion-body"><div class="faq-content">{{ faq.resposta|linebreaksbr|safe }}</div></div>
+                                                    <div class="accordion-body">
+                                                        <div class="faq-content">{{ faq.resposta|linebreaksbr|safe }}</div>
+                                                        
+                                                        {% if faq.fonte %}
+                                                            <div class="faq-source">
+                                                                <a href="{{ faq.fonte }}" target="_blank" rel="noopener noreferrer" class="faq-source-link">
+                                                                    <i class="fas fa-external-link-alt"></i>
+                                                                    <span>Ver fonte completa</span>
+                                                                </a>
+                                                            </div>
+                                                        {% endif %}
+
+                                                    </div>
                                                 </div>
                                             </div>
                                         {% endfor %}
@@ -846,6 +858,49 @@
 /* Animação para o corpo do accordion */
 .accordion-body.animate__fadeIn {
     animation-duration: 0.6s;
+}
+
+/* ==================================
+   ESTILO ELEGANTE PARA FONTE DA FAQ
+   ================================== */
+.faq-source {
+    border-top: 1px solid #e9ecef;
+    padding-top: 1rem;
+    margin-top: 1.5rem;
+}
+
+.faq-source-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+    border-radius: 25px;
+    color: var(--gray-700);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.faq-source-link:hover {
+    background: linear-gradient(135deg, var(--primary-very-light) 0%, #e8e0ff 100%);
+    color: var(--primary-dark);
+    border-color: rgba(106, 62, 161, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(106, 62, 161, 0.15);
+    text-decoration: none;
+}
+
+.faq-source-link i {
+    font-size: 0.9rem;
+    transition: transform 0.3s ease;
+}
+
+.faq-source-link:hover i {
+    transform: scale(1.1);
 }
 
 /*

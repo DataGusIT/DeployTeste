@@ -138,9 +138,9 @@ class CategoriaFAQAdmin(admin.ModelAdmin):
 
 @admin.register(FAQ)
 class FAQAdmin(admin.ModelAdmin):
-    list_display = ('pergunta', 'categoria')
+    list_display = ('pergunta', 'categoria', 'fonte')
     list_filter = ('categoria',)
-    search_fields = ('pergunta', 'resposta')
+    search_fields = ('pergunta', 'resposta', 'fonte')
 
 @admin.register(UserSavedFAQ)
 class UserSavedFAQAdmin(admin.ModelAdmin):

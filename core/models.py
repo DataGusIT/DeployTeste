@@ -154,7 +154,8 @@ class FAQ(models.Model):
     categoria = models.ForeignKey(CategoriaFAQ, on_delete=models.CASCADE, related_name='faqs')
     pergunta = models.CharField(max_length=255)
     resposta = models.TextField()
-    
+    fonte = models.URLField(max_length=255, blank=True, null=True, verbose_name='Fonte')
+
     def __str__(self):
         return self.pergunta
 
