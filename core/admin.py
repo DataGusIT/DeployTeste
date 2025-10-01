@@ -253,19 +253,38 @@ class ContatoAdmin(admin.ModelAdmin):
 
     # Salva as IMAGENS DA GALERIA
     def save_formset(self, request, form, formset, change):
+        # Primeiro, salve o formset sem fazer commit no banco para podermos acessar os dados
         instances = formset.save(commit=False)
-        for i, instance in enumerate(instances):
-            file_upload_key = f'{formset.prefix}-{i}-imagem_upload'
-            if file_upload_key in request.FILES:
-                imagem_file = request.FILES[file_upload_key]
-                # Usa a nova função, especificando o bucket correto
-                public_url, error = _upload_to_supabase(imagem_file, bucket_name="fotos-contatos", sub_folder='gallery')
+        
+        # Iteramos sobre cada formulário dentro do formset
+        for instance_form in formset.forms:
+            # Verificamos se o formulário tem o campo 'imagem_upload' e se um arquivo foi enviado
+            if 'imagem_upload' in instance_form.cleaned_data and instance_form.cleaned_data['imagem_upload']:
+                
+                # Pegamos o objeto do arquivo diretamente do formulário limpo
+                imagem_file = instance_form.cleaned_data['imagem_upload']
+                
+                # O 'instance' é o objeto FotoContato associado a este formulário
+                instance = instance_form.instance
+                
+                # Usa a função de upload, especificando o bucket correto
+                public_url, error = _upload_to_supabase(
+                    imagem_file, 
+                    bucket_name="fotos-contatos", 
+                    sub_folder='gallery'
+                )
+                
                 if public_url:
+                    # Se o upload foi bem-sucedido, atualizamos a URL no objeto
                     instance.imagem_url = public_url
+                    instance.save() # Salvamos a instância individualmente
                 else:
+                    # Se deu erro, mostramos uma mensagem
                     self.message_user(request, f"Erro ao salvar uma imagem da galeria: {error}", level='error')
+
+        # Chamamos o método original do Django para finalizar o processo
         super().save_formset(request, form, formset, change)
-        formset.save_m2m()
+        formset.save_m2m() # Importante para relações Many-to-Many, se houver
 
     @admin.display(description='Imagem Principal')
     def display_imagem(self, obj):
