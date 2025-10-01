@@ -254,14 +254,12 @@ class ContatoAdmin(admin.ModelAdmin):
     # Salva as IMAGENS DA GALERIA
     # Salva as IMAGENS DA GALERIA (VERSÃO FINAL E ROBUSTA)
     def save_formset(self, request, form, formset, change):
-        # Primeiro, executamos o comportamento padrão do Django para lidar com
-        # a criação, atualização e exclusão básica dos objetos.
-        # Isso garante que objetos marcados para remoção sejam deletados
-        # e que objetos existentes sejam atualizados (exceto a imagem).
+        # Primeiro, executamos o comportamento padrão do Django.
+        # Isso cria/atualiza os objetos FotoContato no banco (ainda sem a URL da imagem)
+        # e lida com a exclusão de objetos marcados.
         super().save_formset(request, form, formset, change)
 
-        # Agora, iteramos sobre cada formulário no formset para lidar com o UPLOAD.
-        # formset.forms contém todos os formulários submetidos (novos e existentes).
+        # Iteramos sobre cada formulário no formset para lidar com o UPLOAD.
         for instance_form in formset.forms:
             # Pulamos formulários que não foram alterados ou estão vazios
             if not instance_form.has_changed() and not instance_form.is_bound:
@@ -270,11 +268,7 @@ class ContatoAdmin(admin.ModelAdmin):
             # Verificamos se um novo arquivo foi enviado no campo 'imagem_upload'
             if 'imagem_upload' in instance_form.cleaned_data and instance_form.cleaned_data['imagem_upload']:
                 
-                # Pegamos o objeto de arquivo do formulário
                 imagem_file = instance_form.cleaned_data['imagem_upload']
-                
-                # O instance_form.instance é o objeto FotoContato (novo ou existente)
-                # que o Django já preparou para nós.
                 instance = instance_form.instance
                 
                 # Fazemos o upload para o Supabase
@@ -288,14 +282,10 @@ class ContatoAdmin(admin.ModelAdmin):
                     # Se o upload deu certo, definimos a URL da imagem...
                     instance.imagem_url = public_url
                     # ...e salvamos a instância no banco de dados.
-                    # Isso é crucial para novos objetos e para atualizar existentes.
                     instance.save()
                 else:
                     # Se deu erro, notificamos o administrador
                     self.message_user(request, f"Erro ao salvar uma imagem da galeria: {error}", level='error')
-
-        # Chamamos o método save_m2m no final, que é uma boa prática para formsets.
-        formset.save_m2m()
 
     @admin.display(description='Imagem Principal')
     def display_imagem(self, obj):
