@@ -6,6 +6,9 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
+    # Adicione esta linha para incluir todas as URLs do allauth
+    # (ex: /accounts/google/login/, /accounts/logout/, etc.)
+    path('accounts/', include('allauth.urls')),
 ]
 
 if settings.DEBUG:

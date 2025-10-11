@@ -153,3 +153,11 @@ urlpatterns += [
 
     path('api/filtrar-alunos/', views.filtrar_alunos_api, name='filtrar_alunos_api'),
 ]
+
+# =============================================================================
+# NOVAS URLS: APIs DE CONSULTA DE CEP
+# =============================================================================
+
+urlpatterns += [
+    path('api/consulta-cep/<str:cep>/', views.consulta_cep_api, name='consulta_cep_api'),
+]

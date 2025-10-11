@@ -16,6 +16,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 import json
 import logging
+import requests
 from django.db.models import Q, Count 
 from collections import OrderedDict
 
@@ -1365,3 +1366,37 @@ def document_list(request):
     # Pode ser adaptada conforme seus modelos atuais
     return render(request, 'core/document_list.html', {'documents': []})
 
+# =============================================================================
+# VIEWS PARA CONSULTA DE CEP VIA API EXTERNA
+# =============================================================================
+
+def consulta_cep_api(request, cep):
+    """
+    Endpoint de API para consultar um CEP usando a API ViaCEP.
+    """
+    try:
+        # Limpa o CEP, removendo hifens e pontos
+        cep_limpo = cep.replace('-', '').replace('.', '')
+        
+        # Faz a requisição para a API do ViaCEP
+        response = requests.get(f'https://viacep.com.br/ws/{cep_limpo}/json/')
+        response.raise_for_status()  # Lança um erro para respostas HTTP 4xx ou 5xx
+        
+        data = response.json()
+
+        if 'erro' in data:
+            return JsonResponse({'sucesso': False, 'erro': 'CEP não encontrado.'}, status=404)
+        
+        # Retorna os dados formatados para o frontend
+        return JsonResponse({
+            'sucesso': True,
+            'rua': data.get('logradouro'),
+            'bairro': data.get('bairro'),
+            'cidade': data.get('localidade'),
+            'estado': data.get('uf'),
+        })
+
+    except requests.exceptions.RequestException:
+        return JsonResponse({'sucesso': False, 'erro': 'Falha ao consultar o serviço de CEP.'}, status=500)
+    except Exception as e:
+        return JsonResponse({'sucesso': False, 'erro': str(e)}, status=500)

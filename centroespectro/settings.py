@@ -4,6 +4,8 @@ import dj_database_url  # Importe o dj-database-url
 from pathlib import Path
 from django.contrib.messages import constants as messages
 
+from dotenv import load_dotenv
+load_dotenv()
 
 # ... (outras configurações como BASE_DIR)
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,6 +46,13 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',  # Adicionado para WhiteNoise
     'django.contrib.staticfiles',
     'core',
+    # Apps do Allauth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+
+    # Provedor do Google
+    'allauth.socialaccount.providers.google',
 ]
 
 MIDDLEWARE = [
@@ -56,6 +65,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 # ... (ROOT_URLCONF, TEMPLATES, WSGI_APPLICATION continuam iguais)
@@ -91,7 +101,6 @@ DATABASES = {
     )
 }
 
-
 # ... (AUTH_PASSWORD_VALIDATORS, I18N continuam iguais)
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
@@ -119,4 +128,43 @@ MESSAGE_TAGS = {
     messages.SUCCESS: 'success',
     messages.WARNING: 'warning',
     messages.ERROR: 'error',
+}
+
+
+# Adicione este bloco no final do settings.py
+AUTHENTICATION_BACKENDS = [
+    # Necessário para logar no admin com username
+    'django.contrib.auth.backends.ModelBackend',
+
+    # Backend de autenticação do allauth
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SITE_ID = 1
+
+LOGIN_REDIRECT_URL = '/'  # Redireciona para a home após o login
+LOGOUT_REDIRECT_URL = '/login/' # Redireciona para a página de login após o logout
+
+# Configurações específicas do Allauth
+ACCOUNT_EMAIL_VERIFICATION = 'optional' # ou 'mandatory'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email' # Permite login com user ou email
+SOCIALACCOUNT_QUERY_EMAIL = True
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        # As chaves virão das variáveis de ambiente, não do banco
+        'APP': {
+            'client_id': os.environ.get('GOOGLE_CLIENT_ID'),
+            'secret': os.environ.get('GOOGLE_CLIENT_SECRET'),
+            'key': ''
+        }
+    }
 }
