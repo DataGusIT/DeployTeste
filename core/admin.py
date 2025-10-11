@@ -256,6 +256,13 @@ class ContatoAdmin(admin.ModelAdmin):
         ('Informações Adicionais', { 'fields': ('especialidades', 'convenios', 'observacoes'), 'classes': ('collapse',) }),
     )
 
+    # ==========================================================
+    # ADICIONE ESTA CLASSE INTERNA AQUI
+    # ==========================================================
+    class Media:
+        js = ('js/admin_cep.js',)
+    # ==========================================================
+    
     # Salva a IMAGEM PRINCIPAL
     def save_model(self, request, obj, form, change):
         if 'imagem_upload' in form.cleaned_data and form.cleaned_data['imagem_upload']:

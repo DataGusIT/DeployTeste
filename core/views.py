@@ -538,7 +538,6 @@ def remover_faq_salva(request, faq_id):
 # =============================================================================
 
 
-
 def contatos(request):
     """
     Lista Contatos com paginação aninhada:

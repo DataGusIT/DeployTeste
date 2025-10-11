@@ -6,25 +6,50 @@ from django.contrib.auth.models import AbstractUser
 # LISTA DE ÍCONES PREDEFINIDOS PARA O ADMIN
 # Formato: (valor_no_banco, 'Rótulo no Admin')
 # =============================================================================
-ICON_CHOICES = [
-    # Ícones para FAQ
-    ('fas fa-book-open', 'Livro Aberto (Definições, Contexto)'),
-    ('fas fa-stethoscope', 'Estetoscópio (Diagnóstico, Tratamento)'),
-    ('fas fa-gavel', 'Martelo (Legislação, Direitos)'),
-    ('fas fa-graduation-cap', 'Chapéu de Formatura (Educação)'),
-    ('fas fa-comment-medical', 'Balão de Fala (Terapias)'),
-    
-    # Ícones para Contatos
-    ('fas fa-hands-helping', 'Mãos Ajudando (Apoio, ONGs)'),
-    ('fas fa-clinic-medical', 'Clínica (Clínicas, Hospitais)'),
-    ('fas fa-user-md', 'Médico (Profissionais de Saúde)'),
-    ('fas fa-users', 'Grupo de Pessoas (Grupos de Apoio)'),
-    ('fas fa-building-ngo', 'Prédio (Associações)'),
-
-    # Ícones Gerais
-    ('fas fa-info-circle', 'Círculo de Informação (Geral)'),
+ICONE_CHOICES = [
+    # --- Geral ---
+    ('fas fa-info-circle', 'Círculo de Informação'),
     ('fas fa-question-circle', 'Círculo de Interrogação (Padrão)'),
-    ('fas fa-tools', 'Ferramentas (Ferramentas)'),
+    ('fas fa-tools', 'Ferramentas'),
+    ('fas fa-star', 'Estrela'),
+    ('fas fa-heart', 'Coração'),
+    ('fas fa-tag', 'Etiqueta'),
+    ('fas fa-bell', 'Sino'),
+    ('fas fa-bookmark', 'Marca-página'),
+    
+    # --- Pessoas e Usuários ---
+    ('fas fa-user', 'Usuário (Individual)'),
+    ('fas fa-users', 'Grupo de Pessoas (Grupos de Apoio)'),
+    ('fas fa-user-md', 'Médico (Profissionais de Saúde)'),
+    ('fas fa-user-graduate', 'Chapéu de Formatura (Educação)'),
+    ('fas fa-hands-helping', 'Mãos Ajudando (Apoio, ONGs)'),
+    ('fas fa-child', 'Criança'),
+    
+    # --- Saúde e Bem-estar ---
+    ('fas fa-stethoscope', 'Estetoscópio (Diagnóstico, Tratamento)'),
+    ('fas fa-clinic-medical', 'Clínica (Clínicas, Hospitais)'),
+    ('fas fa-brain', 'Cérebro (Saúde Mental, Neurologia)'),
+    ('fas fa-comments', 'Balão de Fala (Terapias)'),
+    ('fas fa-puzzle-piece', 'Peça de Quebra-cabeça (Autismo)'),
+    ('fas fa-capsules', 'Cápsulas (Medicação)'),
+    
+    # --- Legal e Educação ---
+    ('fas fa-gavel', 'Martelo (Legislação, Direitos)'),
+    ('fas fa-book-open', 'Livro Aberto (Definições, Contexto)'),
+    ('fas fa-school', 'Escola (Educação)'),
+    ('fas fa-balance-scale', 'Balança da Justiça (Direitos)'),
+    
+    # --- Lugares ---
+    ('fas fa-building', 'Prédio (Associações)'),
+    ('fas fa-home', 'Casa (Apoio Familiar)'),
+    ('fas fa-hospital', 'Hospital'),
+    
+    # --- Ações e Comunicação ---
+    ('fas fa-phone', 'Telefone'),
+    ('fas fa-envelope', 'Envelope (Email)'),
+    ('fas fa-map-marker-alt', 'Marcador de Mapa (Localização)'),
+    ('fas fa-link', 'Link (Recursos Online)'),
+    ('fas fa-search', 'Lupa (Pesquisa)'),
 ]
 
 # =============================================================================
@@ -36,7 +61,7 @@ class CategoriaBase(models.Model):
     # AGORA UM CAMPO DE ESCOLHA!
     icone = models.CharField(
         max_length=50, 
-        choices=ICON_CHOICES, # Usa a lista de ícones como opções
+        choices=ICONE_CHOICES, # Usa a lista de ícones como opções
         default='fas fa-question-circle', # Ícone padrão
         verbose_name='Ícone'
     )
