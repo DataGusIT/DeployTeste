@@ -29,11 +29,12 @@ def is_admin(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser)
 
 # NOVA FUNÇÃO AUXILIAR
+
 def is_professor(user):
     """Função auxiliar para verificar se o usuário é professor"""
-    # CORREÇÃO: Acessamos o campo através da relação 'customuser'
-    # Adicionamos um 'hasattr' por segurança, para o caso do admin (superuser) não ter o perfil customuser criado.
-    return user.is_authenticated and hasattr(user, 'customuser') and user.customuser.is_professor
+    # Agora, o atributo is_professor está diretamente no objeto user.
+    # O hasattr ainda é uma boa prática para evitar erros caso o campo não exista.
+    return user.is_authenticated and getattr(user, 'is_professor', False)
 
 # =============================================================================
 # NOVAS VIEWS: ÁREA DO PROFESSOR
@@ -804,23 +805,23 @@ def logout_view(request):
 @login_required
 def profile_view(request):
     """Perfil do usuário com histórico de downloads, FAQs salvas e contatos salvos"""
-    user = request.user
-    custom_user = user.customuser # Acessa o perfil customizado aqui
+    # user agora É o CustomUser. Não precisamos de mais nada.
+    user = request.user 
     
-    # Supondo que UserSavedFAQ e UserSavedContato usam a FK para CustomUser
+    # Use 'user' (ou 'request.user') diretamente nas suas queries.
     duvidas_salvas = UserSavedFAQ.objects.filter(
-        user=custom_user
+        user=user
     ).select_related('faq', 'faq__categoria').order_by('-data_salva')
     
     contatos_salvos = UserSavedContato.objects.filter(
-        user=custom_user
+        user=user
     ).select_related('contato', 'contato__categoria').order_by('-data_salva')
 
-    # Supondo que UserDownload usa a FK para CustomUser
-    downloads = UserDownload.objects.filter(user=custom_user).select_related('ferramenta')
+    downloads = UserDownload.objects.filter(user=user).select_related('ferramenta')
     
     if request.method == 'POST':
-        form = UserProfileForm(request.POST, instance=user) # O form edita o User base
+        # O formulário UserProfileForm já usa 'request.user' e está correto
+        form = UserProfileForm(request.POST, instance=user) 
         if form.is_valid():
             form.save()
             messages.success(request, 'Perfil atualizado com sucesso!')

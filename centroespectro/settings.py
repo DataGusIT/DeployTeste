@@ -148,8 +148,8 @@ LOGOUT_REDIRECT_URL = '/login/' # Redireciona para a página de login após o lo
 
 # Configurações específicas do Allauth
 ACCOUNT_EMAIL_VERIFICATION = 'optional' # ou 'mandatory'
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = 'username_email' # Permite login com user ou email
+ACCOUNT_SIGNUP_FIELDS = ['email', 'username', 'password']
+ACCOUNT_LOGIN_METHODS = ['username', 'email']
 SOCIALACCOUNT_QUERY_EMAIL = True
 
 SOCIALACCOUNT_PROVIDERS = {

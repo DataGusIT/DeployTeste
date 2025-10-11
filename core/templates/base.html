@@ -343,7 +343,7 @@
                                 {% endif %}
                                 
                                 {% comment %} CORREÇÃO: Verifica a existência de 'customuser' da forma correta para templates {% endcomment %}
-                                {% if user.customuser and user.customuser.is_professor %}
+                                {% if user.is_professor %}
                                 <li><a class="dropdown-item" href="{% url 'area_professor' %}"><i class="fas fa-chalkboard-teacher"></i>Área do Professor</a></li>
                                 {% endif %}
                                 
