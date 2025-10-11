@@ -249,7 +249,10 @@ class ContatoAdmin(admin.ModelAdmin):
         ('Informações Básicas', {
             'fields': ('nome', 'descricao', 'imagem_upload', 'display_imagem', 'imagem_url', 'categoria')
         }),
-        ('Endereço', { 'fields': ('rua', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'cep'), 'classes': ('collapse',) }),
+         ('Endereço', { 
+            'fields': ('cep', 'rua', 'numero', 'complemento', 'bairro', 'cidade', 'estado'), 
+            'classes': ('collapse',) 
+        }),
         ('Contato', { 'fields': ('telefone', 'email', 'site', 'horario_funcionamento') }),
         ('Redes Sociais', { 'fields': ('whatsapp', 'facebook', 'instagram', 'linkedin', 'youtube'), 'classes': ('collapse',) }),
         ('Tipo de Atendimento', { 'fields': ('atendimento_presencial', 'atendimento_online') }),
@@ -262,7 +265,7 @@ class ContatoAdmin(admin.ModelAdmin):
     class Media:
         js = ('js/admin_cep.js',)
     # ==========================================================
-    
+
     # Salva a IMAGEM PRINCIPAL
     def save_model(self, request, obj, form, change):
         if 'imagem_upload' in form.cleaned_data and form.cleaned_data['imagem_upload']:
