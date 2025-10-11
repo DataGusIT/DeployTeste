@@ -46,15 +46,32 @@ def _upload_to_supabase(file_obj, bucket_name, sub_folder=''):
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
-    # MODIFICAÇÃO: Adicionado 'is_professor' para fácil visualização e filtro
+    # As suas configurações de listagem continuam as mesmas e estão corretas
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_admin', 'is_professor', 'is_staff')
     list_filter = ('is_admin', 'is_professor', 'is_staff', 'is_active')
     
-    # MODIFICAÇÃO: Adicionado 'is_professor' aos campos editáveis
-    fieldsets = UserAdmin.fieldsets + (
-        ('Funções Customizadas', {'fields': ('is_admin', 'is_professor')}),
+    # AQUI ESTÁ A CORREÇÃO:
+    # Em vez de herdar UserAdmin.fieldsets, nós os definimos do zero,
+    # adicionando nossos campos customizados no grupo que quisermos.
+    fieldsets = (
+        (None, {"fields": ("username", "password")}),
+        ("Informações Pessoais", {"fields": ("first_name", "last_name", "email")}),
+        (
+            "Permissões",
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                ),
+            },
+        ),
+        # Adicionamos nosso próprio grupo para os campos customizados
+        ("Funções Customizadas", {"fields": ("is_admin", "is_professor")}),
+        ("Datas Importantes", {"fields": ("last_login", "date_joined")}),
     )
-
 # =============================================================================
 # NOVA ADMINISTRAÇÃO: ALUNOS E RELATÓRIOS
 # =============================================================================
