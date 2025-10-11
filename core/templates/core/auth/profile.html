@@ -153,17 +153,21 @@
                                         </div>
                                         <div class="contato-info">
                                             <h3 class="contato-nome">{{ contato_salvo.contato.nome }}</h3>
-                                            <p class="contato-empresa">{{ contato_salvo.contato.empresa }}</p>
-                                            <p class="contato-cargo">{{ contato_salvo.contato.cargo }}</p>
+                                            <!-- CORREÇÃO: Mostrando a data de salvamento aqui -->
+                                            <div class="save-date-visible">
+                                                <i class="fas fa-clock"></i>
+                                                Salvo em {{ contato_salvo.data_salva|date:"d/m/Y \à\s H:i" }}
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="contato-actions">
                                         <button class="remove-btn" data-contato-id="{{ contato_salvo.contato.id }}">
                                             <i class="fas fa-times"></i>
                                         </button>
-                                        <button class="contact-btn">
-                                            <i class="fas fa-phone"></i>
-                                        </button>
+                                        <!-- CORREÇÃO: Usando o mesmo ícone de expandir das dúvidas -->
+                                        <div class="expand-icon">
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="contato-detalhes">
@@ -186,11 +190,9 @@
                                             <span>{{ contato_salvo.contato.whatsapp }}</span>
                                         </div>
                                         {% endif %}
+                                        <!-- A data foi movida, então este bloco pode ser removido se desejar -->
                                         <div class="contato-meta">
-                                            <span class="save-date">
-                                                <i class="fas fa-clock"></i>
-                                                Salvo em {{ contato_salvo.data_salvo|date:"d/m/Y \à\s H:i" }}
-                                            </span>
+                                            <a href="{% url 'detalhes_contato' contato_salvo.contato.id %}" class="btn-outline-small">Ver Perfil Completo</a>
                                         </div>
                                     </div>
                                 </div>
@@ -1316,253 +1318,268 @@
     box-shadow: 0 10px 25px rgba(211, 47, 47, 0.3);
 }
 
+.save-date-visible {
+    font-size: 0.9rem;
+    color: var(--gray-500);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.contato-meta .btn-outline-small {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.contato-meta .btn-outline-small:hover {
+    background: var(--primary);
+    color: white;
+}
+
 </style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // ===============================================
-    // LÓGICA DO MODAL DE CONFIRMAÇÃO
-    // ===============================================
-    const modal = document.getElementById('confirmation-modal');
-    const modalMessage = document.getElementById('confirmation-message');
-    const confirmBtn = document.getElementById('modal-confirm-btn');
-    const cancelBtn = document.getElementById('modal-cancel-btn');
-    let onConfirmCallback = null;
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // ===============================================
+        // LÓGICA DO MODAL DE CONFIRMAÇÃO
+        // ===============================================
+        const modal = document.getElementById('confirmation-modal');
+        const modalMessage = document.getElementById('confirmation-message');
+        const confirmBtn = document.getElementById('modal-confirm-btn');
+        const cancelBtn = document.getElementById('modal-cancel-btn');
+        let onConfirmCallback = null;
 
-    function showConfirmationModal(message, callback) {
-        modalMessage.textContent = message;
-        onConfirmCallback = callback;
-        modal.classList.add('show');
-    }
-
-    function hideConfirmationModal() {
-        modal.classList.remove('show');
-        onConfirmCallback = null;
-    }
-
-    // ===============================================
-    // ANEXAR EVENTOS (EVENT LISTENERS)
-    // ===============================================
-
-    // Lógica das Tabs de Navegação
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabPanes = document.querySelectorAll('.tab-pane');
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const tabId = this.dataset.tab;
-            tabBtns.forEach(b => b.classList.remove('active'));
-            tabPanes.forEach(p => p.classList.remove('active'));
-            this.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
-        });
-    });
-
-    // Lógica para abrir/fechar o accordion de DÚVIDAS
-    document.querySelectorAll('.duvida-header').forEach(header => {
-        header.addEventListener('click', () => {
-            toggleDuvida(header);
-        });
-    });
-
-    // Lógica para REMOVER DÚVIDA
-    document.querySelectorAll('.duvidas-list .remove-btn').forEach(btn => {
-        btn.addEventListener('click', (event) => {
-            event.stopPropagation(); // Impede o accordion de abrir/fechar
-            const faqId = btn.dataset.faqId;
-            removerDuvida(faqId, btn);
-        });
-    });
-
-    // Lógica para abrir/fechar detalhes do CONTATO
-    document.querySelectorAll('.contato-actions .contact-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            toggleContatoDetalhes(btn);
-        });
-    });
-
-    // Lógica para REMOVER CONTATO
-    document.querySelectorAll('.contatos-list .remove-btn').forEach(btn => {
-        btn.addEventListener('click', (event) => {
-            event.stopPropagation();
-            const contatoId = btn.dataset.contatoId;
-            removerContato(contatoId, btn);
-        });
-    });
-
-    // Eventos do Modal
-    confirmBtn.addEventListener('click', () => {
-        if (typeof onConfirmCallback === 'function') {
-            onConfirmCallback();
+        function showConfirmationModal(message, callback) {
+            modalMessage.textContent = message;
+            onConfirmCallback = callback;
+            modal.classList.add('show');
         }
-        hideConfirmationModal();
-    });
-    cancelBtn.addEventListener('click', hideConfirmationModal);
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
+
+        function hideConfirmationModal() {
+            modal.classList.remove('show');
+            onConfirmCallback = null;
+        }
+
+        // ===============================================
+        // ANEXAR EVENTOS (EVENT LISTENERS)
+        // ===============================================
+
+        // Lógica das Tabs de Navegação
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabId = this.dataset.tab;
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabPanes.forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Lógica para abrir/fechar o accordion de DÚVIDAS
+        document.querySelectorAll('.duvida-header').forEach(header => {
+            header.addEventListener('click', () => {
+                toggleAccordion(header.closest('.duvida-item'));
+            });
+        });
+        
+        // CORREÇÃO: Lógica para abrir/fechar o accordion de CONTATOS
+        document.querySelectorAll('.contato-header').forEach(header => {
+            header.addEventListener('click', (event) => {
+                // Garante que o clique no botão de remover não abra o accordion
+                if (!event.target.closest('.remove-btn')) {
+                    toggleAccordion(header.closest('.contato-item'));
+                }
+            });
+        });
+
+        // Lógica para REMOVER DÚVIDA
+        document.querySelectorAll('.duvidas-list .remove-btn').forEach(btn => {
+            btn.addEventListener('click', (event) => {
+                event.stopPropagation(); // Impede o accordion de abrir/fechar
+                const faqId = btn.dataset.faqId;
+                removerDuvida(faqId, btn);
+            });
+        });
+
+        // Lógica para REMOVER CONTATO
+        document.querySelectorAll('.contatos-list .remove-btn').forEach(btn => {
+            btn.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const contatoId = btn.dataset.contatoId;
+                removerContato(contatoId, btn);
+            });
+        });
+
+        // Eventos do Modal
+        confirmBtn.addEventListener('click', () => {
+            if (typeof onConfirmCallback === 'function') {
+                onConfirmCallback();
+            }
             hideConfirmationModal();
+        });
+        cancelBtn.addEventListener('click', hideConfirmationModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                hideConfirmationModal();
+            }
+        });
+
+        // ===============================================
+        // DEFINIÇÕES DE FUNÇÕES
+        // ===============================================
+
+        function removerDuvida(faqId, element) {
+            const message = 'Tem certeza que deseja remover esta dúvida das suas dúvidas salvas? Esta ação não pode ser desfeita.';
+            
+            showConfirmationModal(message, () => {
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const item = element.closest('.duvida-item');
+                item.classList.add('removing');
+                
+                fetch(`/remover-faq/${faqId}/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({'faq_id': faqId})
+                })
+                .then(response => response.json().then(data => ({ ok: response.ok, data })))
+                .then(({ ok, data }) => {
+                    if (ok && data.success) {
+                        setTimeout(() => {
+                            item.remove();
+                            const counter = document.querySelector('[data-tab="duvidas-salvas"] .tab-counter');
+                            const newCount = Math.max(0, parseInt(counter.textContent) - 1);
+                            counter.textContent = newCount;
+                            
+                            const headerCount = document.querySelector('#duvidas-salvas .card-header p');
+                            headerCount.textContent = `${newCount} dúvida${newCount !== 1 ? 's' : ''} salva${newCount !== 1 ? 's' : ''}`;
+                            
+                            if (newCount === 0) {
+                                document.querySelector('.duvidas-list').parentElement.innerHTML += `
+                                    <div class="empty-state">
+                                        <div class="empty-icon"><i class="fas fa-bookmark"></i></div>
+                                        <h3>Nenhuma dúvida salva</h3>
+                                        <p>Você ainda não salvou nenhuma dúvida.</p>
+                                        <a href="/duvidas/" class="btn-secondary">Explorar Dúvidas Frequentes</a>
+                                    </div>`;
+                                document.querySelector('.duvidas-list').remove();
+                            }
+                        }, 500);
+                        showToast('success', 'Dúvida removida com sucesso!');
+                    } else {
+                        item.classList.remove('removing');
+                        showToast('error', data.message || 'Erro ao remover dúvida');
+                    }
+                })
+                .catch(error => {
+                    item.classList.remove('removing');
+                    showToast('error', 'Erro de conexão. Tente novamente.');
+                });
+            });
+        }
+
+        function removerContato(contatoId, element) {
+            const message = 'Tem certeza que deseja remover este contato? Ele será apagado permanentemente.';
+
+            showConfirmationModal(message, () => {
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const item = element.closest('.contato-item');
+                item.classList.add('removing');
+                
+                fetch(`/remover-contato/${contatoId}/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({'contato_id': contatoId})
+                })
+                .then(response => response.json().then(data => ({ ok: response.ok, data })))
+                .then(({ ok, data }) => {
+                    if (ok && data.success) {
+                        setTimeout(() => {
+                            item.remove();
+                            const counter = document.querySelector('[data-tab="contatos-salvos"] .tab-counter');
+                            const newCount = Math.max(0, parseInt(counter.textContent) - 1);
+                            counter.textContent = newCount;
+                            
+                            const headerCount = document.querySelector('#contatos-salvos .card-header p');
+                            headerCount.textContent = `${newCount} contato${newCount !== 1 ? 's' : ''} salvo${newCount !== 1 ? 's' : ''}`;
+                            
+                            if (newCount === 0) {
+                                document.querySelector('.contatos-list').parentElement.innerHTML += `
+                                    <div class="empty-state">
+                                        <div class="empty-icon"><i class="fas fa-address-book"></i></div>
+                                        <h3>Nenhum contato salvo</h3>
+                                        <p>Você ainda não salvou nenhum contato.</p>
+                                        <a href="/contatos/" class="btn-secondary">Explorar Contatos</a>
+                                    </div>`;
+                                document.querySelector('.contatos-list').remove();
+                            }
+                        }, 500);
+                        showToast('success', 'Contato removido com sucesso!');
+                    } else {
+                        item.classList.remove('removing');
+                        showToast('error', data.message || 'Erro ao remover contato');
+                    }
+                })
+                .catch(error => {
+                    item.classList.remove('removing');
+                    showToast('error', 'Erro de conexão. Tente novamente.');
+                });
+            });
+        }
+
+        // Função genérica para abrir/fechar accordion
+        function toggleAccordion(itemElement) {
+            const content = itemElement.querySelector('.duvida-content, .contato-detalhes');
+            if (itemElement.classList.toggle('expanded')) {
+                content.style.maxHeight = content.scrollHeight + 'px';
+            } else {
+                content.style.maxHeight = '0px';
+            }
+        }
+
+        function showToast(type, message) {
+            const toast = document.getElementById('toast');
+            const toastIcon = toast.querySelector('.toast-icon i');
+            const toastTitle = toast.querySelector('.toast-title');
+            const toastText = toast.querySelector('.toast-text');
+            const toastIconContainer = toast.querySelector('.toast-icon');
+            
+            switch(type) {
+                case 'success':
+                    toastIcon.className = 'fas fa-check-circle';
+                    toastIconContainer.style.background = 'var(--success)';
+                    toastTitle.textContent = 'Sucesso';
+                    break;
+                case 'error':
+                    toastIcon.className = 'fas fa-exclamation-circle';
+                    toastIconContainer.style.background = 'var(--danger)';
+                    toastTitle.textContent = 'Erro';
+                    break;
+                default:
+                    toastIcon.className = 'fas fa-bell';
+                    toastIconContainer.style.background = 'var(--primary)';
+                    toastTitle.textContent = 'Notificação';
+            }
+            
+            toastText.textContent = message;
+            toast.classList.add('show');
+            setTimeout(hideToast, 4000);
+        }
+
+        function hideToast() {
+            document.getElementById('toast').classList.remove('show');
         }
     });
-
-    // ===============================================
-    // DEFINIÇÕES DE FUNÇÕES
-    // (Agora todas dentro do mesmo escopo)
-    // ===============================================
-
-    function removerDuvida(faqId, element) {
-        const message = 'Tem certeza que deseja remover esta dúvida das suas dúvidas salvas? Esta ação não pode ser desfeita.';
-        
-        showConfirmationModal(message, () => {
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-            const duvidasItem = element.closest('.duvida-item');
-            duvidasItem.classList.add('removing');
-            
-            fetch(`/remover-faq/${faqId}/`, {
-                method: 'POST',
-                headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/json' },
-                body: JSON.stringify({'faq_id': faqId})
-            })
-            .then(response => response.json().then(data => ({ ok: response.ok, data })))
-            .then(({ ok, data }) => {
-                if (ok && data.success) {
-                    setTimeout(() => {
-                        duvidasItem.remove();
-                        const counter = document.querySelector('[data-tab="duvidas-salvas"] .tab-counter');
-                        const newCount = Math.max(0, parseInt(counter.textContent) - 1);
-                        counter.textContent = newCount;
-                        
-                        const headerCount = document.querySelector('#duvidas-salvas .card-header p');
-                        headerCount.textContent = `${newCount} dúvida${newCount !== 1 ? 's' : ''} salva${newCount !== 1 ? 's' : ''}`;
-                        
-                        if (newCount === 0) {
-                            document.querySelector('.duvidas-list').parentElement.innerHTML += `
-                                <div class="empty-state">
-                                    <div class="empty-icon"><i class="fas fa-bookmark"></i></div>
-                                    <h3>Nenhuma dúvida salva</h3>
-                                    <p>Você ainda não salvou nenhuma dúvida.</p>
-                                    <a href="/duvidas/" class="btn-secondary">Explorar Dúvidas Frequentes</a>
-                                </div>`;
-                            document.querySelector('.duvidas-list').remove();
-                        }
-                    }, 500);
-                    showToast('success', 'Dúvida removida com sucesso!');
-                } else {
-                    duvidasItem.classList.remove('removing');
-                    showToast('error', data.message || 'Erro ao remover dúvida');
-                }
-            })
-            .catch(error => {
-                duvidasItem.classList.remove('removing');
-                showToast('error', 'Erro de conexão. Tente novamente.');
-            });
-        });
-    }
-
-    function removerContato(contatoId, element) {
-        const message = 'Tem certeza que deseja remover este contato? Ele será apagado permanentemente.';
-
-        showConfirmationModal(message, () => {
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-            const contatoItem = element.closest('.contato-item');
-            contatoItem.classList.add('removing');
-            
-            fetch(`/remover-contato/${contatoId}/`, {
-                method: 'POST',
-                headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/json' },
-                body: JSON.stringify({'contato_id': contatoId})
-            })
-            .then(response => response.json().then(data => ({ ok: response.ok, data })))
-            .then(({ ok, data }) => {
-                if (ok && data.success) {
-                    setTimeout(() => {
-                        contatoItem.remove();
-                        const counter = document.querySelector('[data-tab="contatos-salvos"] .tab-counter');
-                        const newCount = Math.max(0, parseInt(counter.textContent) - 1);
-                        counter.textContent = newCount;
-                        
-                        const headerCount = document.querySelector('#contatos-salvos .card-header p');
-                        headerCount.textContent = `${newCount} contato${newCount !== 1 ? 's' : ''} salvo${newCount !== 1 ? 's' : ''}`;
-                        
-                        if (newCount === 0) {
-                             document.querySelector('.contatos-list').parentElement.innerHTML += `
-                                <div class="empty-state">
-                                    <div class="empty-icon"><i class="fas fa-address-book"></i></div>
-                                    <h3>Nenhum contato salvo</h3>
-                                    <p>Você ainda não salvou nenhum contato.</p>
-                                    <a href="/contatos/" class="btn-secondary">Explorar Contatos</a>
-                                </div>`;
-                            document.querySelector('.contatos-list').remove();
-                        }
-                    }, 500);
-                    showToast('success', 'Contato removido com sucesso!');
-                } else {
-                    contatoItem.classList.remove('removing');
-                    showToast('error', data.message || 'Erro ao remover contato');
-                }
-            })
-            .catch(error => {
-                contatoItem.classList.remove('removing');
-                showToast('error', 'Erro de conexão. Tente novamente.');
-            });
-        });
-    }
-
-    function toggleDuvida(headerElement) {
-        const duvidaItem = headerElement.closest('.duvida-item');
-        const content = duvidaItem.querySelector('.duvida-content');
-        
-        if (duvidaItem.classList.toggle('expanded')) {
-            content.style.maxHeight = content.scrollHeight + 'px';
-        } else {
-            content.style.maxHeight = '0px';
-        }
-    }
-
-    function toggleContatoDetalhes(buttonElement) {
-        const contatoItem = buttonElement.closest('.contato-item');
-        const detalhes = contatoItem.querySelector('.contato-detalhes');
-        
-        if (contatoItem.classList.toggle('expanded')) {
-            detalhes.style.maxHeight = detalhes.scrollHeight + 'px';
-        } else {
-            detalhes.style.maxHeight = '0px';
-        }
-    }
-
-    function showToast(type, message) {
-        const toast = document.getElementById('toast');
-        const toastIcon = toast.querySelector('.toast-icon i');
-        const toastTitle = toast.querySelector('.toast-title');
-        const toastText = toast.querySelector('.toast-text');
-        const toastIconContainer = toast.querySelector('.toast-icon');
-        
-        switch(type) {
-            case 'success':
-                toastIcon.className = 'fas fa-check-circle';
-                toastIconContainer.style.background = 'var(--success)';
-                toastTitle.textContent = 'Sucesso';
-                break;
-            case 'error':
-                toastIcon.className = 'fas fa-exclamation-circle';
-                toastIconContainer.style.background = 'var(--danger)';
-                toastTitle.textContent = 'Erro';
-                break;
-            default:
-                toastIcon.className = 'fas fa-bell';
-                toastIconContainer.style.background = 'var(--primary)';
-                toastTitle.textContent = 'Notificação';
-        }
-        
-        toastText.textContent = message;
-        toast.classList.add('show');
-        setTimeout(hideToast, 4000);
-    }
-
-    function hideToast() {
-        document.getElementById('toast').classList.remove('show');
-    }
-});
 </script>
 {% endblock %}

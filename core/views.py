@@ -771,10 +771,17 @@ def login_view(request):
                 login(request, user)
                 
                 if user.is_staff or user.is_superuser:
-                    messages.success(request, f'Bem-vindo, {user.first_name}! Acesso administrativo concedido.')
+                    # CORREÇÃO APLICADA AQUI TAMBÉM POR CONSISTÊNCIA
+                    display_name = user.get_full_name() or user.username
+                    messages.success(request, f'Bem-vindo, {display_name}! Acesso administrativo concedido.')
                     return redirect('/admin/')
                 else:
-                    messages.success(request, f'Bem-vindo, {user.first_name}! Login realizado com sucesso.')
+                    # ==========================================================
+                    # LINHA CORRIGIDA
+                    # ==========================================================
+                    # Use o nome completo se disponível, senão, o nome de usuário.
+                    display_name = user.get_full_name() or user.username
+                    messages.success(request, f'Bem-vindo, {display_name}! Login realizado com sucesso.')
                 
                 next_url = request.GET.get('next', 'index')
                 return redirect(next_url)
@@ -786,7 +793,6 @@ def login_view(request):
         form = CustomAuthenticationForm()
     
     return render(request, 'core/auth/login.html', {'form': form})
-
 
 def logout_view(request):
     """Logout de usuários"""
