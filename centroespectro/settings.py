@@ -130,6 +130,7 @@ MESSAGE_TAGS = {
     messages.ERROR: 'error',
 }
 
+AUTH_USER_MODEL = 'core.CustomUser'
 
 # Adicione este bloco no final do settings.py
 AUTHENTICATION_BACKENDS = [
