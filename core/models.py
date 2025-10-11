@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 
 
 # =============================================================================
@@ -54,12 +54,14 @@ class CategoriaBase(models.Model):
 # MODELOS RELACIONADOS A USUÁRIOS
 # =============================================================================
 
-class CustomUser(User):
-    # Campos adicionais
+class CustomUser(AbstractUser):  # Altere a herança
+    # Adicione aqui APENAS os campos que não existem no AbstractUser
     is_admin = models.BooleanField(default=False)
-    # MODIFICAÇÃO: Adicionado campo para identificar professores
     is_professor = models.BooleanField('É professor?', default=False)
     
+    # Não é mais necessário definir username, email, first_name, etc.
+    # eles já vêm do AbstractUser.
+
     class Meta:
         verbose_name = 'Usuário'
         verbose_name_plural = 'Usuários'
