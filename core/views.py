@@ -11,7 +11,7 @@ from .models import (
     Contato, Ferramenta, CustomUser, UserDownload, UserSavedFAQ, UserSavedContato, Aluno, RelatorioDesempenho, Turma
 )
 
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 import json
@@ -339,23 +339,35 @@ def register_download(request, ferramenta_id):
 
 def duvidas(request):
     """
-    Lista FAQs com paginação aninhada:
-    - Paginação principal para TODAS as CATEGORIAS (3 por página).
-    - Paginação secundária para DÚVIDAS dentro de cada categoria (4 por página).
+    Lista FAQs com paginação aninhada e lógica de navegação flexível entre páginas.
     """
     # 1. CAPTURAR TERMO DE PESQUISA
     termo_pesquisa = request.POST.get('termo', request.GET.get('termo', ''))
 
-    # 2. PAGINAÇÃO PRINCIPAL (CATEGORIAS)
-    # CORREÇÃO: Paginamos TODAS as categorias, sem filtrar as vazias.
+    # 2. BUSCAR TODAS AS CATEGORIAS E CALCULAR SUAS PÁGINAS
     todas_categorias = CategoriaFAQ.objects.all().order_by('nome')
+    main_paginator = Paginator(todas_categorias, 3) # 3 categorias por página
 
-    main_paginator = Paginator(todas_categorias, 3)
+    # ================================================================= #
+    # ALTERAÇÃO PRINCIPAL: Criamos uma estrutura de dados mais rica   #
+    # que armazena a categoria e o número da página correspondente.     #
+    # ================================================================= #
+    categorias_com_pagina = []
+    items_per_page = main_paginator.per_page
+    for index, categoria in enumerate(todas_categorias):
+        # Fórmula para calcular a página de um item baseado no seu índice
+        page_number = (index // items_per_page) + 1
+        categorias_com_pagina.append({
+            'categoria': categoria,
+            'pagina': page_number
+        })
+
+    # 3. PAGINAÇÃO PRINCIPAL (CATEGORIAS)
     main_page_number = request.GET.get('page')
     main_page_obj = main_paginator.get_page(main_page_number)
     categorias_na_pagina = main_page_obj.object_list
 
-    # 3. BUSCAR TODAS AS FAQS PARA AS CATEGORIAS DA PÁGINA ATUAL
+    # 4. BUSCAR FAQS (lógica existente permanece a mesma)
     faqs_da_pagina = FAQ.objects.filter(
         categoria__in=categorias_na_pagina
     ).select_related('categoria').order_by('pergunta')
@@ -370,12 +382,11 @@ def duvidas(request):
     for faq in faqs_da_pagina:
         faqs_agrupadas[faq.categoria].append(faq)
 
-    # 4. CRIAR PAGINADORES ANINHADOS PARA CADA CATEGORIA
+    # 5. CRIAR PAGINADORES ANINHADOS (lógica existente permanece a mesma)
     dados_pagina_atual = OrderedDict()
     for categoria in categorias_na_pagina:
         lista_de_faqs = faqs_agrupadas.get(categoria, [])
-        
-        faq_paginator = Paginator(lista_de_faqs, 4) # 4 dúvidas por página
+        faq_paginator = Paginator(lista_de_faqs, 4)
         query_param_name = f"faq_cat_{categoria.id}_page"
         faq_page_number = request.GET.get(query_param_name)
         faq_page_obj = faq_paginator.get_page(faq_page_number)
@@ -385,20 +396,21 @@ def duvidas(request):
             'query_param_name': query_param_name
         }
 
-    # 5. OBTER IDS DAS FAQS SALVAS PELO USUÁRIO
+    # 6. OBTER FAQS SALVAS (lógica existente permanece a mesma)
     faqs_salvas_ids = []
     if request.user.is_authenticated:
         faqs_salvas_ids = list(UserSavedFAQ.objects.filter(
             user=request.user
         ).values_list('faq_id', flat=True))
 
-    # 6. PREPARAR O CONTEXTO FINAL
+    # 7. PREPARAR O CONTEXTO FINAL
     context = {
         'faqs_por_categoria_paginada': dados_pagina_atual,
         'page_obj': main_page_obj,
         'termo_pesquisa': termo_pesquisa,
         'faqs_salvas_ids': faqs_salvas_ids,
-        'todas_as_categorias': todas_categorias, # <-- ADICIONE ESTA LINHA
+        # Substituímos a variável antiga pela nova, mais completa
+        'categorias_com_pagina': categorias_com_pagina,
     }
     
     return render(request, 'core/duvidas.html', context)
