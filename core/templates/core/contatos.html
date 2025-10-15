@@ -80,6 +80,33 @@
     </div>
 </section>
 
+<!-- ========================================================== -->
+<!--     FILTROS DE CATEGORIA (VERSÃO CARROSSEL COM SETAS)      -->
+<!-- ========================================================== -->
+{% if categorias_com_pagina %}
+    <div class="category-carousel-wrapper">
+        <div class="category-filters-container">
+            <div class="category-filters">
+                {% for item in categorias_com_pagina %}
+                    <a href="#{{ item.categoria.nome|lower|slugify }}" 
+                       class="btn-category-filter"
+                       data-target-page="{{ item.pagina }}"
+                       data-current-page="{{ page_obj.number }}">
+                        <i class="{{ item.categoria.icone }} me-2"></i>
+                        <span>{{ item.categoria.nome }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        <button type="button" class="carousel-arrow prev" aria-label="Anterior">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button type="button" class="carousel-arrow next" aria-label="Próximo">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+{% endif %}
+<!-- ========================================================== -->
 
 <!-- ================================== -->
 <!-- SEÇÃO CONTATOS - Lista principal  -->
@@ -364,220 +391,223 @@
 
 {% block extra_js %}
 <script>
-    $(document).ready(function () {
-        // ===============================================
-        // NOVA LÓGICA DE FILTRAGEM DINÂMICA
-        // ===============================================
-        let searchTimeout;
+    // =============================================================================
+    // DECLARAÇÃO DAS FUNÇÕES PRINCIPAIS
+    // =============================================================================
 
-        function applyFilters() {
-            const categoria = $('#filtro-categoria').val();
-            const atendimento = $('#filtro-atendimento').val();
-            const localizacao = $('#filtro-localizacao').val().trim();
-            
-            // Constrói a URL base
-            let url = "{% url 'contatos' %}?";
-            const params = new URLSearchParams();
-
-            if (categoria && categoria !== 'todos') {
-                params.append('categoria', categoria);
-            }
-            if (atendimento && atendimento !== 'todos') {
-                params.append('atendimento', atendimento);
-            }
-            if (localizacao) {
-                params.append('localizacao', localizacao);
-            }
-            
-            // Redireciona para a URL com os filtros
-            window.location.href = url + params.toString();
-        }
-
-        // Eventos que disparam a filtragem
-        $('#filtro-categoria, #filtro-atendimento').on('change', function() {
-            applyFilters();
-        });
-
-        $('#filtro-localizacao').on('keyup', function() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(applyFilters, 500); // Espera 500ms antes de buscar
-        });
-
-        // Evento para o botão de limpar filtros
-        $('#btn-limpar-filtros').on('click', function() {
-            window.location.href = "{% url 'contatos' %}"; // Simplesmente recarrega a página
-        });
-
-        $("#btnEnviarSugestao").click(function () {
-            if ($("#formSugerirContato")[0].checkValidity()) {
-                $("#formSugerirContato").submit();
-                $("#sugerirContatoModal").modal('hide');
-                if (typeof Swal !== 'undefined') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Sugestão enviada!',
-                        text: 'Agradecemos sua contribuição para nossa rede de apoio.',
-                        confirmButtonColor: '#3085d6'
-                    });
-                } else {
-                    alert('Sugestão enviada! Agradecemos sua contribuição para nossa rede de apoio.');
-                }
-                $("#formSugerirContato")[0].reset();
-            } else {
-                $("#formSugerirContato")[0].reportValidity();
-            }
-        });
-
-        $(".hover-card").hover(
-            function () {
-                $(this).addClass("shadow").css({ "transform": "translateY(-5px)", "transition": "all 0.3s ease" });
-            },
-            function () {
-                $(this).removeClass("shadow").css("transform", "translateY(0)");
-            }
-        );
-    });
-
-    function salvarContato(contatoId) {
+    /**
+     * Salva um contato para o usuário logado.
+     */
+    function salvarContato(contatoId, element) {
+        const csrfToken = getCookie('csrftoken');
         fetch(`/salvar-contato/${contatoId}/`, {
             method: 'POST',
-            headers: { 'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json' }
+            headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/json' }
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                updateButton(contatoId, true);
-                // ATUALIZADO: Chamando showToast com título e mensagem
-                showToast('Contato Salvo!', 'Este contato foi adicionado à sua lista de favoritos.', 'success');
+                updateSaveButton(contatoId, true);
+                showToast('Contato Salvo!', 'Adicionado à sua lista de favoritos.', 'success');
             } else {
-                showToast('Ops!', data.message, 'error');
+                showToast('Ops!', data.message || 'Ocorreu um erro.', 'error');
             }
         })
-        .catch(error => {
-            console.error('Erro:', error);
-            showToast('Erro de Rede', 'Não foi possível salvar o contato. Tente novamente.', 'error');
-        });
+        .catch(error => showToast('Erro de Rede', 'Não foi possível salvar o contato.', 'error'));
     }
 
-    function removerContato(contatoId) {
+    /**
+     * Remove um contato salvo do usuário.
+     */
+    function removerContato(contatoId, element) {
+        const csrfToken = getCookie('csrftoken');
         fetch(`/remover-contato/${contatoId}/`, {
             method: 'POST',
-            headers: { 'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json' }
+            headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/json' }
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                updateButton(contatoId, false);
-                // ATUALIZADO: Mensagem de remoção também aprimorada
-                showToast('Contato Removido', 'O contato foi removido da sua lista de salvos.', 'info');
+                updateSaveButton(contatoId, false);
+                showToast('Contato Removido', 'Retirado da sua lista de favoritos.', 'info');
             } else {
-                showToast('Ops!', data.message, 'error');
+                showToast('Ops!', data.message || 'Ocorreu um erro.', 'error');
             }
         })
-        .catch(error => {
-            console.error('Erro:', error);
-            showToast('Erro de Rede', 'Não foi possível remover o contato. Tente novamente.', 'error');
-        });
+        .catch(error => showToast('Erro de Rede', 'Não foi possível remover o contato.', 'error'));
     }
-
-    function updateButton(contatoId, isSaved) {
+    
+    /**
+     * Atualiza a aparência e a função do botão de salvar.
+     */
+    function updateSaveButton(contatoId, isSaved) {
         const button = document.querySelector(`button[data-contato-id="${contatoId}"]`);
         if (button) {
             const icon = button.querySelector('i');
             if (isSaved) {
                 button.classList.add('saved');
-                icon.classList.remove('far');
-                icon.classList.add('fas');
-                button.onclick = () => removerContato(contatoId);
+                icon.classList.replace('far', 'fas');
+                button.setAttribute('onclick', `removerContato(${contatoId}, this)`);
                 button.title = 'Remover dos salvos';
             } else {
                 button.classList.remove('saved');
-                icon.classList.remove('fas');
-                icon.classList.add('far');
-                button.onclick = () => salvarContato(contatoId);
+                icon.classList.replace('fas', 'far');
+                button.setAttribute('onclick', `salvarContato(${contatoId}, this)`);
                 button.title = 'Salvar contato';
             }
         }
     }
 
+    /**
+     * Exibe o modal de login quando uma ação requer autenticação.
+     */
     function showLoginRequired() {
         const modalElement = document.getElementById('loginModal');
         if (modalElement) {
-            const loginModal = new bootstrap.Modal(modalElement);
-            loginModal.show();
-        } else {
-            console.error("O elemento do modal de login (#loginModal) não foi encontrado no DOM.");
-            alert("Para salvar, você precisa fazer login. Redirecionando para a página de login.");
-            window.location.href = '/login/';
+            const loginModalInstance = new bootstrap.Modal(modalElement);
+            loginModalInstance.show();
+        } else if (confirm('Você precisa estar logado para salvar contatos.\nDeseja ir para a página de login?')) {
+            window.location.href = '{% url "login" %}';
         }
     }
 
     /**
-     * ATUALIZADO: Exibe uma notificação toast moderna e customizada.
-     * @param {string} title - O título da notificação.
-     * @param {string} message - A mensagem principal.
-     * @param {string} type - O tipo de notificação ('success', 'error', 'info', 'warning').
+     * Exibe uma notificação toast moderna e customizada.
      */
     function showToast(title, message, type = 'info') {
         const toastElement = document.getElementById('notificationToast');
-        if (!toastElement) {
-            console.error("Elemento de Toast não encontrado!");
-            return;
-        }
-        const toast = new bootstrap.Toast(toastElement, { delay: 5000 }); // Aumenta o tempo para 5s
-
+        if (!toastElement) return;
+        
+        const toast = new bootstrap.Toast(toastElement, { delay: 5000 });
         const toastIconArea = toastElement.querySelector('.toast-icon-area');
         const toastIcon = toastElement.querySelector('#toastIcon');
         const toastTitle = toastElement.querySelector('#toastTitle');
         const toastBody = toastElement.querySelector('#toastBody');
 
-        // Configurações baseadas no tipo para um visual mais rico
         const configs = {
-            success: {
-                icon: 'fa-check-circle',
-                colorClass: 'toast-success',
-                defaultTitle: 'Sucesso!'
-            },
-            error: {
-                icon: 'fa-times-circle',
-                colorClass: 'toast-error',
-                defaultTitle: 'Erro!'
-            },
-            info: {
-                icon: 'fa-info-circle',
-                colorClass: 'toast-info',
-                defaultTitle: 'Informação'
-            },
-            warning: {
-                icon: 'fa-exclamation-triangle',
-                colorClass: 'toast-warning',
-                defaultTitle: 'Atenção!'
-            }
+            success: { icon: 'fa-check-circle', colorClass: 'toast-success', defaultTitle: 'Sucesso!' },
+            error: { icon: 'fa-times-circle', colorClass: 'toast-error', defaultTitle: 'Erro!' },
+            info: { icon: 'fa-info-circle', colorClass: 'toast-info', defaultTitle: 'Informação' },
+            warning: { icon: 'fa-exclamation-triangle', colorClass: 'toast-warning', defaultTitle: 'Atenção!' }
         };
-
         const config = configs[type] || configs.info;
-
-        // Atualiza o conteúdo do toast
+        
         toastTitle.textContent = title || config.defaultTitle;
         toastBody.textContent = message;
-        
-        // Atualiza ícone e classes de cor
         toastIcon.className = `fas ${config.icon}`;
-        toastIconArea.className = 'toast-icon-area d-flex align-items-center justify-content-center'; // Reseta classes
-        toastIconArea.classList.add(config.colorClass);
+        toastIconArea.className = 'toast-icon-area d-flex align-items-center justify-content-center ' + config.colorClass;
 
-        // Adiciona uma classe de animação ao mostrar
         toastElement.classList.remove('hide');
-        toastElement.classList.add('show', 'animate__animated', 'animate__fadeInRight');
-        
         toast.show();
+    }
 
-        // Remove a animação ao esconder para evitar piscadas
-        toastElement.addEventListener('hidden.bs.toast', function () {
-            toastElement.classList.remove('animate__animated', 'animate__fadeInRight');
+    /**
+     * Lógica para os filtros de contato (versão vanilla JS).
+     */
+    function initContactFilters() {
+        const categoriaSelect = document.getElementById('filtro-categoria');
+        const atendimentoSelect = document.getElementById('filtro-atendimento');
+        const localizacaoInput = document.getElementById('filtro-localizacao');
+        const limparBtn = document.getElementById('btn-limpar-filtros');
+        let searchTimeout;
+
+        function applyFilters() {
+            const params = new URLSearchParams(window.location.search);
+            // Atualiza ou remove parâmetros conforme o valor do filtro
+            if (categoriaSelect.value !== 'todos') params.set('categoria', categoriaSelect.value); else params.delete('categoria');
+            if (atendimentoSelect.value !== 'todos') params.set('atendimento', atendimentoSelect.value); else params.delete('atendimento');
+            if (localizacaoInput.value.trim()) params.set('localizacao', localizacaoInput.value.trim()); else params.delete('localizacao');
+            
+            // Navega para a nova URL
+            window.location.href = `{% url 'contatos' %}?${params.toString()}`;
+        }
+        
+        [categoriaSelect, atendimentoSelect].forEach(el => el.addEventListener('change', applyFilters));
+
+        localizacaoInput.addEventListener('keyup', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(applyFilters, 600);
+        });
+
+        limparBtn.addEventListener('click', () => {
+            window.location.href = `{% url 'contatos' %}`;
         });
     }
 
+    /**
+     * Adiciona rolagem suave para os filtros de categoria com lógica de paginação.
+     */
+    function initCategoryFilterScrolling() {
+        document.querySelectorAll('.btn-category-filter').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetPage = parseInt(this.dataset.targetPage, 10);
+                const currentPage = parseInt(this.dataset.currentPage, 10);
+                const targetId = this.getAttribute('href');
+
+                if (targetPage === currentPage) {
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        const offsetTop = targetElement.getBoundingClientRect().top + window.pageYOffset - 120; // Mais espaço
+                        window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+                    }
+                } else {
+                    const newUrl = `{% url 'contatos' %}?page=${targetPage}${targetId}`;
+                    window.location.href = newUrl;
+                }
+            });
+        });
+    }
+
+    /**
+     * Rola suavemente para uma âncora na URL (#) após o carregamento da página.
+     */
+    function smoothScrollToHashOnLoad() {
+        setTimeout(() => {
+            if (window.location.hash) {
+                const targetElement = document.querySelector(window.location.hash);
+                if (targetElement) {
+                    const offsetTop = targetElement.getBoundingClientRect().top + window.pageYOffset - 120;
+                    window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+                }
+            }
+        }, 200);
+    }
+    
+    /**
+     * Inicializa os controles de seta para o carrossel de categorias.
+     */
+    function initCategoryCarouselControls() {
+        const wrapper = document.querySelector('.category-carousel-wrapper');
+        if (!wrapper) return;
+
+        const container = wrapper.querySelector('.category-filters-container');
+        const prevBtn = wrapper.querySelector('.carousel-arrow.prev');
+        const nextBtn = wrapper.querySelector('.carousel-arrow.next');
+
+        if (container.scrollWidth <= container.clientWidth) {
+            prevBtn.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+            return;
+        }
+
+        const scrollAmount = 300;
+        const updateArrowVisibility = () => {
+            const tolerance = 5; 
+            prevBtn.classList.toggle('hidden', container.scrollLeft < tolerance);
+            const isAtEnd = container.scrollLeft + container.clientWidth >= container.scrollWidth - tolerance;
+            nextBtn.classList.toggle('hidden', isAtEnd);
+        };
+
+        prevBtn.addEventListener('click', () => container.scrollBy({ left: -scrollAmount, behavior: 'smooth' }));
+        nextBtn.addEventListener('click', () => container.scrollBy({ left: scrollAmount, behavior: 'smooth' }));
+        container.addEventListener('scroll', updateArrowVisibility);
+        updateArrowVisibility();
+    }
+    
+    /**
+     * Função para obter o valor do cookie CSRF.
+     */
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -592,6 +622,19 @@
         }
         return cookieValue;
     }
+
+
+    // =============================================================================
+    // INICIALIZAÇÃO DA PÁGINA
+    // =============================================================================
+    document.addEventListener('DOMContentLoaded', function () {
+        // Inicializa todas as funcionalidades da página
+        initContactFilters();
+        initCategoryFilterScrolling();
+        smoothScrollToHashOnLoad();
+        initCategoryCarouselControls();
+    });
+
 </script>
 {% endblock %}
 
@@ -809,6 +852,7 @@ ESTRUTURA GERAL DO CSS
 
 /* Corpo do Toast Moderno */
 .modern-toast {
+    position: relative; /* <-- A CORREÇÃO ESTÁ AQUI */
     width: 380px;
     max-width: 95%;
     background-color: #fff;
@@ -827,10 +871,6 @@ ESTRUTURA GERAL DO CSS
 .modern-toast .toast-info { border-bottom-color: #0dcaf0; }
 .modern-toast .toast-warning { border-bottom-color: #ffc107; }
 
-/* Animação de entrada */
-.modern-toast.show {
-    animation: fadeInRight 0.5s ease forwards;
-}
 
 .toast-body {
     padding: 0 !important; /* Removemos o padding padrão */
@@ -1482,5 +1522,97 @@ ESTRUTURA GERAL DO CSS
         border-radius: 50px 0 0 50px;
         color: var(--primary, #6A3EA1);
     }
+
+    /*
+=============================================================================
+10. FILTROS DE CATEGORIA (CARROSSEL HORIZONTAL COM MÁSCARA)
+=============================================================================
+*/
+.category-filters-container {
+    width: 100%;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, transparent, black 30px, black calc(100% - 30px), transparent);
+    mask-image: linear-gradient(to right, transparent, black 30px, black calc(100% - 30px), transparent);
+}
+.category-filters-container::-webkit-scrollbar { display: none; }
+.category-filters {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 12px;
+    padding: 0.5rem 30px;
+    -webkit-overflow-scrolling: touch;
+}
+.btn-category-filter {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1.5rem;
+    background-color: var(--primary-very-light);
+    color: var(--primary-dark);
+    border: 1px solid rgba(106, 62, 161, 0.1);
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.btn-category-filter:hover, .btn-category-filter:focus {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 6px 15px rgba(106, 62, 161, 0.2);
+    text-decoration: none;
+    border-color: var(--primary);
+}
+
+/*
+=============================================================================
+11. CONTROLES DO CARROSSEL DE CATEGORIAS (SETAS)
+=============================================================================
+*/
+.category-carousel-wrapper {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto 2rem auto; /* Adicionado margem inferior */
+}
+.carousel-arrow {
+    display: none;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: white;
+    border: 1px solid var(--gray-300);
+    color: var(--primary);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    z-index: 10;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+.carousel-arrow:hover {
+    background-color: var(--primary);
+    color: white;
+    transform: translateY(-50%) scale(1.1);
+}
+.carousel-arrow.prev { left: -20px; }
+.carousel-arrow.next { right: -20px; }
+.carousel-arrow.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-50%) scale(0.8);
+}
+@media (min-width: 992px) {
+    .carousel-arrow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
 </style>
 {% endblock %}

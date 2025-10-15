@@ -53,18 +53,32 @@
                 <!--          FILTROS DE CATEGORIA (NOVO BLOCO)                 -->
                 <!-- ========================================================== -->
                 {% if categorias_com_pagina %}
-                    <div class="category-filters-container mb-5">
-                        <div class="category-filters">
-                            {% for item in categorias_com_pagina %}
-                                <a href="#{{ item.categoria.nome|lower|slugify }}" 
-                                class="btn-category-filter"
-                                data-target-page="{{ item.pagina }}"
-                                data-current-page="{{ page_obj.number }}">
-                                    <i class="{{ item.categoria.icone }} me-2"></i>
-                                    <span>{{ item.categoria.nome }}</span>
-                                </a>
-                            {% endfor %}
+                    <!-- NOVO: Contêiner-pai para o carrossel e as setas -->
+                    <div class="category-carousel-wrapper">
+                        
+                        <!-- O contêiner que já existia -->
+                        <div class="category-filters-container mb-5">
+                            <div class="category-filters">
+                                {% for item in categorias_com_pagina %}
+                                    <a href="#{{ item.categoria.nome|lower|slugify }}" 
+                                    class="btn-category-filter"
+                                    data-target-page="{{ item.pagina }}"
+                                    data-current-page="{{ page_obj.number }}">
+                                        <i class="{{ item.categoria.icone }} me-2"></i>
+                                        <span>{{ item.categoria.nome }}</span>
+                                    </a>
+                                {% endfor %}
+                            </div>
                         </div>
+
+                        <!-- NOVO: Botões de navegação do carrossel -->
+                        <button type="button" class="carousel-arrow prev" aria-label="Anterior">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button type="button" class="carousel-arrow next" aria-label="Próximo">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+
                     </div>
                 {% endif %}
                 <!-- ========================================================== -->
@@ -590,6 +604,54 @@
         toast.show();
     }
 
+    /**
+    * Inicializa os controles de seta para o carrossel de categorias em desktops.
+    */
+    function initCategoryCarouselControls() {
+        const wrapper = document.querySelector('.category-carousel-wrapper');
+        if (!wrapper) return;
+
+        const container = wrapper.querySelector('.category-filters-container');
+        const prevBtn = wrapper.querySelector('.carousel-arrow.prev');
+        const nextBtn = wrapper.querySelector('.carousel-arrow.next');
+
+        // Se não houver o que rolar, esconde as setas e para a execução
+        if (container.scrollWidth <= container.clientWidth) {
+            prevBtn.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+            return;
+        }
+
+        const scrollAmount = 300; // Distância de rolagem por clique
+
+        // Função para atualizar a visibilidade das setas
+        const updateArrowVisibility = () => {
+            // Tolerância para evitar problemas de arredondamento
+            const tolerance = 5; 
+            
+            // Esconde a seta "anterior" se estiver no início
+            prevBtn.classList.toggle('hidden', container.scrollLeft < tolerance);
+            
+            // Esconde a seta "próximo" se estiver no final
+            const isAtEnd = container.scrollLeft + container.clientWidth >= container.scrollWidth - tolerance;
+            nextBtn.classList.toggle('hidden', isAtEnd);
+        };
+
+        // Event listeners para os cliques
+        prevBtn.addEventListener('click', () => {
+            container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        });
+
+        nextBtn.addEventListener('click', () => {
+            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        });
+
+        // Atualiza a visibilidade das setas sempre que o scroll mudar
+        container.addEventListener('scroll', updateArrowVisibility);
+        
+        // Atualiza a visibilidade ao carregar a página
+        updateArrowVisibility();
+    }
 
     // =============================================================================
     // INICIALIZAÇÃO DA PÁGINA QUANDO O CONTEÚDO ESTIVER CARREGADO
@@ -600,6 +662,7 @@
         highlightSearchTerms();
         initCategoryFilterScrolling();
         smoothScrollToHashOnLoad();
+        initCategoryCarouselControls();
 
         // Animações de entrada para os itens da FAQ
         document.querySelectorAll('.accordion-item').forEach((item, index) => {
@@ -1343,26 +1406,32 @@
 */
 
 /* 1. O contêiner que terá a rolagem e o efeito de fade */
+/* O contêiner que terá a rolagem e o efeito de MÁSCARA */
 .category-filters-container {
-    position: relative;
     width: 100%;
-    overflow-x: auto; /* A mágica acontece aqui: permite a rolagem horizontal */
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    
+    /* A MÁGICA ESTÁ AQUI: */
+    /* Cria uma máscara que é opaca no centro e transparente nas bordas */
+    -webkit-mask-image: linear-gradient(to right, transparent, black 30px, black calc(100% - 30px), transparent);
+    mask-image: linear-gradient(to right, transparent, black 30px, black calc(100% - 30px), transparent);
 }
 
-/* 2. Esconde a barra de rolagem feia do navegador (Chrome, Safari) */
+/* Esconde a barra de rolagem (continua igual) */
 .category-filters-container::-webkit-scrollbar {
     display: none;
 }
 
-/* 3. A lista interna que contém os botões */
+/* O contêiner interno precisa de um padding um pouco maior
+   para que os botões não comecem já transparentes */
 .category-filters {
     display: flex;
-    flex-wrap: nowrap; /* Impede que os botões quebrem a linha */
+    flex-wrap: nowrap;
     gap: 12px;
-    padding: 0.5rem 24px; /* Adiciona espaço nas laterais para não colar na borda */
-    -webkit-overflow-scrolling: touch; /* Melhora a experiência de rolagem no iOS */
+    padding: 0.5rem 30px; /* Aumentamos o padding lateral para 30px */
+    -webkit-overflow-scrolling: touch;
 }
 
 /* 4. O estilo dos botões-pílula (levemente ajustado) */
@@ -1404,6 +1473,67 @@
     height: 100%;
     background: linear-gradient(to right, rgba(249, 249, 253, 0), var(--body-bg) 70%);
     pointer-events: none; /* Permite clicar nos botões que estiverem por baixo */
+}
+
+/*
+=============================================================================
+11. CONTROLES DO CARROSSEL DE CATEGORIAS (SETAS)
+=============================================================================
+*/
+
+/* Contêiner-pai que posiciona as setas */
+.category-carousel-wrapper {
+    position: relative;
+    max-width: 900px; /* Limita a largura para centralizar */
+    margin: 0 auto;
+}
+
+/* Estilo base das setas */
+.carousel-arrow {
+    display: none; /* Escondido por padrão (para mobile) */
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: white;
+    border: 1px solid var(--gray-300);
+    color: var(--primary);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    z-index: 10;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.carousel-arrow:hover {
+    background-color: var(--primary);
+    color: white;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-arrow.prev {
+    left: -20px;
+}
+
+.carousel-arrow.next {
+    right: -20px;
+}
+
+/* Classe para esconder uma seta quando não for necessária */
+.carousel-arrow.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-50%) scale(0.8);
+}
+
+/* Media Query: Mostra as setas apenas em telas de PC (largura > 992px) */
+@media (min-width: 992px) {
+    .carousel-arrow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 }
 </style>
 {% endblock %}

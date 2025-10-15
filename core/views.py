@@ -553,21 +553,33 @@ def remover_faq_salva(request, faq_id):
 
 def contatos(request):
     """
-    Lista Contatos com paginação aninhada:
-    - Paginação principal para CATEGORIAS (3 por página).
-    - Paginação secundária para CONTATOS dentro de cada categoria (3 por página).
+    Lista Contatos com paginação aninhada e navegação flexível por âncoras.
     """
-    # 1. PAGINAÇÃO PRINCIPAL (CATEGORIAS)
-    categorias_com_contatos = CategoriaContato.objects.annotate(
+    # 1. BUSCAR TODAS AS CATEGORIAS E CALCULAR SUAS PÁGINAS
+    todas_categorias = CategoriaContato.objects.annotate(
         num_contatos=Count('contatos')
     ).filter(num_contatos__gt=0).order_by('nome')
     
-    main_paginator = Paginator(categorias_com_contatos, 3)
+    main_paginator = Paginator(todas_categorias, 3) # 3 categorias por página
+
+    # ================================================================= #
+    # ALTERAÇÃO PRINCIPAL: Criamos a lista de categorias com suas páginas #
+    # ================================================================= #
+    categorias_com_pagina = []
+    items_per_page = main_paginator.per_page
+    for index, categoria in enumerate(todas_categorias):
+        page_number = (index // items_per_page) + 1
+        categorias_com_pagina.append({
+            'categoria': categoria,
+            'pagina': page_number
+        })
+
+    # 2. PAGINAÇÃO PRINCIPAL (lógica existente)
     main_page_number = request.GET.get('page')
     main_page_obj = main_paginator.get_page(main_page_number)
     categorias_na_pagina = main_page_obj.object_list
 
-    # 2. BUSCAR TODOS OS CONTATOS PARA AS CATEGORIAS DA PÁGINA ATUAL
+    # 3. BUSCAR CONTATOS DA PÁGINA ATUAL (lógica existente)
     todos_contatos_da_pagina = Contato.objects.filter(
         categoria__in=categorias_na_pagina
     ).order_by('nome')
@@ -576,20 +588,13 @@ def contatos(request):
     for contato in todos_contatos_da_pagina:
         contatos_agrupados[contato.categoria].append(contato)
 
-    # 3. CRIAR PAGINADORES ANINHADOS PARA CADA CATEGORIA
-    # Usamos um OrderedDict para manter a ordem da paginação principal.
+    # 4. CRIAR PAGINADORES ANINHADOS (lógica existente)
     dados_pagina_atual = OrderedDict()
     for categoria in categorias_na_pagina:
         lista_de_contatos = contatos_agrupados.get(categoria, [])
-        
-        # Cria um paginador específico para os contatos desta categoria
-        contato_paginator = Paginator(lista_de_contatos, 3) # 3 contatos por página
-        
-        # Cria um nome de parâmetro de URL único para este paginador
+        contato_paginator = Paginator(lista_de_contatos, 3)
         query_param_name = f"cat_{categoria.id}_page"
         contato_page_number = request.GET.get(query_param_name)
-        
-        # Pega o objeto da página de contatos para esta categoria
         contato_page_obj = contato_paginator.get_page(contato_page_number)
         
         dados_pagina_atual[categoria] = {
@@ -597,20 +602,22 @@ def contatos(request):
             'query_param_name': query_param_name
         }
 
-    # 4. BUSCAR CONTATOS SALVOS PELO USUÁRIO
+    # 5. BUSCAR CONTATOS SALVOS (lógica existente)
     contatos_salvos_ids = []
     if request.user.is_authenticated:
         contatos_salvos_ids = list(UserSavedContato.objects.filter(
             user=request.user
         ).values_list('contato_id', flat=True))
 
-    # 5. PREPARAR O CONTEXTO FINAL
+    # 6. PREPARAR O CONTEXTO FINAL (ATUALIZADO)
     context = {
         'title': 'Contatos',
         'contatos_por_categoria_paginada': dados_pagina_atual,
-        'page_obj': main_page_obj,  # Paginador principal
+        'page_obj': main_page_obj,
         'contatos_salvos_ids': contatos_salvos_ids,
-        'sem_contatos': not categorias_com_contatos.exists()
+        'sem_contatos': not todas_categorias.exists(),
+        'categorias_com_pagina': categorias_com_pagina, # <-- VARIÁVEL NOVA E ESSENCIAL
+        'todas_categorias': todas_categorias # Adicionado para os filtros de select
     }
     
     return render(request, 'core/contatos.html', context)
@@ -753,15 +760,16 @@ def register_view(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # A linha extra foi removida. 'user' aqui já é a instância
-            # do CustomUser pronta para ser usada.
+            
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
+            
+            login(request, user)
             
             username = form.cleaned_data.get('username')
             messages.success(
                 request, 
                 f'Conta criada com sucesso para {username}! Você foi logado automaticamente.'
             )
-            login(request, user)
             return redirect('index')
         else:
             messages.error(
@@ -772,7 +780,6 @@ def register_view(request):
         form = CustomUserCreationForm()
     
     return render(request, 'core/auth/register.html', {'form': form})
-
 def login_view(request):
     """Login de usuários"""
     if request.method == 'POST':
