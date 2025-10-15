@@ -49,6 +49,24 @@
                         </form>
                     </div>
                 </div>
+                <!-- ========================================================== -->
+                <!--          FILTROS DE CATEGORIA (NOVO BLOCO)                 -->
+                <!-- ========================================================== -->
+                {% if todas_as_categorias %}
+                <div class="category-filters-wrapper mb-5">
+                    <div class="category-filters">
+                        {% for categoria in todas_as_categorias %}
+                            <a href="#{{ categoria.nome|lower|slugify }}" class="btn-category-filter">
+                                <i class="{{ categoria.icone }} me-2"></i>
+                                {{ categoria.nome }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                <!-- ========================================================== -->
+                <!--                  FIM DO NOVO BLOCO                         -->
+                <!-- ========================================================== -->
             </div>
         </div>
 
@@ -701,18 +719,41 @@
      * Inicializa todas as funcionalidades quando a página carrega
      */
     document.addEventListener('DOMContentLoaded', function () {
-        // Inicializar funcionalidades principais
-        initSmoothScrolling();
-        enhanceAccordionAnimations();
-        highlightSearchTerms();
-        enhanceFAQContent();
-
-        // Adicionar animações aos elementos FAQ
-        document.querySelectorAll('.accordion-item').forEach((item, index) => {
-            item.classList.add('animate__animated', 'animate__fadeInUp');
-            item.style.animationDelay = `${index * 0.1}s`;
+    // ... (mantenha suas funções existentes) ...
+    initSmoothScrolling();
+    enhanceAccordionAnimations();
+    highlightSearchTerms();
+    enhanceFAQContent();
+    
+    // ADICIONE ESTA NOVA FUNÇÃO
+    /**
+     * Adiciona rolagem suave para os novos filtros de categoria.
+     */
+    function initCategoryFilterScrolling() {
+        document.querySelectorAll('.btn-category-filter').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    // O valor '100' compensa a altura de um possível menu fixo no topo.
+                    // Ajuste se necessário.
+                    const offsetTop = targetElement.getBoundingClientRect().top + window.pageYOffset - 100;
+                    
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            });
         });
-    });
+    }
+
+    // CHAME A NOVA FUNÇÃO AQUI
+    initCategoryFilterScrolling();
+
+});
 </script>
 {% endblock %}
 
@@ -1409,6 +1450,50 @@
         height: 38px;
         font-size: 0.9rem;
     }
+}
+
+/*
+=============================================================================
+10. FILTROS DE CATEGORIA (BOTÕES-PÍLULA)
+=============================================================================
+*/
+.category-filters-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0;
+}
+
+.category-filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px; /* Espaçamento entre os botões */
+    max-width: 900px;
+}
+
+.btn-category-filter {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.6rem 1.4rem;
+    background-color: var(--primary-very-light);
+    color: var(--primary-dark);
+    border: 1px solid rgba(106, 62, 161, 0.1);
+    border-radius: 50px; /* Formato de pílula */
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+}
+
+.btn-category-filter:hover,
+.btn-category-filter:focus {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(106, 62, 161, 0.2);
+    text-decoration: none;
+    border-color: var(--primary);
 }
 </style>
 {% endblock %}

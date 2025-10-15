@@ -398,6 +398,7 @@ def duvidas(request):
         'page_obj': main_page_obj,
         'termo_pesquisa': termo_pesquisa,
         'faqs_salvas_ids': faqs_salvas_ids,
+        'todas_as_categorias': todas_categorias, # <-- ADICIONE ESTA LINHA
     }
     
     return render(request, 'core/duvidas.html', context)
