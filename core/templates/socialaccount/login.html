@@ -1,24 +1,35 @@
 {% extends "base.html" %}
 {% load i18n %}
 
+{% block title %}{% trans "Confirmar Login Social" %}{% endblock %}
+
 {% block content %}
-<div class="container py-5">
+<div class="container py-5 my-5">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <div class="card shadow-lg border-0 rounded-lg text-center">
-                <div class="card-body p-5">
-                    <h1 class="h3 fw-bold mb-3">{% trans "Entrar via Google" %}</h1>
+            
+            <!-- CARD DE AUTENTICAÇÃO MODERNIZADO -->
+            <div class="auth-card animate__animated animate__fadeInUp">
+                
+                <!-- Ícone Proeminente -->
+                <div class="auth-icon">
+                    <i class="fab fa-google"></i>
+                </div>
+                
+                <div class="auth-content">
+                    <h1 class="auth-title">{% trans "Entrar via Google" %}</h1>
                     
                     {% if process == "connect" %}
-                        <p>{% blocktrans with provider.name as provider %}Você está prestes a conectar sua conta existente a uma conta {{ provider }}.{% endblocktrans %}</p>
+                        <p class="auth-text">{% blocktrans with provider.name as provider %}Você está prestes a conectar sua conta a um perfil <strong>{{ provider }}</strong>.{% endblocktrans %}</p>
                     {% else %}
-                        <p>{% blocktrans with provider.name as provider %}Você está prestes a fazer login usando sua conta do {{ provider }}.{% endblocktrans %}</p>
+                        <p class="auth-text">{% blocktrans with provider.name as provider %}Para continuar, confirme que deseja fazer login usando sua conta do <strong>{{ provider }}</strong>.{% endblocktrans %}</p>
                     {% endif %}
 
                     <form method="post">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-primary btn-lg mt-3">
-                            <i class="fab fa-google me-2"></i>Continuar
+                        <button type="submit" class="btn btn-primary btn-lg mt-4 w-100">
+                            <i class="fab fa-google me-2"></i>
+                            Continuar e Confirmar
                         </button>
                     </form>
                 </div>
@@ -26,4 +37,83 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+/>
+<style>
+    .auth-card {
+        background: white;
+        border-radius: 20px; /* Bordas mais arredondadas */
+        box-shadow: var(--card-shadow, 0 10px 40px rgba(0,0,0,0.1));
+        padding: 3rem;
+        text-align: center;
+        border: 1px solid var(--gray-200, #e9ecef);
+        overflow: hidden;
+    }
+
+   .auth-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 2rem auto;
+        border-radius: 50%;
+        /* 1. O fundo agora é branco, com uma borda sutil */
+        background: white;
+        border: 1px solid var(--gray-200, #e9ecef);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* 2. A sombra é mais neutra */
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .auth-icon i {
+        font-size: 2.5rem;
+        /* 3. A MÁGICA: Aplicamos um gradiente de cores diretamente ao ícone */
+        background: -webkit-linear-gradient(45deg, #4285F4, #DB4437, #F4B400, #0F9D58);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        /* Fallback para navegadores que não suportam a máscara de texto */
+        color: #4285F4;
+    }
+
+    .auth-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--gray-800, #343a40);
+        margin-bottom: 1rem;
+    }
+
+    .auth-text {
+        color: var(--gray-600, #6c757d);
+        font-size: 1.1rem;
+        line-height: 1.7;
+    }
+
+    .auth-text strong {
+        color: var(--primary-dark, #5b2e92);
+        font-weight: 600;
+    }
+    
+    .btn-primary {
+        padding-top: 0.8rem;
+        padding-bottom: 0.8rem;
+    }
+
+    @media (max-width: 576px) {
+        .auth-card {
+            padding: 2rem 1.5rem;
+        }
+        .auth-title {
+            font-size: 1.5rem;
+        }
+        .auth-text {
+            font-size: 1rem;
+        }
+    }
+</style>
 {% endblock %}

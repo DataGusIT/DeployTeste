@@ -280,21 +280,25 @@
     </div>
 </div>
 
-<!-- Toast Notification -->
-<div class="toast-container">
-    <div id="toast" class="toast">
-        <div class="toast-content">
-            <div class="toast-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="toast-message">
-                <span class="toast-title">Sucesso</span>
-                <span class="toast-text">Mensagem aqui</span>
+<!-- =============================================================================
+   CONTAINER DE NOTIFICAÇÕES (TOAST MODERNO)
+   ============================================================================= -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 2100"> <!-- z-index maior por causa do modal -->
+    <div id="notificationToast" class="toast modern-toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-body p-0">
+            <div class="d-flex">
+                <div class="toast-icon-area d-flex align-items-center justify-content-center">
+                    <i id="toastIcon" class="fas fa-check-circle"></i>
+                </div>
+                <div class="toast-content-area p-3">
+                    <h6 id="toastTitle" class="toast-title mb-1">Sucesso!</h6>
+                    <p id="toastBody" class="toast-message mb-0">Mensagem aqui.</p>
+                </div>
+                <button type="button" class="btn-close-toast" data-bs-dismiss="toast" aria-label="Fechar">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         </div>
-        <button class="toast-close" onclick="hideToast()">
-            <i class="fas fa-times"></i>
-        </button>
     </div>
 </div>
 {% endblock %}
@@ -999,81 +1003,7 @@
     margin: 0 0 2rem 0;
 }
 
-/* Toast Notification */
-.toast-container {
-    position: fixed;
-    top: 2rem;
-    right: 2rem;
-    z-index: 1000;
-}
 
-.toast {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    padding: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    min-width: 320px;
-    transform: translateX(400px);
-    opacity: 0;
-    transition: var(--transition);
-}
-
-.toast.show {
-    transform: translateX(0);
-    opacity: 1;
-}
-
-.toast-content {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex: 1;
-}
-
-.toast-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--success);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-}
-
-.toast-message {
-    display: flex;
-    flex-direction: column;
-}
-
-.toast-title {
-    font-weight: 600;
-    color: var(--gray-800);
-    font-size: 0.9rem;
-}
-
-.toast-text {
-    color: var(--gray-600);
-    font-size: 0.85rem;
-}
-
-.toast-close {
-    background: none;
-    border: none;
-    color: var(--gray-400);
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 50%;
-    transition: var(--transition);
-}
-
-.toast-close:hover {
-    background: var(--gray-100);
-    color: var(--gray-600);
-}
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -1142,21 +1072,6 @@
     /* 2. Diminui o padding para um tamanho mais elegante */
     padding: 0.75rem 1.75rem;
 }
-
-/* Animation for item removal */
-@keyframes slideOutRight {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateX(100%);
-    }
-}
-
-.removing {
-    animation: slideOutRight 0.5s ease forwards;
 }
 
 /* ================================================== */
@@ -1343,6 +1258,104 @@
     color: white;
 }
 
+/*
+====================================================================
+10. NOTIFICAÇÕES TOAST (VERSÃO MODERNA)
+====================================================================
+*/
+
+/* Corpo do Toast Moderno */
+.modern-toast {
+    position: relative; /* Essencial para o botão de fechar */
+    width: 380px;
+    max-width: 95%;
+    background-color: #fff;
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    border-bottom: 4px solid transparent; 
+}
+
+.toast-body { padding: 0 !important; }
+
+/* Área do Ícone Colorida */
+.toast-icon-area {
+    flex: 0 0 60px;
+    color: #fff;
+    font-size: 1.8rem;
+    transition: background-color 0.3s ease;
+}
+.toast-icon-area.toast-success { background: linear-gradient(135deg, #28a745, #218838); }
+.toast-icon-area.toast-error { background: linear-gradient(135deg, #dc3545, #c82333); }
+.toast-icon-area.toast-info { background: linear-gradient(135deg, #17a2b8, #138496); }
+
+/* Área de Conteúdo */
+.toast-content-area {
+    flex-grow: 1;
+    padding: 1rem 1.2rem;
+}
+.toast-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #343a40;
+    margin-bottom: 0.25rem;
+}
+.toast-message {
+    font-size: 0.95rem;
+    color: #6c757d;
+}
+
+/* Botão de Fechar */
+.btn-close-toast {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    color: #adb5bd;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+.btn-close-toast:hover {
+    background-color: #f1f3f5;
+    color: #495057;
+    transform: rotate(90deg) scale(1.1);
+}
+
+/*
+====================================================================
+11. ANIMAÇÃO SUAVE DE REMOÇÃO DE ITEM
+====================================================================
+*/
+@keyframes shrinkAndFade {
+    from {
+        opacity: 1;
+        transform: scaleY(1);
+        max-height: 200px; /* Altura inicial aproximada */
+        margin-bottom: 1rem;
+        padding: 1.5rem;
+    }
+    to {
+        opacity: 0;
+        transform: scaleY(0);
+        max-height: 0;
+        margin-bottom: 0;
+        padding: 0 1.5rem;
+    }
+}
+
+.removing {
+    transform-origin: top;
+    transition: all 0.5s ease;
+    animation: shrinkAndFade 0.5s ease-out forwards;
+}
 </style>
 {% endblock %}
 
@@ -1351,7 +1364,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         
         // ===============================================
-        // LÓGICA DO MODAL DE CONFIRMAÇÃO
+        // VARIÁVEIS E INICIALIZAÇÃO DO MODAL
         // ===============================================
         const modal = document.getElementById('confirmation-modal');
         const modalMessage = document.getElementById('confirmation-message');
@@ -1359,186 +1372,127 @@
         const cancelBtn = document.getElementById('modal-cancel-btn');
         let onConfirmCallback = null;
 
+        // ===============================================
+        // FUNÇÕES PRINCIPAIS
+        // ===============================================
+
+        /**
+         * Exibe o modal de confirmação com uma mensagem e uma ação a ser executada.
+         */
         function showConfirmationModal(message, callback) {
             modalMessage.textContent = message;
             onConfirmCallback = callback;
             modal.classList.add('show');
         }
 
+        /**
+         * Esconde o modal de confirmação.
+         */
         function hideConfirmationModal() {
             modal.classList.remove('show');
             onConfirmCallback = null;
         }
 
-        // ===============================================
-        // ANEXAR EVENTOS (EVENT LISTENERS)
-        // ===============================================
-
-        // Lógica das Tabs de Navegação
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const tabPanes = document.querySelectorAll('.tab-pane');
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const tabId = this.dataset.tab;
-                tabBtns.forEach(b => b.classList.remove('active'));
-                tabPanes.forEach(p => p.classList.remove('active'));
-                this.classList.add('active');
-                document.getElementById(tabId).classList.add('active');
-            });
-        });
-
-        // Lógica para abrir/fechar o accordion de DÚVIDAS
-        document.querySelectorAll('.duvida-header').forEach(header => {
-            header.addEventListener('click', () => {
-                toggleAccordion(header.closest('.duvida-item'));
-            });
-        });
-        
-        // CORREÇÃO: Lógica para abrir/fechar o accordion de CONTATOS
-        document.querySelectorAll('.contato-header').forEach(header => {
-            header.addEventListener('click', (event) => {
-                // Garante que o clique no botão de remover não abra o accordion
-                if (!event.target.closest('.remove-btn')) {
-                    toggleAccordion(header.closest('.contato-item'));
-                }
-            });
-        });
-
-        // Lógica para REMOVER DÚVIDA
-        document.querySelectorAll('.duvidas-list .remove-btn').forEach(btn => {
-            btn.addEventListener('click', (event) => {
-                event.stopPropagation(); // Impede o accordion de abrir/fechar
-                const faqId = btn.dataset.faqId;
-                removerDuvida(faqId, btn);
-            });
-        });
-
-        // Lógica para REMOVER CONTATO
-        document.querySelectorAll('.contatos-list .remove-btn').forEach(btn => {
-            btn.addEventListener('click', (event) => {
-                event.stopPropagation();
-                const contatoId = btn.dataset.contatoId;
-                removerContato(contatoId, btn);
-            });
-        });
-
-        // Eventos do Modal
-        confirmBtn.addEventListener('click', () => {
-            if (typeof onConfirmCallback === 'function') {
-                onConfirmCallback();
-            }
-            hideConfirmationModal();
-        });
-        cancelBtn.addEventListener('click', hideConfirmationModal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                hideConfirmationModal();
-            }
-        });
-
-        // ===============================================
-        // DEFINIÇÕES DE FUNÇÕES
-        // ===============================================
-
-        function removerDuvida(faqId, element) {
-            const message = 'Tem certeza que deseja remover esta dúvida das suas dúvidas salvas? Esta ação não pode ser desfeita.';
+        /**
+         * Lida com a remoção de uma dúvida salva.
+         */
+        function handleRemoveDuvida(faqId, element) {
+            const message = 'Tem certeza que deseja remover esta dúvida dos seus favoritos?';
             
             showConfirmationModal(message, () => {
-                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
                 const item = element.closest('.duvida-item');
-                item.classList.add('removing');
+                item.classList.add('removing'); // Aplica a animação de remoção
                 
                 fetch(`/remover-faq/${faqId}/`, {
                     method: 'POST',
-                    headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({'faq_id': faqId})
-                })
-                .then(response => response.json().then(data => ({ ok: response.ok, data })))
-                .then(({ ok, data }) => {
-                    if (ok && data.success) {
-                        setTimeout(() => {
-                            item.remove();
-                            const counter = document.querySelector('[data-tab="duvidas-salvas"] .tab-counter');
-                            const newCount = Math.max(0, parseInt(counter.textContent) - 1);
-                            counter.textContent = newCount;
-                            
-                            const headerCount = document.querySelector('#duvidas-salvas .card-header p');
-                            headerCount.textContent = `${newCount} dúvida${newCount !== 1 ? 's' : ''} salva${newCount !== 1 ? 's' : ''}`;
-                            
-                            if (newCount === 0) {
-                                document.querySelector('.duvidas-list').parentElement.innerHTML += `
-                                    <div class="empty-state">
-                                        <div class="empty-icon"><i class="fas fa-bookmark"></i></div>
-                                        <h3>Nenhuma dúvida salva</h3>
-                                        <p>Você ainda não salvou nenhuma dúvida.</p>
-                                        <a href="/duvidas/" class="btn-secondary">Explorar Dúvidas Frequentes</a>
-                                    </div>`;
-                                document.querySelector('.duvidas-list').remove();
-                            }
-                        }, 500);
-                        showToast('success', 'Dúvida removida com sucesso!');
-                    } else {
-                        item.classList.remove('removing');
-                        showToast('error', data.message || 'Erro ao remover dúvida');
+                    headers: { 
+                        'X-CSRFToken': getCookie('csrftoken'), 
+                        'Content-Type': 'application/json' 
                     }
                 })
-                .catch(error => {
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Espera a animação terminar para remover o elemento
+                        setTimeout(() => {
+                            item.remove();
+                            updateCounter('duvidas-salvas');
+                        }, 500); // Duração da animação
+                        showToast('Dúvida Removida', 'Retirada da sua lista de favoritos.', 'info');
+                    } else {
+                        item.classList.remove('removing');
+                        showToast('Erro', data.message || 'Não foi possível remover a dúvida.', 'error');
+                    }
+                })
+                .catch(() => {
                     item.classList.remove('removing');
-                    showToast('error', 'Erro de conexão. Tente novamente.');
+                    showToast('Erro de Rede', 'Verifique sua conexão e tente novamente.', 'error');
                 });
             });
         }
 
-        function removerContato(contatoId, element) {
-            const message = 'Tem certeza que deseja remover este contato? Ele será apagado permanentemente.';
+        /**
+         * Lida com a remoção de um contato salvo.
+         */
+        function handleRemoveContato(contatoId, element) {
+            const message = 'Tem certeza que deseja remover este contato dos seus favoritos?';
 
             showConfirmationModal(message, () => {
-                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
                 const item = element.closest('.contato-item');
                 item.classList.add('removing');
                 
                 fetch(`/remover-contato/${contatoId}/`, {
                     method: 'POST',
-                    headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({'contato_id': contatoId})
-                })
-                .then(response => response.json().then(data => ({ ok: response.ok, data })))
-                .then(({ ok, data }) => {
-                    if (ok && data.success) {
-                        setTimeout(() => {
-                            item.remove();
-                            const counter = document.querySelector('[data-tab="contatos-salvos"] .tab-counter');
-                            const newCount = Math.max(0, parseInt(counter.textContent) - 1);
-                            counter.textContent = newCount;
-                            
-                            const headerCount = document.querySelector('#contatos-salvos .card-header p');
-                            headerCount.textContent = `${newCount} contato${newCount !== 1 ? 's' : ''} salvo${newCount !== 1 ? 's' : ''}`;
-                            
-                            if (newCount === 0) {
-                                document.querySelector('.contatos-list').parentElement.innerHTML += `
-                                    <div class="empty-state">
-                                        <div class="empty-icon"><i class="fas fa-address-book"></i></div>
-                                        <h3>Nenhum contato salvo</h3>
-                                        <p>Você ainda não salvou nenhum contato.</p>
-                                        <a href="/contatos/" class="btn-secondary">Explorar Contatos</a>
-                                    </div>`;
-                                document.querySelector('.contatos-list').remove();
-                            }
-                        }, 500);
-                        showToast('success', 'Contato removido com sucesso!');
-                    } else {
-                        item.classList.remove('removing');
-                        showToast('error', data.message || 'Erro ao remover contato');
+                    headers: { 
+                        'X-CSRFToken': getCookie('csrftoken'), 
+                        'Content-Type': 'application/json' 
                     }
                 })
-                .catch(error => {
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        setTimeout(() => {
+                            item.remove();
+                            updateCounter('contatos-salvos');
+                        }, 500);
+                        showToast('Contato Removido', 'Retirado da sua lista de favoritos.', 'info');
+                    } else {
+                        item.classList.remove('removing');
+                        showToast('Erro', data.message || 'Não foi possível remover o contato.', 'error');
+                    }
+                })
+                .catch(() => {
                     item.classList.remove('removing');
-                    showToast('error', 'Erro de conexão. Tente novamente.');
+                    showToast('Erro de Rede', 'Verifique sua conexão e tente novamente.', 'error');
                 });
             });
         }
 
-        // Função genérica para abrir/fechar accordion
+        /**
+         * Atualiza o contador de uma tab e exibe o estado de "vazio" se necessário.
+         */
+        function updateCounter(tabId) {
+            const tabBtn = document.querySelector(`[data-tab="${tabId}"]`);
+            const counter = tabBtn.querySelector('.tab-counter');
+            const listContainer = document.querySelector(`#${tabId} .duvidas-list, #${tabId} .contatos-list`);
+            
+            const newCount = Math.max(0, parseInt(counter.textContent) - 1);
+            counter.textContent = newCount;
+            
+            const headerCount = document.querySelector(`#${tabId} .card-header p`);
+            const itemName = tabId.includes('duvidas') ? 'dúvida' : 'contato';
+            headerCount.textContent = `${newCount} ${itemName}${newCount !== 1 ? 's' : ''} salvo${newCount !== 1 ? 's' : ''}`;
+            
+            if (newCount === 0 && listContainer) {
+                const emptyState = document.querySelector(`#${tabId} .empty-state`);
+                listContainer.remove();
+                if (emptyState) emptyState.style.display = 'block'; // Mostra se já existe, ou você pode recriar como antes
+            }
+        }
+        
+        /**
+         * Função genérica para abrir/fechar os acordeões.
+         */
         function toggleAccordion(itemElement) {
             const content = itemElement.querySelector('.duvida-content, .contato-detalhes');
             if (itemElement.classList.toggle('expanded')) {
@@ -1548,38 +1502,102 @@
             }
         }
 
-        function showToast(type, message) {
-            const toast = document.getElementById('toast');
-            const toastIcon = toast.querySelector('.toast-icon i');
-            const toastTitle = toast.querySelector('.toast-title');
-            const toastText = toast.querySelector('.toast-text');
-            const toastIconContainer = toast.querySelector('.toast-icon');
+        /**
+         * Exibe uma notificação toast moderna e customizada.
+         */
+        function showToast(title, message, type = 'info') {
+            const toastElement = document.getElementById('notificationToast');
+            if (!toastElement) return;
             
-            switch(type) {
-                case 'success':
-                    toastIcon.className = 'fas fa-check-circle';
-                    toastIconContainer.style.background = 'var(--success)';
-                    toastTitle.textContent = 'Sucesso';
-                    break;
-                case 'error':
-                    toastIcon.className = 'fas fa-exclamation-circle';
-                    toastIconContainer.style.background = 'var(--danger)';
-                    toastTitle.textContent = 'Erro';
-                    break;
-                default:
-                    toastIcon.className = 'fas fa-bell';
-                    toastIconContainer.style.background = 'var(--primary)';
-                    toastTitle.textContent = 'Notificação';
-            }
+            const toast = new bootstrap.Toast(toastElement, { delay: 5000 });
+            const toastIconArea = toastElement.querySelector('.toast-icon-area');
+            const toastIcon = toastElement.querySelector('#toastIcon');
+            const toastTitle = toastElement.querySelector('#toastTitle');
+            const toastBody = toastElement.querySelector('#toastBody');
+
+            const configs = {
+                success: { icon: 'fa-check-circle', colorClass: 'toast-success', defaultTitle: 'Sucesso!' },
+                error: { icon: 'fa-times-circle', colorClass: 'toast-error', defaultTitle: 'Erro!' },
+                info: { icon: 'fa-info-circle', colorClass: 'toast-info', defaultTitle: 'Informação' }
+            };
+            const config = configs[type] || configs.info;
             
-            toastText.textContent = message;
-            toast.classList.add('show');
-            setTimeout(hideToast, 4000);
+            toastTitle.textContent = title;
+            toastBody.textContent = message;
+            toastIcon.className = `fas ${config.icon}`;
+            toastIconArea.className = 'toast-icon-area d-flex align-items-center justify-content-center ' + config.colorClass;
+
+            toastElement.classList.add('animate__animated', 'animate__fadeInRight');
+            toast.show();
+
+            toastElement.addEventListener('hidden.bs.toast', () => {
+                toastElement.classList.remove('animate__animated', 'animate__fadeInRight');
+            }, { once: true });
         }
 
-        function hideToast() {
-            document.getElementById('toast').classList.remove('show');
+        /**
+         * Obtém o cookie CSRF para requisições seguras.
+         */
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
         }
+
+        // ===============================================
+        // EVENT LISTENERS (ANEXO DE EVENTOS)
+        // ===============================================
+
+        // Navegação por Tabs
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabId = this.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Acordeão de Dúvidas e Contatos
+        document.querySelectorAll('.duvida-header, .contato-header').forEach(header => {
+            header.addEventListener('click', (event) => {
+                if (!event.target.closest('.remove-btn')) {
+                    toggleAccordion(header.closest('.duvida-item, .contato-item'));
+                }
+            });
+        });
+
+        // Botões de Remover
+        document.querySelectorAll('.duvidas-list .remove-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                handleRemoveDuvida(btn.dataset.faqId, btn);
+            });
+        });
+        document.querySelectorAll('.contatos-list .remove-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                handleRemoveContato(btn.dataset.contatoId, btn);
+            });
+        });
+
+        // Eventos do Modal
+        confirmBtn.addEventListener('click', () => {
+            if (typeof onConfirmCallback === 'function') onConfirmCallback();
+            hideConfirmationModal();
+        });
+        cancelBtn.addEventListener('click', hideConfirmationModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) hideConfirmationModal(); });
     });
 </script>
 {% endblock %}
