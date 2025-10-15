@@ -622,6 +622,69 @@ def contatos(request):
     
     return render(request, 'core/contatos.html', context)
 
+@require_POST # Garante que esta view só aceite requisições POST
+def sugerir_contato(request):
+    """
+    Recebe os dados do formulário do modal de sugestão, cria um novo contato
+    e redireciona o usuário de volta para a página de contatos.
+    """
+    try:
+        # 1. Obter dados obrigatórios do formulário
+        nome = request.POST.get('nome')
+        categoria_id = request.POST.get('categoria')
+        telefone = request.POST.get('telefone')
+        cidade = request.POST.get('cidade')
+        estado = request.POST.get('estado')
+
+        # 2. Obter dados opcionais (com valores padrão vazios)
+        whatsapp = request.POST.get('whatsapp', '')
+        email = request.POST.get('email', '')
+        site = request.POST.get('site', '')
+        rua = request.POST.get('rua', '') # O campo foi nomeado 'rua' no modal
+        observacoes = request.POST.get('observacoes', '')
+        
+        # 3. Tratar checkboxes (só são enviados se marcados)
+        atendimento_presencial = 'atendimento_presencial' in request.POST
+        atendimento_online = 'atendimento_online' in request.POST
+
+        # 4. Validação simples para campos obrigatórios
+        if not all([nome, categoria_id, telefone, cidade, estado]):
+            messages.error(request, 'Erro: Todos os campos marcados com * são obrigatórios.')
+            return redirect('contatos')
+
+        # 5. Buscar a categoria e criar o novo contato
+        categoria = get_object_or_404(CategoriaContato, pk=categoria_id)
+        
+        # Cria a instância do novo contato
+        # Nota: Seu modelo atual não possui todos os campos do formulário (ex: site, whatsapp).
+        # Adicionei os que existem. Você precisará atualizar seu modelo Contato se quiser salvar todos.
+        novo_contato = Contato(
+            nome=nome,
+            categoria=categoria,
+            telefone=telefone,
+            whatsapp=whatsapp, # Adicione este campo ao seu models.py
+            email=email,       # Adicione este campo ao seu models.py
+            site=site,         # Adicione este campo ao seu models.py
+            cidade=cidade,
+            estado=estado,
+            rua=rua,
+            atendimento_presencial=atendimento_presencial,
+            atendimento_online=atendimento_online,
+            observacoes=observacoes,
+            horario_funcionamento="A ser confirmado" # Valor padrão
+        )
+        novo_contato.save()
+
+        messages.success(request, 'Sugestão enviada com sucesso! Agradecemos sua colaboração.')
+
+    except CategoriaContato.DoesNotExist:
+        messages.error(request, 'A categoria selecionada não é válida.')
+    except Exception as e:
+        # Para depuração, você pode querer registrar o erro 'e'
+        messages.error(request, 'Ocorreu um erro inesperado ao processar sua sugestão.')
+
+    return redirect('contatos')
+
 def detalhes_contato(request, id):
     """Exibe detalhes de um contato específico"""
     contato = Contato.objects.get(pk=id)

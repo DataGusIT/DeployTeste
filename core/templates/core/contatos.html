@@ -387,6 +387,114 @@
     </div>
 </div>
 
+<!-- =============================================================================
+   MODAL PARA SUGERIR CONTATO
+   ============================================================================= -->
+<div class="modal fade" id="sugerirContatoModal" tabindex="-1" aria-labelledby="sugerirContatoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sugerirContatoModalLabel">
+                    <i class="fas fa-plus-circle me-2"></i>Sugerir Novo Contato
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="sugestaoForm" action="{% url 'sugerir_contato' %}" method="POST">
+                    {% csrf_token %}
+                    <p class="form-description">
+                        Agradecemos sua colaboração! Preencha os campos abaixo com as informações que você conhece. Nossa equipe revisará a sugestão.
+                    </p>
+
+                    <div class="row g-3">
+                        <!-- Informações Essenciais -->
+                        <div class="col-12">
+                            <label for="sugestao-nome" class="form-label">Nome do Local ou Profissional <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="sugestao-nome" name="nome" placeholder="Ex: Clínica Crescer, Dr. João Silva" required>
+                        </div>
+                        <div class="col-12">
+                            <label for="sugestao-categoria" class="form-label">Categoria <span class="text-danger">*</span></label>
+                            <select class="form-select" id="sugestao-categoria" name="categoria" required>
+                                <option value="" disabled selected>Selecione a principal área de atuação</option>
+                                {% for categoria in categorias %}
+                                    <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Contato -->
+                        <div class="col-md-6">
+                            <label for="sugestao-telefone" class="form-label">Telefone <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" id="sugestao-telefone" name="telefone" placeholder="(00) 0000-0000" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="sugestao-whatsapp" class="form-label">WhatsApp (Opcional)</label>
+                            <input type="tel" class="form-control" id="sugestao-whatsapp" name="whatsapp" placeholder="(00) 90000-0000">
+                        </div>
+                         <div class="col-md-6">
+                            <label for="sugestao-email" class="form-label">E-mail (Opcional)</label>
+                            <input type="email" class="form-control" id="sugestao-email" name="email" placeholder="contato@exemplo.com">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="sugestao-site" class="form-label">Site ou Rede Social (Opcional)</label>
+                            <input type="url" class="form-control" id="sugestao-site" name="site" placeholder="https://www.instagram.com/perfil">
+                        </div>
+
+                        <!-- Endereço -->
+                        <div class="form-section-divider">
+                            <span>Localização</span>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="sugestao-cidade" class="form-label">Cidade <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="sugestao-cidade" name="cidade" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="sugestao-estado" class="form-label">Estado <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="sugestao-estado" name="estado" placeholder="Sigla, ex: SP" required>
+                        </div>
+                        <div class="col-12">
+                            <label for="sugestao-endereco" class="form-label">Endereço (Rua, Bairro - Opcional)</label>
+                            <input type="text" class="form-control" id="sugestao-endereco" name="rua" placeholder="Rua das Flores, 123 - Centro">
+                        </div>
+
+                        <!-- Detalhes Adicionais -->
+                        <div class="form-section-divider">
+                            <span>Detalhes Adicionais</span>
+                        </div>
+                         <div class="col-12">
+                            <label class="form-label">Tipo de Atendimento</label>
+                            <div class="d-flex flex-wrap gap-3">
+                                <div class="form-check custom-checkbox">
+                                    <input class="form-check-input" type="checkbox" value="True" id="sugestao-presencial" name="atendimento_presencial" checked>
+                                    <label class="form-check-label" for="sugestao-presencial">
+                                        <i class="fas fa-building"></i> Presencial
+                                    </label>
+                                </div>
+                                <div class="form-check custom-checkbox">
+                                    <input class="form-check-input" type="checkbox" value="True" id="sugestao-online" name="atendimento_online">
+                                    <label class="form-check-label" for="sugestao-online">
+                                        <i class="fas fa-laptop"></i> Online
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label for="sugestao-observacoes" class="form-label">Observações (Opcional)</label>
+                            <textarea class="form-control" id="sugestao-observacoes" name="observacoes" rows="3" placeholder="Algo mais que devamos saber? (Especialidades, convênios, etc.)"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary" form="sugestaoForm">
+                    <i class="fas fa-paper-plane me-2"></i>Enviar Sugestão
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -668,7 +776,6 @@ ESTRUTURA GERAL DO CSS
 */
 :root {
     --primary: #6A3EA1;
-    --primary-light: #8E44AD;
     --gradient-modern: linear-gradient(45deg, #6A3EA1, #8E44AD);
     --shadow-modern: 0 10px 40px -10px rgba(0, 0, 0, 0.2);
     --border-radius-lg: 20px;
@@ -1003,9 +1110,16 @@ ESTRUTURA GERAL DO CSS
 .cta-card {
     border-radius: var(--border-radius-lg);
     overflow: hidden;
-    background: var(--gradient-modern);
     position: relative;
     z-index: 1;
+    /* 
+       A MÁGICA ACONTECE AQUI:
+       1. A primeira imagem é o padrão de bolinhas.
+       2. A segunda é o seu gradiente roxo que fica por baixo.
+    */
+    background: 
+        url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='rgba(255,255,255,0.1)' fill-rule='evenodd'/%3E%3C/svg%3E"),
+        var(--gradient-modern);
 }
 
 /* 
@@ -1612,6 +1726,165 @@ ESTRUTURA GERAL DO CSS
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+}
+
+/* 
+===============================================================================
+12. MODAL DE SUGESTÃO DE CONTATO (VERSÃO FINAL)
+===============================================================================
+*/
+#sugerirContatoModal .modal-content {
+    border: none;
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    overflow: hidden;
+}
+
+#sugerirContatoModal .modal-header {
+    background-color: var(--primary-very-light, #f8f5fc);
+    border-bottom: 1px solid rgba(106, 62, 161, 0.1);
+    padding: 1rem 1.5rem;
+}
+
+#sugerirContatoModal .modal-title {
+    color: var(--primary-dark, #552A8A);
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+#sugerirContatoModal .modal-body {
+    padding: 1.5rem 2rem 2rem 2rem;
+}
+
+.form-description {
+    font-size: 0.95rem;
+    color: var(--gray-600, #6c757d);
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+#sugerirContatoModal .form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+#sugerirContatoModal .form-control,
+#sugerirContatoModal .form-select {
+    border-radius: 12px;
+    border: 1px solid #ced4da;
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease-in-out;
+}
+
+#sugerirContatoModal .form-control:focus,
+#sugerirContatoModal .form-select:focus {
+    border-color: var(--primary, #6A3EA1);
+    box-shadow: 0 0 0 3px rgba(106, 62, 161, 0.2);
+}
+
+.form-section-divider {
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid #e9ecef;
+    line-height: 0.1em;
+    margin: 2rem 0;
+}
+
+.form-section-divider span {
+    background: #fff;
+    padding: 0 15px;
+    font-weight: 500;
+    color: var(--gray-600, #6c757d);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.custom-checkbox .form-check-input {
+    display: none;
+}
+
+.custom-checkbox .form-check-label {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.6rem 1.2rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.custom-checkbox .form-check-label i {
+    margin-right: 0.6rem;
+    color: var(--gray-600, #6c757d);
+    transition: all 0.3s ease;
+}
+
+.custom-checkbox .form-check-input:checked + .form-check-label {
+    background-color: var(--primary-very-light, #f8f5fc);
+    border-color: var(--primary, #6A3EA1);
+    color: var(--primary-dark, #552A8A);
+}
+
+.custom-checkbox .form-check-input:checked + .form-check-label i {
+    color: var(--primary, #6A3EA1);
+}
+
+/* --- AJUSTE NO FOOTER --- */
+#sugerirContatoModal .modal-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: center; /* <<< MUDANÇA: Centraliza os botões */
+    gap: 0.75rem; /* Adiciona espaço entre os botões */
+}
+
+#sugerirContatoModal .modal-footer .btn {
+    border-radius: 50px;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    font-weight: 600;
+}
+
+#sugerirContatoModal .modal-footer .btn-primary {
+    background: var(--gradient-modern, linear-gradient(45deg, #6A3EA1, #8E44AD));
+    border: none;
+}
+
+#sugerirContatoModal .modal-footer .btn-outline-secondary {
+    border-width: 2px;
+}
+
+
+/* 
+===============================================================================
+13. AJUSTES RESPONSIVOS PARA O MODAL (MOBILE)
+===============================================================================
+*/
+@media (max-width: 576px) {
+    #sugerirContatoModal .modal-body {
+        padding: 1.5rem; /* Reduz o padding lateral */
+    }
+
+    /* Melhora a legibilidade do placeholder no mobile */
+    #sugerirContatoModal textarea::placeholder {
+        font-size: 0.9rem; /* Torna o texto do placeholder ligeiramente menor */
+    }
+
+    /* Empilha os botões na vertical para facilitar o toque */
+    #sugerirContatoModal .modal-footer {
+        flex-direction: column-reverse; /* Coloca o botão primário no topo */
+        gap: 0.5rem;
+    }
+    
+    #sugerirContatoModal .modal-footer .btn {
+        width: 100%; /* Faz os botões ocuparem a largura total */
     }
 }
 </style>

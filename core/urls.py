@@ -39,6 +39,7 @@ urlpatterns += [
 
 urlpatterns += [
     path('contatos/', views.contatos, name='contatos'),
+    path('contatos/sugerir/', views.sugerir_contato, name='sugerir_contato'),  # <-- ADICIONE ESTA LINHA
     path('contatos/<int:id>/', views.detalhes_contato, name='detalhes_contato'),
     path('salvar-contato/<int:contato_id>/', views.salvar_contato, name='salvar_contato'),
     path('remover-contato/<int:contato_id>/', views.remover_contato_salvo, name='remover_contato_salvo'),

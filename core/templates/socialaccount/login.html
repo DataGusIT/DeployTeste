@@ -11,25 +11,38 @@
             <!-- CARD DE AUTENTICAÇÃO MODERNIZADO -->
             <div class="auth-card animate__animated animate__fadeInUp">
                 
-                <!-- Ícone Proeminente -->
+                <!-- Ícone Proeminente com SVG Oficial -->
                 <div class="auth-icon">
-                    <i class="fab fa-google"></i>
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="google-logo-svg">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.42-4.55H24v8.51h12.8c-.57 2.76-2.26 5.23-4.78 6.81l7.68 5.95c4.52-4.18 7.27-10.24 7.27-17.72z"></path>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.82l-7.68-5.95c-2.18 1.45-4.94 2.3-8.21 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+                        <path fill="none" d="M0 0h48v48H0z"></path>
+                    </svg>
                 </div>
                 
                 <div class="auth-content">
                     <h1 class="auth-title">{% trans "Entrar via Google" %}</h1>
                     
                     {% if process == "connect" %}
-                        <p class="auth-text">{% blocktrans with provider.name as provider %}Você está prestes a conectar sua conta a um perfil <strong>{{ provider }}</strong>.{% endblocktrans %}</p>
+                        <p class="auth-text">{% blocktrans %}Você está prestes a conectar sua conta a um perfil <strong>Google</strong>.{% endblocktrans %}</p>
                     {% else %}
-                        <p class="auth-text">{% blocktrans with provider.name as provider %}Para continuar, confirme que deseja fazer login usando sua conta do <strong>{{ provider }}</strong>.{% endblocktrans %}</p>
+                        <p class="auth-text">{% blocktrans %}Para continuar, confirme que deseja fazer login usando sua conta do <strong>Google</strong>.{% endblocktrans %}</p>
                     {% endif %}
 
                     <form method="post">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-primary btn-lg mt-4 w-100">
-                            <i class="fab fa-google me-2"></i>
-                            Continuar e Confirmar
+                        <button type="submit" class="btn btn-social-confirm w-100 mt-4">
+                            <!-- Ícone SVG colorido oficial do Google -->
+                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="google-icon-btn">
+                                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.42-4.55H24v8.51h12.8c-.57 2.76-2.26 5.23-4.78 6.81l7.68 5.95c4.52-4.18 7.27-10.24 7.27-17.72z"></path>
+                                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.82l-7.68-5.95c-2.18 1.45-4.94 2.3-8.21 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+                                <path fill="none" d="M0 0h48v48H0z"></path>
+                            </svg>
+                            <span>Confirmar e Continuar</span>
                         </button>
                     </form>
                 </div>
@@ -48,37 +61,33 @@
 <style>
     .auth-card {
         background: white;
-        border-radius: 20px; /* Bordas mais arredondadas */
-        box-shadow: var(--card-shadow, 0 10px 40px rgba(0,0,0,0.1));
-        padding: 3rem;
+        border-radius: 24px; /* Aumentei para combinar com a imagem */
+        box-shadow: 0 15px 45px rgba(0,0,0,0.1);
+        padding: 3.5rem; /* Mais espaçamento interno */
         text-align: center;
         border: 1px solid var(--gray-200, #e9ecef);
-        overflow: hidden;
+        overflow: visible; /* Permite que o ícone 'flutue' para fora */
+        position: relative;
     }
 
    .auth-icon {
-        width: 80px;
-        height: 80px;
-        margin: 0 auto 2rem auto;
+        width: 90px;
+        height: 90px;
+        margin: -45px auto 2rem auto; /* Puxa o ícone para cima */
+        position: relative;
+        top: -30px; /* Mais ajuste para cima */
         border-radius: 50%;
-        /* 1. O fundo agora é branco, com uma borda sutil */
         background: white;
         border: 1px solid var(--gray-200, #e9ecef);
         display: flex;
         align-items: center;
         justify-content: center;
-        /* 2. A sombra é mais neutra */
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     }
-
-    .auth-icon i {
-        font-size: 2.5rem;
-        /* 3. A MÁGICA: Aplicamos um gradiente de cores diretamente ao ícone */
-        background: -webkit-linear-gradient(45deg, #4285F4, #DB4437, #F4B400, #0F9D58);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        /* Fallback para navegadores que não suportam a máscara de texto */
-        color: #4285F4;
+    
+    .google-logo-svg {
+        width: 45px;
+        height: 45px;
     }
 
     .auth-title {
@@ -92,21 +101,61 @@
         color: var(--gray-600, #6c757d);
         font-size: 1.1rem;
         line-height: 1.7;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .auth-text strong {
-        color: var(--primary-dark, #5b2e92);
+        color: var(--primary, #6a3ea1); /* Destaque com a cor primária */
         font-weight: 600;
     }
     
-    .btn-primary {
-        padding-top: 0.8rem;
-        padding-bottom: 0.8rem;
+   .auth-card .btn.btn-social-confirm {
+        /* Estilos do botão branco da tela de login */
+        height: 56px;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 14px;
+        
+        /* Propriedades visuais corretas */
+        background-color: #ffffff;
+        color: #3c4043; /* Cor de texto oficial do Google */
+        border: 1px solid #dadce0; /* Borda sutil oficial do Google */
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+
+        /* Propriedades de alinhamento */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px; /* Aumenta o espaço entre ícone e texto */
+        transition: var(--transition, all 0.3s ease);
     }
+
+    .auth-card .btn.btn-social-confirm:hover {
+        /* Efeito de hover sutil */
+        background-color: #f8f9fa;
+        border-color: #c6c6c6;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+        
+    .google-icon-btn {
+        /* Tamanho do ícone colorido */
+        width: 20px;
+        height: 20px;
+    }
+    
 
     @media (max-width: 576px) {
         .auth-card {
-            padding: 2rem 1.5rem;
+            padding: 2.5rem 1.5rem;
+        }
+        .auth-icon {
+            width: 80px;
+            height: 80px;
+            top: -20px;
+            margin-top: -40px;
         }
         .auth-title {
             font-size: 1.5rem;
