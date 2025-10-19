@@ -23,7 +23,7 @@
                                             <i class="fas fa-rocket fa-3x"></i>
                                         </div>
                                         <div class="display-4 fw-bold mb-3 welcome-text">Bem-vindo!</div>
-                                        <p class="lead opacity-85 mb-0">Acesse sua conta e continue sua jornada</p>
+                                        <p class="lead opacity-85 mb-0">Um espaço de apoio e informação ao seu alcance.</p>
                                     </div>
 
                                     
@@ -161,6 +161,7 @@
     </div>
 </div>
 
+
 <style>
     /* Variáveis CSS modernas */
     :root {
@@ -195,7 +196,8 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        /* OPACIDADE AUMENTADA DE 0.05 PARA 0.1 */
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
     }
 
     .brand-icon {
@@ -216,22 +218,6 @@
 
     .welcome-text {
         text-shadow: none;
-    }
-
-    .feature-benefits {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        align-items: flex-start;
-        max-width: 280px;
-        margin: 0 auto;
-    }
-
-    .benefit-item {
-        display: flex;
-        align-items: center;
-        opacity: 0.9;
-        font-size: 0.95rem;
     }
 
     /* Ícone para mobile */
@@ -368,39 +354,33 @@
     }
 
     .divider-modern span {
-        position: relative; /* <-- ADICIONE ESTA LINHA */
+        position: relative;
         background: white;
         padding: 0 20px;
     }
 
-    /* --- NOVO BOTÃO DE LOGIN COM GOOGLE --- */
+    /* Botão de login com Google */
     .btn-google-modern {
-        /* Copia as dimensões do botão principal para garantir a mesma largura */
         padding: 16px 24px;
         border-radius: 12px;
         font-weight: 600;
         font-size: 16px;
         text-decoration: none;
-        
-        /* Alinhamento do ícone e texto */
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 12px;
-
-        /* Estilo oficial do Google */
         background-color: #ffffff;
-        color: #3c4043; /* Cor de texto do Google */
+        color: #3c4043;
         border: 2px solid var(--border-color);
         box-shadow: var(--shadow-light);
-
         transition: all 0.3s ease;
     }
 
     .btn-google-modern:hover {
         transform: translateY(-2px);
         box-shadow: var(--shadow-medium);
-        border-color: #c6c6c6; /* Borda um pouco mais escura no hover */
+        border-color: #c6c6c6;
         background-color: #f8f9fa;
     }
 

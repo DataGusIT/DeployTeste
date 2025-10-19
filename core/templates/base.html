@@ -2,6 +2,7 @@
 <html lang="pt-br">
 
 <head>
+    <!-- <script src="https://cdn.userway.org/widget.js" data-account="zM164JKvYT"></script>  -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% if title %}{{ title }} - {% endif %}CentroEspectro</title>
@@ -39,6 +40,10 @@
             overflow: hidden;
         }
 
+         /* NOVO: Muda a cor do botão VLibras de azul para roxo */
+        div[vw-access-button] { /* Este é o seletor específico do botão */
+            filter: hue-rotate(40deg) !important; /* Valor corrigido para girar de azul para roxo */
+        }
 
         /* ================================================================== */
         /* HEADER & NAVEGAÇÃO DESKTOP (A partir de 992px) */
@@ -301,6 +306,8 @@
         }
         .footer-copyright { border-top: 1px solid #dee2e6; padding-top: 20px; font-size: 0.85rem; }
         .demo-content { height: 150vh; padding: 2rem; }
+
+        
     </style>
     
     {% block extra_css %}{% endblock %}
@@ -486,6 +493,20 @@
     {% endif %}
 
     {% block extra_js %}{% endblock %}
+
+    <!-- INÍCIO DO SCRIPT DO HAND TALK -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+    <!-- FIM DO SCRIPT DO HAND TALK -->
+    
 </body>
 
 </html>
