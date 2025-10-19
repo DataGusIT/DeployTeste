@@ -2,12 +2,12 @@
 {% load static %}
 
 {% block content %}
-<!-- Hero Section - Presumindo que você tenha essa seção em seu template original -->
+<!-- Hero Section -->
 <section class="hero-section">
     <div class="hero-overlay"></div>
     <div class="container position-relative">
         <div class="row min-vh-75 align-items-center py-5">
-            <div class="col-lg-6 animate__animated" data-animation="animate__fadeInLeft">
+            <div class="col-lg-6">
                 <span class="badge bg-white text-primary fs-6 mb-3 px-3 py-2">Projeto TCC</span>
                 <h1 class="display-4 fw-bold text-white mb-4">Apoio e informação para <span
                         class="highlight-text">Transtorno do Espectro Autista</span></h1>
@@ -23,7 +23,7 @@
                     </a>
                 </div>
             </div>
-            <div class="col-lg-6 d-flex justify-content-center animate__animated" data-animation="animate__fadeInRight">
+            <div class="col-lg-6 d-flex justify-content-center">
                 <div class="hero-image-container">
                     <img src="{% static 'img/testeIndex.png' %}"
                         alt="Crianças e professores em ambiente inclusivo" class="hero-image">
@@ -34,7 +34,7 @@
 </section>
 
 <!-- Statistics -->
-<section class="stats-section py-5">
+<section class="stats-section py-5 fade-in-section">
     <div class="container">
         <div class="stats-cards row justify-content-center">
             <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
@@ -86,7 +86,7 @@
 </section>
 
 <!-- Features Section -->
-<section id="recursos" class="features-section py-5">
+<section id="recursos" class="features-section py-5 fade-in-section">
     <div class="container">
         <div class="section-header text-center mb-5">
             <span class="section-subtitle">O que você vai encontrar aqui</span>
@@ -98,24 +98,8 @@
         </div>
 
         <div class="row g-4">
-            <!-- Feature Card 1
-            <div class="col-lg-4 col-md-6 animate__animated" data-animation="animate__fadeInUp">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-tools"></i>
-                    </div>
-                    <h3 class="feature-title">Dicas e Estratégias</h3>
-                    <p class="feature-description">
-                        Dicas simples e práticas para o dia a dia, como lidar com situações específicas e apoiar melhor nossos alunos.
-                    </p>
-                    <a href="#" class="feature-link">
-                        Ver dicas <i class="fas fa-arrow-right ms-1"></i>
-                    </a>
-                </div>
-            </div> -->
-
             <!-- Feature Card 2 -->
-            <div class="col-lg-4 col-md-6 animate__animated" data-animation="animate__fadeInUp" data-delay="200">
+            <div class="col-lg-4 col-md-6 fade-in-section">
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-book-reader"></i>
@@ -131,7 +115,7 @@
             </div>
 
             <!-- Feature Card 3 -->
-            <div class="col-lg-4 col-md-6 animate__animated" data-animation="animate__fadeInUp" data-delay="400">
+            <div class="col-lg-4 col-md-6 fade-in-section">
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-question-circle"></i>
@@ -145,41 +129,9 @@
                     </a>
                 </div>
             </div>
-
-            <!-- Feature Card 4
-            <div class="col-lg-4 col-md-6 animate__animated" data-animation="animate__fadeInUp">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-comments"></i>
-                    </div>
-                    <h3 class="feature-title">Comunicação</h3>
-                    <p class="feature-description">
-                        Como se comunicar melhor com alunos autistas, usando gestos, imagens e palavras que funcionam.
-                    </p>
-                    <a href="#" class="feature-link">
-                        Ver dicas <i class="fas fa-arrow-right ms-1"></i>
-                    </a>
-                </div>
-            </div> -->
-
-            <!-- Feature Card 5
-            <div class="col-lg-4 col-md-6 animate__animated" data-animation="animate__fadeInUp" data-delay="200">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-address-book"></i>
-                    </div>
-                    <h3 class="feature-title">Quando Pedir Ajuda</h3>
-                    <p class="feature-description">
-                        Orientações sobre quando chamar a coordenação, professores ou outros profissionais para ajudar.
-                    </p>
-                    <a href="#" class="feature-link">
-                        Ver orientações <i class="fas fa-arrow-right ms-1"></i>
-                    </a>
-                </div>
-            </div> -->
-
+            
              <!-- Feature Card 6 -->
-            <div class="col-lg-4 col-md-6 animate__animated" data-animation="animate__fadeInUp" data-delay="200">
+            <div class="col-lg-4 col-md-6 fade-in-section">
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-address-book"></i>
@@ -199,29 +151,24 @@
 </section>
 
 <!-- About Section -->
-<section class="about-section py-5 mt-4">
+<section class="about-section py-5 mt-4 fade-in-section">
     <div class="container">
         <div class="row align-items-center">
-            <div class="col-lg-6 mb-4 mb-lg-0 order-lg-2 animate__animated" data-animation="animate__fadeInRight">
-                <!-- Adicionamos a classe text-center aqui -->
+            <div class="col-lg-6 mb-4 mb-lg-0 order-lg-2">
                 <div class="section-header text-center mb-4">
                     <span class="section-subtitle">Sobre este projeto</span>
                     <h2 class="section-title">Feito pensando em vocês</h2>
                     <div class="section-divider"></div>
                 </div>
-
-                <!-- Os parágrafos continuam como estavam, sem a centralização -->
                 <p>Este projeto de TCC foi desenvolvido para apoiar os funcionários sobre o autismo e no acolhimento dos alunos.</p>
                 <p>A proposta nasceu da necessidade de reunir, em um único espaço, informações simples, práticas e acessíveis sobre os alunos autistas, sem complicações.</p>
-
-                <!-- Adicionamos a classe text-center também na div do botão -->
                 <div class="mt-4 text-center">
                     <a href="#" class="btn btn-primary">
                         Conhecer mais sobre o projeto
                     </a>
                 </div>
             </div>
-            <div class="col-lg-6 text-center order-lg-1 animate__animated" data-animation="animate__fadeInLeft">
+            <div class="col-lg-6 text-center order-lg-1">
                 <div class="about-image-container">
                     <img src="{% static 'img/testeProf (11).png' %}" alt="Equipe da escola trabalhando juntos"
                         class="about-image img-fluid">
@@ -232,37 +179,17 @@
     </div>
 </section>
 
-<!-- CTA Section
-<section class="cta-section">
-    <div class="container">
-        <div class="cta-wrapper">
-            <div class="row align-items-center">
-                <div class="col-lg-7 mb-4 mb-lg-0">
-                    <h2 class="cta-title">Vamos trabalhar juntos por uma escola mais inclusiva</h2>
-                    <p class="cta-text">Explore as dicas e informações que preparamos para ajudar vocês no dia a dia com nossos alunos autistas.</p>
-                </div>
-                <div class="col-lg-5 text-lg-end text-center">
-                    <a href="{% url 'ferramentas' %}" class="btn btn-light btn-lg">Ver dicas agora</a>
-                    <a href="{% url 'contatos' %}" class="btn btn-outline-light btn-lg ms-2">Preciso de ajuda</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section> -->
-
 <!-- Recent Updates -->
-<section class="updates-section py-5">
+<section class="updates-section py-5 fade-in-section">
     <div class="container">
         <div class="section-header text-center mb-5">
             <span class="section-subtitle">Novidades</span>
             <h2 class="section-title">Últimas informações adicionadas</h2>
             <div class="section-divider"></div>
         </div>
-
-        <!-- A classe justify-content-center foi adicionada aqui -->
         <div class="row justify-content-center">
             <!-- Update Card 1 -->
-            <div class="col-lg-4 col-md-6 mb-4">
+            <div class="col-lg-4 col-md-6 mb-4 fade-in-section">
                 <div class="update-card">
                     <div class="update-image">
                         <img src="{% static 'img/update1.jpeg' %}" alt="Ponto de interrogação simbolizando dúvidas" class="img-fluid">
@@ -276,9 +203,8 @@
                     </div>
                 </div>
             </div>
-
             <!-- Update Card 2 -->
-            <div class="col-lg-4 col-md-6 mb-4">
+            <div class="col-lg-4 col-md-6 mb-4 fade-in-section">
                 <div class="update-card">
                     <div class="update-image">
                         <img src="{% static 'img/update2.jpeg' %}" alt="Agenda de contatos simbolizando rede de apoio" class="img-fluid">
@@ -292,19 +218,15 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Update Card 3 foi removido -->
-            
         </div>
-
-        <div class="text-center mt-4">
+        <div class="text-center mt-4 fade-in-section">
             <a href="#" class="btn btn-outline-primary">Ver todas as informações</a>
         </div>
     </div>
 </section>
 
 <!-- Newsletter -->
-<section class="newsletter-section py-5">
+<section class="newsletter-section py-5 fade-in-section">
     <div class="container">
         <div class="newsletter-wrapper">
             <div class="row">

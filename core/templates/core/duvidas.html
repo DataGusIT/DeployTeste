@@ -14,10 +14,11 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-12 text-center">
-                <h1 class="display-4 fw-bold mb-4 animate__animated animate__fadeInUp">
+                <!-- REMOVIDO: Classes de animação antigas -->
+                <h1 class="display-4 fw-bold mb-4">
                     Dúvidas Frequentes
                 </h1>
-                <p class="lead mb-4 animate__animated animate__fadeInUp animate__delay-1s">
+                <p class="lead mb-4">
                     Aqui você encontra respostas para as perguntas mais comuns sobre o Transtorno do Espectro Autista
                 </p>
             </div>
@@ -27,12 +28,12 @@
 
 <!-- =============================================================================
    SEÇÃO PRINCIPAL - CONTEÚDO FAQ
-   ============================================================================= #} -->
+   ============================================================================= -->
 <section class="py-5">
     <div class="container">
         
-        <!-- Formulário de pesquisa -->
-        <div class="row justify-content-center mb-5">
+        <!-- Formulário de pesquisa com a nova animação -->
+        <div class="row justify-content-center mb-5 fade-in-section">
             <div class="col-lg-8 text-center">
                 <div class="section-subtitle">Encontre respostas</div>
                 <h2 class="section-title">O que você precisa saber sobre o autismo</h2>
@@ -49,14 +50,8 @@
                         </form>
                     </div>
                 </div>
-                <!-- ========================================================== -->
-                <!--          FILTROS DE CATEGORIA (NOVO BLOCO)                 -->
-                <!-- ========================================================== -->
                 {% if categorias_com_pagina %}
-                    <!-- NOVO: Contêiner-pai para o carrossel e as setas -->
                     <div class="category-carousel-wrapper">
-                        
-                        <!-- O contêiner que já existia -->
                         <div class="category-filters-container mb-5">
                             <div class="category-filters">
                                 {% for item in categorias_com_pagina %}
@@ -70,39 +65,31 @@
                                 {% endfor %}
                             </div>
                         </div>
-
-                        <!-- NOVO: Botões de navegação do carrossel -->
                         <button type="button" class="carousel-arrow prev" aria-label="Anterior">
                             <i class="fas fa-chevron-left"></i>
                         </button>
                         <button type="button" class="carousel-arrow next" aria-label="Próximo">
                             <i class="fas fa-chevron-right"></i>
                         </button>
-
                     </div>
                 {% endif %}
-                <!-- ========================================================== -->
-                <!--                  FIM DO NOVO BLOCO                         -->
-                <!-- ========================================================== -->
             </div>
         </div>
 
         {% if faqs_por_categoria_paginada %}
-            <!-- ACORDEÕES DE FAQ POR CATEGORIA -->
             <div class="row">
                 <div class="col-lg-10 mx-auto">
                     {% for categoria, dados in faqs_por_categoria_paginada.items %}
                         {% with faqs_page_obj=dados.faqs_page_obj query_param_name=dados.query_param_name %}
                             
                             {% if faqs_page_obj %}
-                                <div class="mb-5" id="{{ categoria.nome|lower|slugify }}">
-                                    <!-- Cabeçalho da categoria -->
+                                <!-- ADICIONADO: A classe .fade-in-section é aplicada em cada bloco de categoria -->
+                                <div class="mb-5 fade-in-section" id="{{ categoria.nome|lower|slugify }}">
                                     <div class="d-flex align-items-center mb-4">
                                         <div class="feature-icon me-3"><i class="{{ categoria.icone }}"></i></div>
                                         <h3 class="feature-title mb-0">{{ categoria.nome }}</h3>
                                     </div>
 
-                                    <!-- Acordeão -->
                                     <div class="accordion shadow-sm" id="accordion-{{ categoria.id }}">
                                         {% for faq in faqs_page_obj %}
                                             <div class="accordion-item border-0 mb-3 rounded-3 overflow-hidden">
@@ -134,14 +121,12 @@
                                                                 </a>
                                                             </div>
                                                         {% endif %}
-
                                                     </div>
                                                 </div>
                                             </div>
                                         {% endfor %}
                                     </div>
 
-                                    <!-- PAGINAÇÃO DAS DÚVIDAS (ANINHADA) -->
                                     {% if faqs_page_obj.paginator.num_pages > 1 %}
                                     <nav aria-label="Navegação de dúvidas para {{ categoria.nome }}" class="mt-4">
                                         <ul class="pagination pagination-sm justify-content-center">
@@ -172,26 +157,19 @@
                 </div>
             </div>
 
-            <!-- =============================================================================
-            PAGINAÇÃO PRINCIPAL DAS CATEGORIAS (COM CLASSES ATUALIZADAS)
-            ============================================================================= -->
             {% if page_obj.has_other_pages %}
-            <nav aria-label="Navegação das páginas de categorias" class="mt-5">
+            <!-- ADICIONADO: Animação na Paginação Principal -->
+            <nav aria-label="Navegação das páginas de categorias" class="mt-5 fade-in-section">
                 <ul class="pagination justify-content-center">
                     {% if page_obj.has_previous %}
-                        {# Adicionamos a classe 'main-pagination-item' aqui #}
                         <li class="page-item main-pagination-item">
                             <a class="page-link" href="?{% query_transform page=page_obj.previous_page_number %}">&laquo; Categorias Anteriores</a>
                         </li>
                     {% endif %}
-                    
-                    {# E aqui também #}
                     <li class="page-item main-pagination-item disabled">
                         <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
                     </li>
-                    
                     {% if page_obj.has_next %}
-                        {# E finalmente aqui #}
                         <li class="page-item main-pagination-item">
                             <a class="page-link" href="?{% query_transform page=page_obj.next_page_number %}">Próximas Categorias &raquo;</a>
                         </li>
@@ -201,10 +179,10 @@
             {% endif %}
         
         {% else %}
-            <!-- MENSAGEM QUANDO NÃO HÁ RESULTADOS -->
             <div class="row">
                 <div class="col-lg-8 mx-auto text-center">
-                    <div class="alert alert-info p-4 shadow-sm rounded-3">
+                    <!-- ADICIONADO: Animação na mensagem de "sem resultados" -->
+                    <div class="alert alert-info p-4 shadow-sm rounded-3 fade-in-section">
                         <i class="fas fa-info-circle fa-2x mb-3"></i>
                         <h4>Nenhuma informação encontrada</h4>
                         <p class="mb-0">
@@ -215,100 +193,8 @@
                 </div>
             </div>
         {% endif %}
-        
-        <!-- CALL TO ACTION 
-        <div class="row mt-5">
-            <div class="col-lg-10 mx-auto">
-                <div class="card border-0 shadow-sm" style="background: linear-gradient(45deg, var(--primary) 0%, var(--primary-light) 100%); border-radius: 16px;">
-                    <div class="card-body p-5 text-white">
-                        <div class="row align-items-center">
-                            <div class="col-lg-8"><h3 class="mb-3">Ainda tem dúvidas?</h3><p class="mb-lg-0">Se você não encontrou a resposta que procura, entre em contato com nossa equipe. Estamos aqui para ajudar.</p></div>
-                            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0"><a href="{% url 'contatos' %}" class="btn btn-light btn-lg"><i class="fas fa-envelope me-2"></i> Fale Conosco</a></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div> -->
     </div>
 </section>
-<!-- =============================================================================
-   SEÇÃO DE RECURSOS ADICIONAIS
-   ============================================================================= 
-<section class="py-5 bg-light">
-    <div class="container">
-        
-        {# Cabeçalho da seção #}
-        <div class="row justify-content-center mb-5">
-            <div class="col-lg-8 text-center">
-                <div class="section-subtitle">Explore</div>
-                <h2 class="section-title">O que você pode encontrar aqui</h2>
-                <div class="section-divider"></div>
-                <p class="section-description">
-                    Um espaço simples para conhecer mais sobre o autismo e encontrar informações úteis
-                </p>
-            </div>
-        </div>
-
-        {# Cards de recursos #}
-        <div class="row">
-            
-            {# Card 1 - Informações básicas #}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 border-0 shadow-sm feature-card">
-                    <div class="card-body p-4 text-center">
-                        <div class="feature-icon">
-                            <i class="fas fa-lightbulb"></i>
-                        </div>
-                        <h4 class="feature-title">Informações básicas</h4>
-                        <p class="feature-description">
-                            Conteúdo introdutório sobre autismo, características e dicas simples do dia a dia
-                        </p>
-                        <a href="#" class="feature-link">
-                            Saiba mais <i class="fas fa-arrow-right ms-2"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            {# Card 2 - Atividades práticas #}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 border-0 shadow-sm feature-card">
-                    <div class="card-body p-4 text-center">
-                        <div class="feature-icon">
-                            <i class="fas fa-gamepad"></i>
-                        </div>
-                        <h4 class="feature-title">Atividades práticas</h4>
-                        <p class="feature-description">
-                            Ideias de jogos, brincadeiras e exercícios que podem ajudar no desenvolvimento
-                        </p>
-                        <a href="{% url 'ferramentas' %}" class="feature-link">
-                            Ver atividades <i class="fas fa-arrow-right ms-2"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            {# Card 3 - Apoio e orientação #}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 border-0 shadow-sm feature-card">
-                    <div class="card-body p-4 text-center">
-                        <div class="feature-icon">
-                            <i class="fas fa-heart"></i>
-                        </div>
-                        <h4 class="feature-title">Apoio e orientação</h4>
-                        <p class="feature-description">
-                            Dicas para funcionários e informações sobre onde buscar ajuda profissional
-                        </p>
-                        <a href="#" class="feature-link">
-                            Acessar <i class="fas fa-arrow-right ms-2"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section> -->
-
 <!-- =============================================================================
    MODAL DE LOGIN MODERNO - VERSÃO REFATORADA
    ============================================================================= -->
@@ -658,17 +544,12 @@
     // =============================================================================
     document.addEventListener('DOMContentLoaded', function () {
         // Inicializa todas as funcionalidades
-        enhanceAccordionAnimations();
         highlightSearchTerms();
         initCategoryFilterScrolling();
         smoothScrollToHashOnLoad();
         initCategoryCarouselControls();
 
-        // Animações de entrada para os itens da FAQ
-        document.querySelectorAll('.accordion-item').forEach((item, index) => {
-            item.classList.add('animate__animated', 'animate__fadeInUp');
-            item.style.animationDelay = `${index * 0.05}s`;
-        });
+        
     });
 </script>
 {% endblock %}
@@ -843,9 +724,6 @@
 }
 
 /* Animação para o corpo do accordion */
-.accordion-body.animate__fadeIn {
-    animation-duration: 0.6s;
-}
 
 /* ==================================
    ESTILO ELEGANTE PARA FONTE DA FAQ

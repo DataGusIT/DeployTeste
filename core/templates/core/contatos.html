@@ -12,14 +12,15 @@
     <div class="container py-4">
         <div class="row align-items-center">
             <div class="col-lg-8 mx-auto text-center">
-                <h1 class="fw-bold display-5 mb-3 animate__animated animate__fadeInUp">
+                <!-- REMOVIDO: classes de animação antigas -->
+                <h1 class="fw-bold display-5 mb-3">
                     Rede de Apoio Especializada em Autismo
                 </h1>
-                <p class="lead mb-4 animate__animated animate__fadeInUp animate__delay-1s">
+                <p class="lead mb-4">
                     Conecte-se com profissionais, instituições e grupos de apoio dedicados ao atendimento e suporte para
                     pessoas com TEA e suas famílias.
                 </p>
-                <div class="d-flex justify-content-center gap-3 animate__animated animate__fadeInUp animate__delay-2s">
+                <div class="d-flex justify-content-center gap-3">
                     <a href="#contatos-section" class="btn btn-light btn-lg px-4">
                         <i class="fas fa-address-book me-2"></i>Ver contatos
                     </a>
@@ -35,12 +36,11 @@
 <!-- ================================== -->
 <!-- SEÇÃO FILTROS - REESTILIZADA     -->
 <!-- ================================== -->
-<section id="filtro-section" class="py-5 bg-light">
+<!-- ADICIONADO: classe .fade-in-section -->
+<section id="filtro-section" class="py-5 bg-light fade-in-section">
     <div class="container">
-        <!-- Estrutura de layout para centralizar o card -->
         <div class="row justify-content-center">
             <div class="col-lg-10 col-xl-9">
-                <!-- O NOVO CARD DE FILTRO -->
                 <div class="filter-card">
                     <div class="filter-card-header">
                         <h5 class="mb-0"><i class="fas fa-filter me-2 text-primary"></i>Encontre o apoio que você precisa</h5>
@@ -54,7 +54,6 @@
                                 <label for="filtro-categoria" class="form-label">Tipo de contato</label>
                                 <select id="filtro-categoria" class="form-select">
                                     <option value="todos" selected>Todas as categorias</option>
-                                    {# Assumindo que você passa 'categorias' para o template #}
                                     {% for categoria in categorias %}
                                     <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
                                     {% endfor %}
@@ -84,7 +83,8 @@
 <!--     FILTROS DE CATEGORIA (VERSÃO CARROSSEL COM SETAS)      -->
 <!-- ========================================================== -->
 {% if categorias_com_pagina %}
-    <div class="category-carousel-wrapper">
+    <!-- ADICIONADO: classe .fade-in-section -->
+    <div class="category-carousel-wrapper fade-in-section">
         <div class="category-filters-container">
             <div class="category-filters">
                 {% for item in categorias_com_pagina %}
@@ -113,7 +113,8 @@
 <!-- ================================== -->
 <section id="contatos-section" class="py-5">
     <div class="container">
-        <div class="row mb-5">
+        <!-- ADICIONADO: classe .fade-in-section -->
+        <div class="row mb-5 fade-in-section">
             <div class="col-lg-8 mx-auto text-center">
                 <div class="section-subtitle">Nossa rede de apoio</div>
                 <h2 class="section-title">Contatos Especializados</h2>
@@ -125,36 +126,27 @@
             </div>
         </div>
 
-        {# Verificação se há algum conteúdo para mostrar #}
         {% if contatos_por_categoria_paginada %}
-            
-            {# Loop principal pelas categorias da página #}
             {% for categoria, dados in contatos_por_categoria_paginada.items %}
                 {% with contatos_page_obj=dados.contatos_page_obj query_param_name=dados.query_param_name %}
-
-                    {# Só exibe a categoria se ela tiver contatos nesta página #}
                     {% if contatos_page_obj %}
-                        <div class="contato-category mb-5" id="{{ categoria.nome|lower|slugify }}">
+                        <!-- ADICIONADO: classe .fade-in-section em cada categoria -->
+                        <div class="contato-category mb-5 fade-in-section" id="{{ categoria.nome|lower|slugify }}">
                             <div class="category-header">
                                 <div class="category-icon">
                                     <i class="{{ categoria.icone }} text-primary fs-3"></i>
                                 </div>
                                 <h3 class="mb-0">{{ categoria.nome }}</h3>
                             </div>
-
                             <div class="row g-4">
-                                {# Loop pelos contatos DA PÁGINA DE CONTATOS ATUAL #}
                                 {% for contato in contatos_page_obj %}
+                                    <!-- A animação agora vem do pai (.contato-category) -->
                                     <div class="col-md-6 col-lg-4 contato-item">
                                         <div class="card h-100 border-0 shadow-sm hover-card">
-                                            
                                             <div class="card-img-top position-relative">
-                                                {# Verificamos o novo campo 'imagem_url' #}
                                                 {% if contato.imagem_url %}
-                                                    {# Usamos diretamente o 'imagem_url', sem o .url no final #}
                                                     <img src="{{ contato.imagem_url }}" alt="{{ contato.nome }}" class="img-fluid rounded-top" style="height: 200px; width: 100%; object-fit: cover;">
                                                 {% else %}
-                                                    {# O 'else' para a imagem padrão continua perfeito #}
                                                     <img src="{% static 'img/default-contact.jpg' %}" alt="{{ contato.nome }}" class="img-fluid rounded-top" style="height: 200px; width: 100%; object-fit: cover;">
                                                 {% endif %}
                                                 
@@ -172,7 +164,6 @@
                                                     <span class="badge bg-primary">{{ contato.categoria.nome }}</span>
                                                 </div>
                                             </div>
-                                            
                                             <div class="card-body">
                                                 <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="card-title mb-0">{{ contato.nome }}</h5></div>
                                                 <p class="card-text text-muted mb-3">{{ contato.descricao|truncatechars:80 }}</p>
@@ -204,10 +195,6 @@
                                 {% endfor %}
                             </div>
 
-                            <!-- ============================================= -->
-                            <!--      PAGINAÇÃO DOS CONTATOS (ANINHADA)      -->
-                            <!-- ============================================= -->
-                            <!-- PAGINAÇÃO DOS CONTATOS (ANINHADA) - VERSÃO CORRIGIDA -->
                             {% if contatos_page_obj.paginator.num_pages > 1 %}
                             <nav aria-label="Navegação de contatos para {{ categoria.nome }}" class="mt-4">
                                 <ul class="pagination pagination-sm justify-content-center">
@@ -218,7 +205,6 @@
                                     {% else %}
                                         <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1">&laquo;</a></li>
                                     {% endif %}
-
                                     {% for i in contatos_page_obj.paginator.page_range %}
                                         {% if contatos_page_obj.number == i %}
                                             <li class="page-item active"><span class="page-link">{{ i }}</span></li>
@@ -226,7 +212,6 @@
                                             <li class="page-item"><a class="page-link" href="?{% build_query query_param_name i %}">{{ i }}</a></li>
                                         {% endif %}
                                     {% endfor %}
-
                                     {% if contatos_page_obj.has_next %}
                                         <li class="page-item">
                                             <a class="page-link" href="?{% build_query query_param_name contatos_page_obj.next_page_number %}">&raquo;</a>
@@ -237,32 +222,24 @@
                                 </ul>
                             </nav>
                             {% endif %}
-                            <!-- ============================================= -->
                         </div>
                     {% endif %}
                 {% endwith %}
             {% endfor %}
 
-            <!-- =============================================================================
-            PAGINAÇÃO PRINCIPAL DAS CATEGORIAS (COM CLASSES ATUALIZADAS)
-            ============================================================================= -->
             {% if page_obj.has_other_pages %}
-            <nav aria-label="Navegação das páginas de categorias" class="mt-5">
+            <!-- ADICIONADO: classe .fade-in-section -->
+            <nav aria-label="Navegação das páginas de categorias" class="mt-5 fade-in-section">
                 <ul class="pagination justify-content-center">
                     {% if page_obj.has_previous %}
-                        {# Adicionamos a classe 'main-pagination-item' aqui #}
                         <li class="page-item main-pagination-item">
                             <a class="page-link" href="?{% query_transform page=page_obj.previous_page_number %}">&laquo; Categorias Anteriores</a>
                         </li>
                     {% endif %}
-                    
-                    {# E aqui também #}
                     <li class="page-item main-pagination-item disabled">
                         <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
                     </li>
-                    
                     {% if page_obj.has_next %}
-                        {# E finalmente aqui #}
                         <li class="page-item main-pagination-item">
                             <a class="page-link" href="?{% query_transform page=page_obj.next_page_number %}">Próximas Categorias &raquo;</a>
                         </li>
@@ -274,7 +251,8 @@
         {% else %}
             <div class="row">
                 <div class="col-lg-8 mx-auto text-center">
-                    <div class="alert alert-info p-4 shadow-sm rounded-3">
+                    <!-- ADICIONADO: classe .fade-in-section -->
+                    <div class="alert alert-info p-4 shadow-sm rounded-3 fade-in-section">
                         <i class="fas fa-info-circle fa-2x mb-3"></i>
                         <h4>Nenhum contato encontrado</h4>
                         <p class="mb-0">
@@ -285,7 +263,8 @@
             </div>
         {% endif %}
 
-        <div class="row mt-5">
+        <!-- ADICIONADO: classe .fade-in-section -->
+        <div class="row mt-5 fade-in-section">
             <div class="col-lg-8 mx-auto">
                 <div class="card cta-card border-0 shadow">
                     <div class="card-body p-5 text-center text-white">
@@ -1273,45 +1252,6 @@ ESTRUTURA GERAL DO CSS
     background: rgba(106, 62, 161, 0.05);
 }
 
-/* 
-===============================================================================
-7. ANIMAÇÕES
-===============================================================================
-*/
-
-/* Animação de Entrada */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Animação de Pulso */
-@keyframes pulse-modern {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
-}
-
-/* Aplicação das Animações */
-.contato-item {
-    animation: fadeInUp 0.6s ease forwards;
-    opacity: 0;
-}
-
-.contato-item:nth-child(2) { animation-delay: 0.1s; }
-.contato-item:nth-child(3) { animation-delay: 0.2s; }
-.contato-item:nth-child(4) { animation-delay: 0.3s; }
-.contato-item:nth-child(5) { animation-delay: 0.4s; }
-.contato-item:nth-child(6) { animation-delay: 0.5s; }
 
 /* 
 ===============================================================================

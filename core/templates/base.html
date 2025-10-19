@@ -437,6 +437,28 @@
                 });
             });
 
+            const animatedSections = document.querySelectorAll('.fade-in-section');
+
+            if (!animatedSections.length) {
+                return;
+            }
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target); // Para a observação após a primeira animação
+                    }
+                });
+            }, {
+                root: null, // observa a viewport
+                threshold: 0.1 // aciona quando 10% do elemento está visível
+            });
+
+            animatedSections.forEach(section => {
+                observer.observe(section);
+            });
+
             // SCRIPT DO BOTÃO "VOLTAR AO TOPO"
             const backToTopBtn = $('#back-to-top');
             $(window).scroll(function () {
