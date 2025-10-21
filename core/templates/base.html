@@ -117,6 +117,14 @@
             margin-right: 0.5rem;
         }
 
+        .logo-img {
+            height: 70px; 
+            width: auto;
+            margin-right: 8px;
+            /* ADICIONE ESTAS DUAS LINHAS: */
+            margin-top: -12px;  /* Puxa o conteúdo abaixo para cima */
+            margin-bottom: -12px; /* Puxa o header para baixo */
+        }
 
         /* ================================================================== */
         /* BOTÃO HAMBÚRGUER (ÍCONE DO MENU MOBILE) */
@@ -317,8 +325,8 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-light sticky-top">
             <div class="container">
-                <a class="navbar-brand d-flex align-items:center" href="{% url 'index' %}">
-                    <i class="fas fa-puzzle-piece logo-icon"></i>
+                <a class="navbar-brand d-flex align-items-center" href="{% url 'index' %}">
+                    <img src="{% static 'img/favicon.png' %}" alt="Logo CentroEspectro" class="logo-img">
                     <span>CentroEspectro</span>
                 </a>
                 
@@ -391,7 +399,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-logo">
-                    <i class="fas fa-puzzle-piece logo-icon"></i>
+                    <img src="{% static 'img/favicon.png' %}" alt="Logo CentroEspectro" class="logo-img">
                     <span>CentroEspectro</span>
                 </div>
                 <p class="footer-description">Ferramenta de apoio para alunos autistas de uma escola municipal.</p>
