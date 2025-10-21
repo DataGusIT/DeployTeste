@@ -2,17 +2,59 @@
 {% load static %}
 
 {% block content %}
+
+<!-- Adicionando um bloco de estilo para os novos botões -->
+<style>
+    /* Estilo base para os novos botões de ação */
+    .btn-action-custom {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%; /* Deixa o botão perfeitamente circular */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        border: none; /* Remove a borda padrão */
+    }
+
+    /* Estilo do botão de Editar */
+    .btn-action-edit {
+        color: var(--primary); /* Cor do ícone */
+        background-color: transparent;
+    }
+    .btn-action-edit:hover {
+        background-color: var(--primary-very-light); /* Fundo suave ao passar o mouse */
+        color: var(--primary);
+    }
+
+    /* Estilo do botão de Apagar */
+    .btn-action-delete {
+        color: var(--danger); /* Cor do ícone */
+        background-color: transparent;
+    }
+    .btn-action-delete:hover {
+        background-color: var(--danger-light); /* Fundo suave ao passar o mouse */
+        color: var(--danger);
+    }
+
+    /* Garante que o ícone dentro do avatar do professor esteja perfeitamente centralizado */
+    .testimonial-avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
 <section class="container py-5 animate-fade-up">
 
     <!-- CABEÇALHO DA PÁGINA -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5">
         <div>
-            <!-- Subtítulo e Título seguindo o padrão do seu site -->
             <span class="section-subtitle">{{ aluno.nome_completo }}</span>
             <h1 class="section-title mb-0">Detalhes e Relatórios</h1>
         </div>
         <div class="mt-3 mt-md-0 d-flex justify-content-start">
-            <!-- Botões de Ação com o estilo do seu site.css -->
             <a href="{% url 'area_professor' %}" class="btn btn-outline-primary me-2">
                 <i class="fas fa-arrow-left me-2"></i> Voltar
             </a>
@@ -49,10 +91,6 @@
                 <i class="fas fa-file-medical text-primary fa-lg me-3 mt-1"></i>
                 <div>
                     <strong class="text-dark">Laudo Médico:</strong><br>
-                    
-                    <!-- ================================== -->
-                    <!--     CORREÇÃO APLICADA AQUI       -->
-                    <!-- ================================== -->
                     {% if aluno.laudo_url %}
                         <a href="{{ aluno.laudo_url }}" target="_blank" class="feature-link">
                             Visualizar Laudo <i class="fas fa-external-link-alt ms-1"></i>
@@ -60,8 +98,6 @@
                     {% else %}
                         <span class="text-muted">Nenhum laudo cadastrado</span>
                     {% endif %}
-                    <!-- FIM DA CORREÇÃO -->
-
                 </div>
             </div>
         </div>
@@ -81,28 +117,26 @@
                     </span>
                 </div>
                 
-                {% if relatorio.professor == user.customuser %}
-                    <!-- Se o professor logado for o autor, mostra os botões de ação -->
-                    <div class="d-flex align-items-center" style="gap: 0.5rem;">
+                {% if relatorio.professor == user %}
+                    <div class="d-flex align-items-center" style="gap: 0.25rem;">
                         
                         <!-- ================================== -->
-                        <!--     MUDANÇA: BOTÕES ESTILIZADOS    -->
+                        <!--   BOTÕES COM ESTILO ATUALIZADO     -->
                         <!-- ================================== -->
                         <a href="{% url 'editar_relatorio' relatorio.id %}" 
-                           class="btn btn-sm btn-outline-primary btn-action-icon" 
+                           class="btn-action-custom btn-action-edit" 
                            data-tooltip="Editar Relatório">
-                            <i class="fas fa-pencil-alt"></i>
+                            <i class="fas fa-pencil-alt fa-fw"></i>
                         </a>
                         <a href="{% url 'apagar_relatorio' relatorio.id %}" 
-                           class="btn btn-sm btn-outline-danger btn-action-icon" 
+                           class="btn-action-custom btn-action-delete" 
                            data-tooltip="Apagar Relatório">
-                            <i class="fas fa-trash-alt"></i>
+                            <i class="fas fa-trash-alt fa-fw"></i>
                         </a>
                         <!-- FIM DA MUDANÇA -->
 
                     </div>
                 {% else %}
-                    <!-- Senão, mostra o ícone de citação padrão -->
                     <div class="testimonial-quote">
                         <i class="fas fa-quote-right"></i>
                     </div>
@@ -111,7 +145,10 @@
             </div>
             <p class="testimonial-text mt-3" style="white-space: pre-wrap;">{{ relatorio.relato }}</p>
             <div class="testimonial-author">
-                <div class="testimonial-avatar" style="background-color: var(--primary-very-light); display: flex; align-items-center; justify-content: center;">
+                <!-- ================================== -->
+                <!--       AVATAR CENTRALIZADO          -->
+                <!-- ================================== -->
+                <div class="testimonial-avatar" style="background-color: var(--primary-very-light);">
                     <i class="fas fa-user-tie" style="font-size: 22px; color: var(--primary);"></i>
                 </div>
                 <div class="testimonial-info">

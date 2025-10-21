@@ -138,7 +138,7 @@ def adicionar_relatorio(request, aluno_id):
         if form.is_valid():
             relatorio = form.save(commit=False)
             relatorio.aluno = aluno
-            relatorio.professor = request.user.customuser # Associa o CustomUser do professor logado
+            relatorio.professor = request.user # Associa o CustomUser do professor logado
             relatorio.save()
             messages.success(request, f'Relatório para {aluno.nome_completo} salvo com sucesso!')
             return redirect('detalhes_aluno', aluno_id=aluno.id)
@@ -161,7 +161,7 @@ def editar_relatorio(request, relatorio_id):
     aluno = relatorio.aluno
 
     # Verificação de segurança: Apenas o autor pode editar.
-    if relatorio.professor != request.user.customuser:
+    if relatorio.professor != request.user:
         messages.error(request, 'Você não tem permissão para editar este relatório.')
         return redirect('detalhes_aluno', aluno_id=aluno.id)
 
@@ -191,7 +191,7 @@ def apagar_relatorio(request, relatorio_id):
     aluno = relatorio.aluno
 
     # Verificação de segurança: Apenas o autor pode apagar.
-    if relatorio.professor != request.user.customuser:
+    if relatorio.professor != request.user:
         messages.error(request, 'Você não tem permissão para apagar este relatório.')
         return redirect('detalhes_aluno', aluno_id=aluno.id)
 
