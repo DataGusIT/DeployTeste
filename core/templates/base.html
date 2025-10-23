@@ -79,42 +79,46 @@
             font-size: 1.1rem;
         }
 
-        /* --- ESTILOS ATUALIZADOS PARA OS BOTÕES DE LOGIN E CADASTRO (DESKTOP) --- */
-        .navbar-nav .nav-item a.nav-link.login-btn {
-            padding: 0.6rem 1.5rem !important;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            border: 2px solid rgba(106, 62, 161, 0.25); /* Contorno sutil */
-            background-color: transparent !important;
-        }
-        .navbar-nav .nav-item a.nav-link.login-btn:hover {
-             color: var(--primary) !important;
-             background-color: rgba(106, 62, 161, 0.08);
-             border-color: var(--primary); /* Contorno mais forte no hover */
-        }
-
-        .navbar-nav .nav-item .btn-cadastro {
-            background-color: var(--primary);
-            color: white !important;
-            padding: 0.6rem 1.5rem;
-            border-radius: 8px;
+        /* ================================================================== */
+        /*     BOTÕES DE NAVEGAÇÃO MODERNOS (LOGIN & CADASTRO) - DESKTOP      */
+        /* ================================================================== */
+        .navbar-nav .nav-item a.login-btn,
+        .navbar-nav .nav-item a.btn-cadastro {
+            padding: 0.65rem 1.6rem !important; /* Aumenta o padding para um toque mais premium */
+            border-radius: 12px; /* Bordas mais suaves e modernas */
             font-weight: 500;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(106, 62, 161, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid var(--primary); /* Borda da mesma cor do fundo para alinhamento */
+            letter-spacing: 0.5px; /* Leve espaçamento entre as letras */
         }
-        .navbar-nav .nav-item .btn-cadastro:hover {
-            background-color: var(--primary-dark);
-            border-color: var(--primary-dark); /* Borda acompanha a cor do fundo no hover */
+
+        /* Botão "Entrar" (Secundário) */
+        .navbar-nav .nav-item a.login-btn {
+            border: 2px solid var(--primary-very-light); /* Borda muito sutil */
+            background-color: var(--primary-very-light) !important;
+            color: var(--primary) !important;
+        }
+
+        .navbar-nav .nav-item a.login-btn:hover {
+            border-color: var(--primary); /* Borda fica forte no hover */
+            background-color: transparent !important;
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(106, 62, 161, 0.3);
         }
-         .navbar-nav .nav-item .btn-cadastro i {
-            font-size: 1.1em;
-            margin-right: 0.5rem;
+
+        /* Botão "Cadastrar" (Primário) */
+        .navbar-nav .nav-item a.btn-cadastro {
+            background: linear-gradient(45deg, var(--primary) 30%, var(--primary-light) 90%);
+            color: white !important;
+            border: 2px solid transparent; /* Borda transparente para manter o alinhamento */
+            box-shadow: 0 4px 15px rgba(106, 62, 161, 0.2);
+        }
+
+        .navbar-nav .nav-item a.btn-cadastro:hover {
+            background: linear-gradient(45deg, var(--primary-dark) 30%, var(--primary) 90%);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(106, 62, 161, 0.3); /* Sombra mais pronunciada */
         }
 
         .logo-img {
@@ -169,41 +173,46 @@
             }
             .nav-icon { display: none; } 
             
-            /* --- NOVOS ESTILOS PARA OS BOTÕES NO MENU MOBILE --- */
-            .navbar-nav:last-child {
-                gap: 1rem; /* Espaçamento entre os botões */
-                margin-top: 1.5rem; /* Espaço acima dos botões */
+             .navbar-nav:last-child {
+                gap: 1rem;
+                margin-top: 1.5rem;
             }
-            .navbar-nav:last-child .nav-item a {
+
+            .navbar-nav:last-child .nav-item a.login-btn,
+            .navbar-nav:last-child .nav-item a.btn-cadastro {
                 padding: 0.8rem 1.5rem !important;
                 font-size: 1.1rem !important;
                 font-weight: 500 !important;
-                border-radius: 8px;
+                border-radius: 12px; /* Consistência com o desktop */
                 transition: all 0.3s ease-in-out;
-                display: flex;
-                align-items: center;
-                justify-content: center;
                 width: 100%;
             }
+
+            /* Botão "Entrar" Mobile */
             .navbar-nav:last-child .login-btn {
                 border: 2px solid var(--primary) !important;
                 background-color: transparent !important;
                 color: var(--primary) !important;
             }
+
             .navbar-nav:last-child .login-btn:hover {
                 background-color: var(--primary) !important;
                 color: white !important;
             }
+            
+            /* Botão "Cadastrar" Mobile */
             .navbar-nav:last-child .btn-cadastro {
                 border: 2px solid var(--primary) !important;
-                background-color: var(--primary) !important;
+                background: var(--primary) !important;
                 color: white !important;
             }
+
             .navbar-nav:last-child .btn-cadastro:hover {
                 background: var(--primary-dark) !important;
                 border-color: var(--primary-dark) !important;
                 transform: translateY(-2px);
             }
+        }
             
             /* --- ESTILOS PARA DROPDOWN MOBILE --- */
             .nav-item.dropdown {
@@ -372,9 +381,8 @@
                             </ul>
                         </li>
                         {% else %}
-                        <!-- Ícone adicionado aqui -->
-                        <li class="nav-item"><a class="nav-link login-btn {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}"><i class="fas fa-sign-in-alt me-2"></i>Entrar</a></li>
-                        <li class="nav-item"><a class="btn btn-cadastro ms-lg-2" href="{% url 'register' %}"><i class="fas fa-user-plus"></i>Cadastrar</a></li>
+                        <li class="nav-item"><a class="nav-link login-btn {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}"><i class="fas fa-arrow-right-to-bracket me-2"></i>Entrar</a></li>
+                        <li class="nav-item"><a class="btn btn-cadastro ms-lg-2" href="{% url 'register' %}"><i class="fas fa-user-plus me-2"></i>Cadastrar</a></li>
                         {% endif %}
                     </ul>
                 </div>
