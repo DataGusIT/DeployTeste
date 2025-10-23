@@ -24,6 +24,43 @@ $(document).ready(function () {
     if ($(window).scrollTop() > 300) {
         backToTopBtn.addClass('show');
     }
+
+    // ================================= //
+    //          LÓGICA DO BANNER DE COOKIES
+    // ================================= //
+
+    // Função para buscar um cookie específico pelo nome
+    function getCookie(name) {
+        let cookieArr = document.cookie.split(";");
+        for (let i = 0; i < cookieArr.length; i++) {
+            let cookiePair = cookieArr[i].split("=");
+            if (name == cookiePair[0].trim()) {
+                return decodeURIComponent(cookiePair[1]);
+            }
+        }
+        return null;
+    }
+
+    // Seleciona os elementos do banner
+    const cookieBanner = $('#cookie-banner');
+    const acceptBtn = $('#cookie-accept-btn');
+
+    // Verifica se o cookie 'cookie_consent' NÃO existe
+    if (!getCookie('cookie_consent')) {
+        // Se não existir, mostra o banner adicionando a classe 'show'
+        cookieBanner.addClass('show');
+    }
+
+    // Adiciona um evento de clique ao botão de aceitar
+    acceptBtn.on('click', function () {
+        // Define o cookie para expirar em 1 ano (365 dias)
+        let expiryDate = new Date();
+        expiryDate.setDate(expiryDate.getDate() + 365);
+        document.cookie = "cookie_consent=true; expires=" + expiryDate.toUTCString() + "; path=/";
+
+        // Esconde o banner removendo a classe 'show'
+        cookieBanner.removeClass('show');
+    });
 });
 
 $(document).ready(function () {
@@ -63,6 +100,7 @@ function animateOnScroll() {
 $(window).scroll(animateOnScroll);
 $(document).ready(animateOnScroll);
 
+
 // static/js/main.js
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -84,3 +122,4 @@ document.addEventListener("DOMContentLoaded", function () {
         observer.observe(element);
     });
 });
+
