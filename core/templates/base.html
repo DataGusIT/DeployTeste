@@ -30,6 +30,7 @@
             --gray-700: #4a5568;
             --text-dark: #2d3748;
             --danger-red: #e53e3e;
+            --primary-very-light: #f3effa; /* Adicionada para os botões */
         }
 
         body {
@@ -40,37 +41,60 @@
             overflow: hidden;
         }
 
-         /* NOVO: Muda a cor do botão VLibras de azul para roxo */
-        div[vw-access-button] { /* Este é o seletor específico do botão */
-            filter: hue-rotate(40deg) !important; /* Valor corrigido para girar de azul para roxo */
+         /* Muda a cor do botão VLibras de azul para roxo */
+        div[vw-access-button] {
+            filter: hue-rotate(40deg) !important;
         }
 
         /* ================================================================== */
-        /* HEADER & NAVEGAÇÃO DESKTOP (A partir de 992px) */
+        /* HEADER & NAVEGAÇÃO DESKTOP (A PARTIR DE 992px) - VERSÃO CORRIGIDA */
         /* ================================================================== */
         .navbar {
             background-color: #fff;
             box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
-            padding: 0.7rem 0;
+            padding: 0.5rem 0;
+            min-height: 75px;
             z-index: 1030;
+            transition: all 0.3s ease;
         }
+
         .navbar .container {
-            display: flex; align-items: center; justify-content: space-between;
+            display: flex;
+            align-items: center; /* Alinhamento vertical centralizado */
+            justify-content: space-between;
         }
+
         .navbar-brand {
-            font-weight: 700; font-size: 1.4rem; color: var(--primary) !important;
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--primary) !important;
         }
-        .navbar-brand .logo-icon {
-            color: var(--primary); margin-right: 0.5rem; font-size: 1.8rem;
+
+        /* CORREÇÃO: Definição única e correta para o logo, sem margens negativas */
+        .logo-img {
+            height: 45px;
+            width: auto;
+            margin-right: 0.5rem;
         }
+
         .nav-link {
-            color: var(--gray-700) !important; font-weight: 500; padding: 0.7rem 1rem !important; transition: all 0.3s ease; border-radius: 6px; display: flex; align-items: center;
+            color: var(--gray-700) !important;
+            font-weight: 500;
+            padding: 0.7rem 1rem !important;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
         }
+
         .nav-link:hover {
-            color: var(--primary) !important; background-color: rgba(106, 62, 161, 0.04);
+            color: var(--primary) !important;
+            background-color: rgba(106, 62, 161, 0.04);
         }
+
         .nav-link.active {
-            color: var(--primary) !important; background-color: rgba(106, 62, 161, 0.08);
+            color: var(--primary) !important;
+            background-color: rgba(106, 62, 161, 0.08);
         }
         
         .nav-icon {
@@ -79,55 +103,51 @@
             font-size: 1.1rem;
         }
 
+        /* CORREÇÃO: Garante o alinhamento dos grupos de links no desktop */
+        @media (min-width: 992px) {
+            .navbar-collapse {
+                align-items: center;
+            }
+        }
+
         /* ================================================================== */
         /*     BOTÕES DE NAVEGAÇÃO MODERNOS (LOGIN & CADASTRO) - DESKTOP      */
         /* ================================================================== */
         .navbar-nav .nav-item a.login-btn,
         .navbar-nav .nav-item a.btn-cadastro {
-            padding: 0.65rem 1.6rem !important; /* Aumenta o padding para um toque mais premium */
-            border-radius: 12px; /* Bordas mais suaves e modernas */
+            padding: 0.65rem 1.6rem !important;
+            border-radius: 12px;
             font-weight: 500;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            letter-spacing: 0.5px; /* Leve espaçamento entre as letras */
+            letter-spacing: 0.5px;
         }
 
-        /* Botão "Entrar" (Secundário) */
         .navbar-nav .nav-item a.login-btn {
-            border: 2px solid var(--primary-very-light); /* Borda muito sutil */
+            border: 2px solid var(--primary-very-light);
             background-color: var(--primary-very-light) !important;
             color: var(--primary) !important;
         }
 
         .navbar-nav .nav-item a.login-btn:hover {
-            border-color: var(--primary); /* Borda fica forte no hover */
+            border-color: var(--primary);
             background-color: transparent !important;
             transform: translateY(-2px);
         }
 
-        /* Botão "Cadastrar" (Primário) */
         .navbar-nav .nav-item a.btn-cadastro {
             background: linear-gradient(45deg, var(--primary) 30%, var(--primary-light) 90%);
             color: white !important;
-            border: 2px solid transparent; /* Borda transparente para manter o alinhamento */
+            border: 2px solid transparent;
             box-shadow: 0 4px 15px rgba(106, 62, 161, 0.2);
         }
 
         .navbar-nav .nav-item a.btn-cadastro:hover {
             background: linear-gradient(45deg, var(--primary-dark) 30%, var(--primary) 90%);
             transform: translateY(-2px);
-            box-shadow: 0 7px 20px rgba(106, 62, 161, 0.3); /* Sombra mais pronunciada */
-        }
-
-        .logo-img {
-            height: 55px; 
-            width: auto;
-            margin-right: 1px;
-            /* ADICIONE ESTAS DUAS LINHAS: */
-            margin-top: -15px;  /* Puxa o conteúdo abaixo para cima */
-            margin-bottom: -19px; /* Puxa o header para baixo */
+            box-shadow: 0 7px 20px rgba(106, 62, 161, 0.3);
         }
 
         /* ================================================================== */
@@ -149,22 +169,61 @@
         body.menu-open .hamburger span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
 
         /* ================================================================== */
-        /* NOVO MENU OVERLAY RESPONSIVO (Até 991.98px) */
+        /* NOVO MENU OVERLAY RESPONSIVO (Até 991.98px) - VERSÃO CORRIGIDA */
         /* ================================================================== */
         @media (max-width: 991.98px) {
             .navbar-collapse {
-                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #ffffff; z-index: 1045; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 2rem; /* Aumentado o gap geral */ opacity: 0; visibility: hidden; transform: scale(0.98); transition: opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), visibility 0.3s; will-change: transform, opacity;
+                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+                background-color: #ffffff; 
+                z-index: 1045; 
+                display: flex; flex-direction: column; justify-content: center; align-items: center; 
+                gap: 2rem; 
+                
+                /* Animação do Overlay */
+                opacity: 0; 
+                visibility: hidden; 
+                transform: translateY(-100%); /* Começa fora da tela, no topo */
+                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, visibility 0.4s;
+                will-change: transform, opacity;
             }
+
             .navbar-collapse:not(.show) { display: none; }
+            
             body.menu-open .navbar-collapse {
-                opacity: 1; visibility: visible; transform: scale(1); display: flex;
+                opacity: 1; 
+                visibility: visible; 
+                transform: translateY(0); /* Desliza para a posição final */
+                display: flex;
             }
+
             .navbar-nav {
                 list-style: none; padding-left: 0; margin: 0 !important; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
             }
+            
+            /* Estado inicial dos itens do menu (antes da animação) */
             .nav-item {
                 width: 100%; max-width: 320px; text-align: center;
+                opacity: 0;
+                transform: translateY(15px);
+                transition: opacity 0.3s ease-out, transform 0.3s ease-out;
             }
+
+            /* Estado final dos itens do menu (depois da animação) com atraso (stagger) */
+            body.menu-open .nav-item {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            
+            /* Atraso para cada item aparecer em sequência */
+            body.menu-open .navbar-nav.mx-auto .nav-item:nth-child(1) { transition-delay: 0.15s; }
+            body.menu-open .navbar-nav.mx-auto .nav-item:nth-child(2) { transition-delay: 0.25s; }
+            body.menu-open .navbar-nav.mx-auto .nav-item:nth-child(3) { transition-delay: 0.35s; }
+            
+            /* Atraso para os botões de login/usuário */
+            body.menu-open .navbar-nav:not(.mx-auto) .nav-item:nth-child(1) { transition-delay: 0.45s; }
+            body.menu-open .navbar-nav:not(.mx-auto) .nav-item:nth-child(2) { transition-delay: 0.55s; }
+
+
             .navbar-nav.mx-auto .nav-link {
                 font-size: 1.5rem !important; font-weight: 500 !important; color: var(--text-dark) !important; justify-content: center;
             }
@@ -173,7 +232,7 @@
             }
             .nav-icon { display: none; } 
             
-             .navbar-nav:last-child {
+            .navbar-nav:last-child {
                 gap: 1rem;
                 margin-top: 1.5rem;
             }
@@ -183,12 +242,11 @@
                 padding: 0.8rem 1.5rem !important;
                 font-size: 1.1rem !important;
                 font-weight: 500 !important;
-                border-radius: 12px; /* Consistência com o desktop */
+                border-radius: 12px;
                 transition: all 0.3s ease-in-out;
                 width: 100%;
             }
 
-            /* Botão "Entrar" Mobile */
             .navbar-nav:last-child .login-btn {
                 border: 2px solid var(--primary) !important;
                 background-color: transparent !important;
@@ -200,7 +258,6 @@
                 color: white !important;
             }
             
-            /* Botão "Cadastrar" Mobile */
             .navbar-nav:last-child .btn-cadastro {
                 border: 2px solid var(--primary) !important;
                 background: var(--primary) !important;
@@ -212,9 +269,7 @@
                 border-color: var(--primary-dark) !important;
                 transform: translateY(-2px);
             }
-        }
-            
-            /* --- ESTILOS PARA DROPDOWN MOBILE --- */
+
             .nav-item.dropdown {
                 display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
             }
@@ -245,8 +300,19 @@
         @media (min-width: 992px) {
             .nav-icon { display: inline-block; }
             .nav-item.dropdown { position: relative; }
-            .dropdown-toggle { background: rgba(106, 62, 161, 0.04); border-radius: 20px; padding: 0.6rem 1.2rem !important; font-weight: 500; border: 1px solid rgba(106, 62, 161, 0.08); }
-            .dropdown-toggle:hover { background: rgba(106, 62, 161, 0.08); transform: translateY(-1px); }
+            .dropdown-toggle { 
+                background: rgba(106, 62, 161, 0.04);
+                border-radius: 25px;
+                padding: 0.7rem 1.2rem !important; /* Padding ajustado para alinhamento */
+                font-weight: 500; 
+                border: 1px solid transparent;
+                transition: all 0.2s ease-in-out;
+            }
+            .dropdown-toggle:hover { 
+                background: rgba(106, 62, 161, 0.08); 
+                border-color: rgba(106, 62, 161, 0.1);
+                transform: translateY(-1px); 
+            }
             .dropdown-toggle::after { margin-left: 0.8rem; border-top: 3px solid; transition: transform 0.3s ease; }
             .dropdown-toggle[aria-expanded="true"]::after { transform: rotate(180deg); }
             .dropdown-menu { background: white; border: 1px solid rgba(106, 62, 161, 0.08); border-radius: 10px; box-shadow: 0 8px 25px rgba(106, 62, 161, 0.08); padding: 0.5rem 0; margin-top: 0.5rem; min-width: 200px; }
@@ -264,42 +330,24 @@
         .btn-primary { background: linear-gradient(45deg, var(--primary) 30%, var(--primary-light) 90%); border: none; box-shadow: 0 4px 10px rgba(106, 62, 161, 0.2); }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(106, 62, 161, 0.3); }
         
-        /* --- BOTÃO BACK TO TOP MELHORADO --- */
         @keyframes bounceArrow {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-4px); }
         }
         .back-to-top {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
+            position: fixed; bottom: 25px; right: 25px; width: 50px; height: 50px; border-radius: 50%;
             background: linear-gradient(45deg, var(--primary), var(--primary-light));
-            color: white;
-            border: none;
-            box-shadow: 0 5px 20px rgba(106, 62, 161, 0.3);
-            z-index: 1000;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(20px) scale(0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
+            color: white; border: none; box-shadow: 0 5px 20px rgba(106, 62, 161, 0.3);
+            z-index: 1000; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            opacity: 0; visibility: hidden; transform: translateY(20px) scale(0.9);
+            display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
         }
         .back-to-top.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0) scale(1);
+            opacity: 1; visibility: visible; transform: translateY(0) scale(1);
         }
         .back-to-top:hover {
             background: linear-gradient(45deg, var(--primary-dark), var(--primary));
-            transform: translateY(-4px) scale(1.05);
-            box-shadow: 0 8px 25px rgba(106, 62, 161, 0.4);
+            transform: translateY(-4px) scale(1.05); box-shadow: 0 8px 25px rgba(106, 62, 161, 0.4);
         }
         .back-to-top i {
             animation: bounceArrow 1.5s infinite ease-in-out;
@@ -311,20 +359,11 @@
         .footer-logo .logo-icon { color: var(--primary); margin-right: 10px; font-size: 1.5rem; }
         .footer-logo span { font-size: 1.3rem; font-weight: 600; }
         .footer-description { max-width: 600px; margin: 0 auto 25px auto; }
-        
-        .footer-links {
-            margin-bottom: 25px;
-        }
-        .footer-links a {
-            display: block; color: #6c757d; text-decoration: none; margin: 8px 0; font-size: 0.95rem; transition: color 0.3s ease;
-        }
-        .footer-links a:hover {
-            color: var(--primary);
-        }
+        .footer-links { margin-bottom: 25px; }
+        .footer-links a { display: block; color: #6c757d; text-decoration: none; margin: 8px 0; font-size: 0.95rem; transition: color 0.3s ease; }
+        .footer-links a:hover { color: var(--primary); }
         .footer-copyright { border-top: 1px solid #dee2e6; padding-top: 20px; font-size: 0.85rem; }
         .demo-content { height: 150vh; padding: 2rem; }
-
-        
     </style>
     
     {% block extra_css %}{% endblock %}
@@ -455,7 +494,8 @@
             const navLinks = document.querySelectorAll('.navbar-collapse a');
 
             if (navbarCollapse) {
-                navbarCollapse.classList.add('show');
+                // Remove a classe .show por padrão para evitar que o menu mobile apareça brevemente ao carregar
+                // navbarCollapse.classList.add('show'); 
             }
 
             function toggleMenu() {
@@ -475,27 +515,25 @@
                 });
             });
 
+            // SCRIPT PARA ANIMAÇÃO DE ENTRADA
             const animatedSections = document.querySelectorAll('.fade-in-section');
-
-            if (!animatedSections.length) {
-                return;
-            }
-
-            const observer = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target); // Para a observação após a primeira animação
-                    }
+            if (animatedSections.length) {
+                const observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    root: null,
+                    threshold: 0.1
                 });
-            }, {
-                root: null, // observa a viewport
-                threshold: 0.1 // aciona quando 10% do elemento está visível
-            });
 
-            animatedSections.forEach(section => {
-                observer.observe(section);
-            });
+                animatedSections.forEach(section => {
+                    observer.observe(section);
+                });
+            }
 
             // SCRIPT DO BOTÃO "VOLTAR AO TOPO"
             const backToTopBtn = $('#back-to-top');

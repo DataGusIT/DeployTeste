@@ -172,18 +172,22 @@
                     <h4 class="card-title text-primary mb-4">
                         <i class="fas fa-map-marked-alt me-2"></i>Localização
                     </h4>
+
                     <div class="map-container mb-3">
                         <iframe 
-                            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBokTpGg0E16-NMOa-UJqVJ_EaJFQRN7xE&q={{ contato.endereco_para_maps|urlencode }}"
-                            width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" 
+                            src="https://www.google.com/maps?q={{ contato.endereco_para_maps|urlencode }}&output=embed"
+                            width="100%" height="300" style="border:0;" 
+                            allowfullscreen="" loading="lazy"
                             referrerpolicy="no-referrer-when-downgrade">
                         </iframe>
                     </div>
+
                     <p class="text-muted mb-0">
                         <i class="fas fa-map-marker-alt me-2 text-primary"></i>
                         {{ contato.endereco_completo }}
                     </p>
                 </div>
+
             </div>
 
             <!-- Sidebar -->
