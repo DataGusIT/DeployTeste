@@ -72,9 +72,11 @@
 
         /* CORREÇÃO: Definição única e correta para o logo, sem margens negativas */
         .logo-img {
-            height: 45px;
+            height: 65px;
             width: auto;
-            margin-right: 0.5rem;
+            margin-top: -15px;  /* Puxa o conteúdo abaixo para cima */
+            margin-bottom: -19px; /* Puxa o header para baixo */
+            margin-right: 1px;
         }
 
         .nav-link {
@@ -171,29 +173,44 @@
         /* ================================================================== */
         /* NOVO MENU OVERLAY RESPONSIVO (Até 991.98px) - VERSÃO CORRIGIDA */
         /* ================================================================== */
-        @media (max-width: 991.98px) {
+         @media (max-width: 991.98px) {
+            /* 
+             * CORREÇÃO PRINCIPAL:
+             * Forçamos o .navbar-collapse a sempre usar 'display: flex'.
+             * Em vez de 'display: none', controlamos a visibilidade com 'opacity' e 'visibility'.
+             * Isso garante que o elemento exista no DOM para que a transição possa ser aplicada.
+            */
             .navbar-collapse {
                 position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
                 background-color: #ffffff; 
                 z-index: 1045; 
-                display: flex; flex-direction: column; justify-content: center; align-items: center; 
+                
+                /* Força o display e o alinhamento */
+                display: flex !important; 
+                flex-direction: column; 
+                justify-content: center; 
+                align-items: center; 
                 gap: 2rem; 
                 
-                /* Animação do Overlay */
+                /* Estado inicial (escondido) para a animação */
                 opacity: 0; 
                 visibility: hidden; 
-                transform: translateY(-100%); /* Começa fora da tela, no topo */
-                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, visibility 0.4s;
+                pointer-events: none; /* Impede cliques quando invisível */
+                transform: scale(0.98) translateY(-10px); /* Efeito suave de entrada */
+                
+                /* A transição que será aplicada ao abrir E fechar */
+                transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease, visibility 0.35s;
                 will-change: transform, opacity;
             }
 
-            .navbar-collapse:not(.show) { display: none; }
+            /* Removemos a regra :not(.show) que causava o desaparecimento abrupto */
             
+            /* Quando o menu está aberto (body.menu-open) */
             body.menu-open .navbar-collapse {
                 opacity: 1; 
                 visibility: visible; 
-                transform: translateY(0); /* Desliza para a posição final */
-                display: flex;
+                pointer-events: auto; /* Permite cliques */
+                transform: scale(1) translateY(0); /* Estado final da animação */
             }
 
             .navbar-nav {
@@ -295,7 +312,7 @@
             .dropdown-item-logout:hover { color: var(--danger-red) !important; }
             .dropdown-item-logout:hover i { color: var(--danger-red); }
         }
-        
+
         /* Dropdown de Usuário (Desktop) */
         @media (min-width: 992px) {
             .nav-icon { display: inline-block; }
