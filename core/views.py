@@ -10,6 +10,8 @@ from .models import (
     FAQ, CategoriaFAQ, CategoriaContato, CategoriaFerramenta, 
     Contato, Ferramenta, CustomUser, UserDownload, UserSavedFAQ, UserSavedContato, Aluno, RelatorioDesempenho, Turma
 )
+from django.conf import settings
+
 
 from collections import defaultdict, OrderedDict
 from django.views.decorators.csrf import csrf_protect
@@ -281,11 +283,68 @@ def privacy(request):
     return render(request, 'core/privacy.html', {'title': 'Privacy Policy'})
 
 def newsletter_signup(request):
-    """Cadastro de newsletter"""
+    """
+    Cadastra um e-mail na lista do Mailchimp.
+    """
     if request.method == "POST":
         email = request.POST.get('email')
-        # Aqui você pode adicionar lógica para salvar o e-mail na sua lista de newsletter
-        return HttpResponse(f"Obrigado por se inscrever! Seu e-mail: {email}")
+        if not email:
+            messages.error(request, 'Por favor, forneça um e-mail válido.')
+            return redirect('index')
+
+        # Verifique se as configurações do Mailchimp existem
+        api_key = settings.MAILCHIMP_API_KEY
+        audience_id = settings.MAILCHIMP_AUDIENCE_ID
+        data_center = settings.MAILCHIMP_DATA_CENTER
+
+        if not all([api_key, audience_id, data_center]):
+            messages.error(request, 'A integração com a newsletter não está configurada corretamente.')
+            # Para o admin, é útil registrar um erro mais detalhado no console
+            logging.error("As configurações do Mailchimp (API Key, Audience ID, ou Data Center) não foram encontradas.")
+            return redirect('index')
+
+        # Construa a URL da API do Mailchimp
+        api_url = f'https://{data_center}.api.mailchimp.com/3.0/lists/{audience_id}/members/'
+        
+        # Dados que serão enviados para o Mailchimp
+        payload = {
+            'email_address': email,
+            'status': 'subscribed',
+        }
+        
+        headers = {
+            'Authorization': f'apikey {api_key}',
+            'Content-Type': 'application/json',
+        }
+
+        try:
+            response = requests.post(
+                api_url, 
+                data=json.dumps(payload), 
+                headers=headers,
+                timeout=10 # Adiciona um tempo limite para a requisição
+            )
+            response.raise_for_status() # Lança um erro para respostas HTTP ruins (4xx ou 5xx)
+            
+            messages.success(request, 'Obrigado por se inscrever! Seu e-mail foi cadastrado com sucesso.')
+
+        except requests.exceptions.HTTPError as err:
+            # Tenta extrair a mensagem de erro específica do Mailchimp
+            error_json = err.response.json()
+            error_title = error_json.get("title", "Erro desconhecido")
+            
+            if error_title == "Member Exists":
+                messages.warning(request, 'Este e-mail já está cadastrado em nossa lista.')
+            else:
+                messages.error(request, 'Ocorreu um erro ao tentar cadastrar seu e-mail. Tente novamente.')
+                logging.error(f"Erro na API do Mailchimp: {error_json.get('detail', str(err))}")
+        
+        except requests.exceptions.RequestException as e:
+            # Erros de conexão, timeout, etc.
+            messages.error(request, 'Não foi possível se conectar ao serviço de newsletter. Tente novamente mais tarde.')
+            logging.error(f"Erro de conexão com o Mailchimp: {e}")
+
+    # Redireciona de volta para a página inicial em qualquer caso
     return redirect('index')
 
 # =============================================================================
