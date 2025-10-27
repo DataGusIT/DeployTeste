@@ -640,7 +640,8 @@ def contatos(request):
 
     # 3. BUSCAR CONTATOS DA PÁGINA ATUAL (lógica existente)
     todos_contatos_da_pagina = Contato.objects.filter(
-        categoria__in=categorias_na_pagina
+        categoria__in=categorias_na_pagina,
+        aprovado=True  # <-- ADICIONE ESTE FILTRO IMPORTANTE
     ).order_by('nome')
     
     contatos_agrupados = defaultdict(list)
@@ -685,52 +686,41 @@ def contatos(request):
 def sugerir_contato(request):
     """
     Recebe os dados do formulário do modal de sugestão, cria um novo contato
-    e redireciona o usuário de volta para a página de contatos.
+    com status 'não aprovado' e redireciona o usuário.
     """
     try:
-        # 1. Obter dados obrigatórios do formulário
+        # 1. Obter dados obrigatórios
         nome = request.POST.get('nome')
         categoria_id = request.POST.get('categoria')
         telefone = request.POST.get('telefone')
         cidade = request.POST.get('cidade')
         estado = request.POST.get('estado')
 
-        # 2. Obter dados opcionais (com valores padrão vazios)
-        whatsapp = request.POST.get('whatsapp', '')
-        email = request.POST.get('email', '')
-        site = request.POST.get('site', '')
-        rua = request.POST.get('rua', '') # O campo foi nomeado 'rua' no modal
-        observacoes = request.POST.get('observacoes', '')
-        
-        # 3. Tratar checkboxes (só são enviados se marcados)
-        atendimento_presencial = 'atendimento_presencial' in request.POST
-        atendimento_online = 'atendimento_online' in request.POST
-
-        # 4. Validação simples para campos obrigatórios
+        # 2. Validação simples
         if not all([nome, categoria_id, telefone, cidade, estado]):
-            messages.error(request, 'Erro: Todos os campos marcados com * são obrigatórios.')
+            messages.error(request, 'Erro: Preencha todos os campos obrigatórios (*).')
             return redirect('contatos')
 
-        # 5. Buscar a categoria e criar o novo contato
+        # 3. Buscar a categoria
         categoria = get_object_or_404(CategoriaContato, pk=categoria_id)
         
-        # Cria a instância do novo contato
-        # Nota: Seu modelo atual não possui todos os campos do formulário (ex: site, whatsapp).
-        # Adicionei os que existem. Você precisará atualizar seu modelo Contato se quiser salvar todos.
+        # 4. Criar a instância do novo contato com aprovado=False
         novo_contato = Contato(
             nome=nome,
             categoria=categoria,
-            telefone=telefone,
-            whatsapp=whatsapp, # Adicione este campo ao seu models.py
-            email=email,       # Adicione este campo ao seu models.py
-            site=site,         # Adicione este campo ao seu models.py
+            telefone=request.POST.get('telefone', ''),
+            whatsapp=request.POST.get('whatsapp', ''),
+            email=request.POST.get('email', ''),
+            site=request.POST.get('site', ''),
             cidade=cidade,
             estado=estado,
-            rua=rua,
-            atendimento_presencial=atendimento_presencial,
-            atendimento_online=atendimento_online,
-            observacoes=observacoes,
-            horario_funcionamento="A ser confirmado" # Valor padrão
+            rua=request.POST.get('rua', ''),
+            atendimento_presencial='atendimento_presencial' in request.POST,
+            atendimento_online='atendimento_online' in request.POST,
+            observacoes=request.POST.get('observacoes', ''),
+            horario_funcionamento="A ser confirmado", # Valor padrão
+            descricao="Sugestão de usuário, aguardando revisão.", # Descrição padrão
+            aprovado=False  # <-- A PARTE MAIS IMPORTANTE!
         )
         novo_contato.save()
 
@@ -739,7 +729,7 @@ def sugerir_contato(request):
     except CategoriaContato.DoesNotExist:
         messages.error(request, 'A categoria selecionada não é válida.')
     except Exception as e:
-        # Para depuração, você pode querer registrar o erro 'e'
+        logging.error(f"Erro ao salvar sugestão: {e}") # Bom para depuração
         messages.error(request, 'Ocorreu um erro inesperado ao processar sua sugestão.')
 
     return redirect('contatos')

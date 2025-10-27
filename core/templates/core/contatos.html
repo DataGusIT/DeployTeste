@@ -54,7 +54,7 @@
                                 <label for="filtro-categoria" class="form-label">Tipo de contato</label>
                                 <select id="filtro-categoria" class="form-select">
                                     <option value="todos" selected>Todas as categorias</option>
-                                    {% for categoria in categorias %}
+                                    {% for categoria in todas_categorias %}
                                     <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
                                     {% endfor %}
                                 </select>
@@ -395,7 +395,7 @@
                             <label for="sugestao-categoria" class="form-label">Categoria <span class="text-danger">*</span></label>
                             <select class="form-select" id="sugestao-categoria" name="categoria" required>
                                 <option value="" disabled selected>Selecione a principal área de atuação</option>
-                                {% for categoria in categorias %}
+                                {% for categoria in todas_categorias %}
                                     <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
                                 {% endfor %}
                             </select>

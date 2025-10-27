@@ -239,8 +239,8 @@ class ContatoAdmin(admin.ModelAdmin):
     form = ContatoAdminForm # Usa nosso formulário personalizado para o Contato
     inlines = [FotoContatoInline] # Mantém o formulário da galeria
 
-    list_display = ('nome', 'categoria', 'cidade', 'display_imagem')
-    list_filter = ('categoria', 'estado', 'atendimento_presencial', 'atendimento_online')
+    list_display = ('nome', 'categoria', 'cidade', 'aprovado', 'display_imagem')
+    list_filter = ('aprovado', 'categoria', 'estado', 'atendimento_presencial', 'atendimento_online')
     search_fields = ('nome', 'descricao', 'cidade')
     
     readonly_fields = ('imagem_url', 'display_imagem')
@@ -255,7 +255,7 @@ class ContatoAdmin(admin.ModelAdmin):
         }),
         ('Contato', { 'fields': ('telefone', 'email', 'site', 'horario_funcionamento') }),
         ('Redes Sociais', { 'fields': ('whatsapp', 'facebook', 'instagram', 'linkedin', 'youtube'), 'classes': ('collapse',) }),
-        ('Tipo de Atendimento', { 'fields': ('atendimento_presencial', 'atendimento_online') }),
+        ('Configurações e Status', { 'fields': ('aprovado', 'atendimento_presencial', 'atendimento_online') }),
         ('Informações Adicionais', { 'fields': ('especialidades', 'convenios', 'observacoes'), 'classes': ('collapse',) }),
     )
 

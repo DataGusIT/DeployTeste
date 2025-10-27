@@ -259,6 +259,8 @@ class Contato(models.Model):
     atendimento_presencial = models.BooleanField(default=True)
     atendimento_online = models.BooleanField(default=False)
     
+    aprovado = models.BooleanField(default=True, verbose_name="Aprovado para exibição")
+
     # Campos adicionais para melhor experiência
     especialidades = models.TextField(blank=True, null=True, help_text="Liste as especialidades separadas por vírgula")
     convenios = models.TextField(blank=True, null=True, help_text="Convênios aceitos")
