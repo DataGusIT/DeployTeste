@@ -161,4 +161,5 @@ urlpatterns += [
 
 urlpatterns += [
     path('api/consulta-cep/<str:cep>/', views.consulta_cep_api, name='consulta_cep_api'),
+    path('api/validate-field/', views.validate_field_api, name='validate_field_api'),
 ]

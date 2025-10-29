@@ -1532,3 +1532,35 @@ def consulta_cep_api(request, cep):
         return JsonResponse({'sucesso': False, 'erro': 'Falha ao consultar o serviço de CEP.'}, status=500)
     except Exception as e:
         return JsonResponse({'sucesso': False, 'erro': str(e)}, status=500)
+
+# =============================================================================
+# NOVA VIEW DE API PARA VALIDAÇÃO EM TEMPO REAL
+# =============================================================================
+@require_POST
+def validate_field_api(request):
+    """
+    Endpoint de API para validar se username ou email já existem.
+    Chamado via AJAX pelo formulário de registro.
+    """
+    try:
+        data = json.loads(request.body)
+        field_name = data.get('field_name')
+        field_value = data.get('field_value')
+
+        if not field_name or not field_value:
+            return JsonResponse({'error': 'Campo ou valor ausente.'}, status=400)
+
+        # Prepara o filtro dinamicamente, ignorando maiúsculas/minúsculas
+        if field_name == 'username':
+            is_taken = CustomUser.objects.filter(username__iexact=field_value).exists()
+        elif field_name == 'email':
+            is_taken = CustomUser.objects.filter(email__iexact=field_value).exists()
+        else:
+            return JsonResponse({'error': 'Campo inválido.'}, status=400)
+
+        return JsonResponse({'is_taken': is_taken})
+
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'JSON inválido.'}, status=400)
+    except Exception:
+        return JsonResponse({'error': 'Erro interno do servidor.'}, status=500)

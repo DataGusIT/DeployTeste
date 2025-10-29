@@ -1,4 +1,3 @@
-<!-- core/templates/core/auth/register.html -->
 {% extends 'base.html' %}
 {% load socialaccount %}
 
@@ -26,8 +25,6 @@
                                             <p class="lead mb-4 opacity-90">
                                                 Crie sua conta e comece sua jornada conosco
                                             </p>
-                                            
-                                            
                                         </div>
                                     </div>
                                 </div>
@@ -36,15 +33,6 @@
                             <!-- Formulário -->
                             <div class="col-lg-7">
                                 <div class="form-section p-4 p-lg-5">
-                                    <!-- Header móvel -->
-                                    <div class="d-lg-none text-center mb-4">
-                                        <div class="mobile-icon mb-3">
-                                            <i class="fas fa-user-plus"></i>
-                                        </div>
-                                        <h3 class="fw-bold text-dark">Criar Conta</h3>
-                                        <p class="text-muted">Preencha seus dados para começar</p>
-                                    </div>
-
                                     <!-- Header desktop -->
                                     <div class="d-none d-lg-block mb-4">
                                         <h2 class="fw-bold text-dark mb-2">Criar sua conta</h2>
@@ -77,11 +65,7 @@
                                                     </label>
                                                 </div>
                                                 {% if form.first_name.errors %}
-                                                <div class="error-message">
-                                                    {% for error in form.first_name.errors %}
-                                                    <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
-                                                    {% endfor %}
-                                                </div>
+                                                <div class="error-message">{% for error in form.first_name.errors %}<small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>{% endfor %}</div>
                                                 {% endif %}
                                             </div>
                                             <div class="col-md-6">
@@ -92,11 +76,7 @@
                                                     </label>
                                                 </div>
                                                 {% if form.last_name.errors %}
-                                                <div class="error-message">
-                                                    {% for error in form.last_name.errors %}
-                                                    <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
-                                                    {% endfor %}
-                                                </div>
+                                                <div class="error-message">{% for error in form.last_name.errors %}<small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>{% endfor %}</div>
                                                 {% endif %}
                                             </div>
                                         </div>
@@ -109,12 +89,10 @@
                                                     <i class="fas fa-at me-2 text-primary"></i>Nome de usuário
                                                 </label>
                                             </div>
+                                            <!-- NOVO: Container para validação em tempo real -->
+                                            <div id="username-validation-message" class="validation-message"></div>
                                             {% if form.username.errors %}
-                                            <div class="error-message">
-                                                {% for error in form.username.errors %}
-                                                <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
-                                                {% endfor %}
-                                            </div>
+                                            <div class="error-message">{% for error in form.username.errors %}<small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>{% endfor %}</div>
                                             {% endif %}
                                         </div>
 
@@ -126,12 +104,10 @@
                                                     <i class="fas fa-envelope me-2 text-primary"></i>Email
                                                 </label>
                                             </div>
+                                            <!-- NOVO: Container para validação em tempo real -->
+                                            <div id="email-validation-message" class="validation-message"></div>
                                             {% if form.email.errors %}
-                                            <div class="error-message">
-                                                {% for error in form.email.errors %}
-                                                <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
-                                                {% endfor %}
-                                            </div>
+                                            <div class="error-message">{% for error in form.email.errors %}<small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>{% endfor %}</div>
                                             {% endif %}
                                         </div>
 
@@ -142,35 +118,22 @@
                                                 <label for="{{ form.password1.id_for_label }}">
                                                     <i class="fas fa-lock me-2 text-primary"></i>Senha
                                                 </label>
-                                                <button type="button" class="password-toggle" id="togglePassword1">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
+                                                <button type="button" class="password-toggle" id="togglePassword1"><i class="fas fa-eye"></i></button>
                                             </div>
                                             
-                                            <!-- Indicador de força da senha -->
                                             <div id="passwordStrength" class="password-strength d-none">
                                                 <div class="strength-bars">
-                                                    <div class="strength-bar"></div>
-                                                    <div class="strength-bar"></div>
-                                                    <div class="strength-bar"></div>
-                                                    <div class="strength-bar"></div>
+                                                    <div class="strength-bar"></div><div class="strength-bar"></div><div class="strength-bar"></div><div class="strength-bar"></div>
                                                 </div>
                                                 <small id="passwordStrengthText" class="strength-text">Força da senha</small>
                                             </div>
                                             
                                             {% if form.password1.errors %}
-                                            <div class="error-message">
-                                                {% for error in form.password1.errors %}
-                                                <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
-                                                {% endfor %}
-                                            </div>
+                                            <div class="error-message">{% for error in form.password1.errors %}<small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>{% endfor %}</div>
                                             {% endif %}
                                             
                                             <div class="password-requirements">
-                                                <small class="text-muted">
-                                                    <i class="fas fa-info-circle me-1"></i>
-                                                    Mínimo 8 caracteres, inclua letras e números
-                                                </small>
+                                                <small class="text-muted"><i class="fas fa-info-circle me-1"></i>Mínimo 8 caracteres, inclua letras e números</small>
                                             </div>
                                         </div>
 
@@ -181,49 +144,30 @@
                                                 <label for="{{ form.password2.id_for_label }}">
                                                     <i class="fas fa-lock me-2 text-primary"></i>Confirmar senha
                                                 </label>
-                                                <button type="button" class="password-toggle" id="togglePassword2">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
+                                                <button type="button" class="password-toggle" id="togglePassword2"><i class="fas fa-eye"></i></button>
                                             </div>
                                             
-                                            <!-- Status de confirmação -->
-                                            <div id="passwordMatch" class="password-match success d-none">
-                                                <small><i class="fas fa-check-circle me-1"></i>Senhas coincidem</small>
-                                            </div>
-                                            <div id="passwordMismatch" class="password-match error d-none">
-                                                <small><i class="fas fa-times-circle me-1"></i>Senhas não coincidem</small>
-                                            </div>
+                                            <div id="passwordMatch" class="password-match success d-none"><small><i class="fas fa-check-circle me-1"></i>Senhas coincidem</small></div>
+                                            <div id="passwordMismatch" class="password-match error d-none"><small><i class="fas fa-times-circle me-1"></i>Senhas não coincidem</small></div>
                                             
                                             {% if form.password2.errors %}
-                                            <div class="error-message">
-                                                {% for error in form.password2.errors %}
-                                                <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
-                                                {% endfor %}
-                                            </div>
+                                            <div class="error-message">{% for error in form.password2.errors %}<small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>{% endfor %}</div>
                                             {% endif %}
                                         </div>
 
                                         <!-- Termos -->
                                         <div class="form-check mb-4">
                                             <input class="form-check-input" type="checkbox" id="termsAgree" required>
-                                            <label class="form-check-label" for="termsAgree">
-                                                Concordo com os 
-                                                <a href="#" class="text-primary text-decoration-none">Termos de Serviço</a> 
-                                                e 
-                                                <a href="#" class="text-primary text-decoration-none">Política de Privacidade</a>
-                                            </label>
+                                            <label class="form-check-label" for="termsAgree">Concordo com os <a href="#" class="text-primary text-decoration-none">Termos de Serviço</a> e <a href="#" class="text-primary text-decoration-none">Política de Privacidade</a></label>
                                         </div>
 
                                         <!-- Botão de submit -->
                                         <button type="submit" class="btn btn-primary btn-modern w-100 mb-4" id="registerButton" disabled>
-                                            <span class="btn-text">Criar conta</span>
-                                            <i class="fas fa-arrow-right ms-2"></i>
+                                            <span class="btn-text">Criar conta</span><i class="fas fa-arrow-right ms-2"></i>
                                         </button>
                                     </form>
 
-                                    <div class="divider">
-                                        <span>ou cadastre-se com</span>
-                                    </div>
+                                    <div class="divider"><span>ou cadastre-se com</span></div>
 
                                     <!-- Login social modernizado -->
                                     <div class="d-grid mb-4">
@@ -408,6 +352,7 @@
     border-radius: 12px;
     font-size: 1rem;
     transition: var(--transition);
+    transition: border-color 0.3s ease; /* Adiciona transição suave para a borda */
     background: #ffffff;
     padding: 1.625rem 1rem 0.625rem;
 }
@@ -678,11 +623,90 @@
     outline: 2px solid var(--primary);
     outline-offset: 2px;
 }
+
+/* NOVO CSS para mensagens de validação */
+.validation-message {
+    font-size: 0.85rem;
+    height: 1.2rem; /* Reserva espaço para evitar que o layout pule */
+    transition: all 0.3s ease;
+    margin-top: 0.25rem !important;
+    padding-left: 0.2rem;
+}
+.validation-message.error {
+    color: #f44336; /* Vermelho para erro */
+}
+.validation-message.success {
+    color: #4caf50; /* Verde para sucesso */
+}
+
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Configurar inputs
+    // =========================================================================
+    // NOVA LÓGICA DE VALIDAÇÃO EM TEMPO REAL
+    // =========================================================================
+    
+    // Função para exibir mensagens de validação (sucesso/erro)
+    function showValidationMessage(elementId, message, isError) {
+        const el = document.getElementById(elementId);
+        if (el) {
+            el.innerHTML = message;
+            el.className = 'validation-message'; // Reseta classes
+            if (message) {
+                el.classList.add(isError ? 'error' : 'success');
+            }
+        }
+    }
+
+    // Função assíncrona para validar campos via API
+    async function validateField(inputElement, fieldName) {
+        const value = inputElement.value.trim();
+        const messageContainerId = `${fieldName}-validation-message`;
+
+        // Limpa a mensagem se o campo estiver vazio ou muito curto
+        if (value.length < 3) {
+            showValidationMessage(messageContainerId, '', false);
+            inputElement.style.borderColor = ''; // Reseta a cor da borda
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/validate-field/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}' // Essencial para segurança do Django
+                },
+                body: JSON.stringify({
+                    field_name: fieldName,
+                    field_value: value
+                })
+            });
+
+            if (!response.ok) throw new Error('A resposta da rede não foi OK');
+
+            const data = await response.json();
+            const fieldLabel = fieldName === 'username' ? 'Nome de usuário' : 'Email';
+
+            if (data.is_taken) {
+                showValidationMessage(messageContainerId, `<i class="fas fa-times-circle me-1"></i>${fieldLabel} já está em uso.`, true);
+                inputElement.style.borderColor = '#f44336'; // Borda vermelha
+            } else {
+                showValidationMessage(messageContainerId, `<i class="fas fa-check-circle me-1"></i>${fieldLabel} disponível!`, false);
+                inputElement.style.borderColor = '#4caf50'; // Borda verde
+            }
+
+        } catch (error) {
+            console.error('Erro na validação:', error);
+            showValidationMessage(messageContainerId, '', false); // Limpa em caso de erro de rede
+        }
+    }
+
+    // =========================================================================
+    // SEU CÓDIGO EXISTENTE COM AJUSTES
+    // =========================================================================
+
     const inputs = {
         firstName: document.getElementById('{{ form.first_name.id_for_label }}'),
         lastName: document.getElementById('{{ form.last_name.id_for_label }}'),
@@ -702,40 +726,28 @@ document.addEventListener('DOMContentLoaded', function() {
         passwordMismatch: document.getElementById('passwordMismatch')
     };
 
-    // Aplicar classes e placeholders aos inputs
     Object.values(inputs).forEach(input => {
         if (input) {
             input.classList.add('form-control');
-            input.setAttribute('placeholder', ' '); // Necessário para o floating label
+            input.setAttribute('placeholder', ' ');
         }
     });
 
-    // Placeholders específicos quando focados
-    const placeholders = {
-        firstName: 'Digite seu nome',
-        lastName: 'Digite seu sobrenome', 
-        username: 'Escolha um nome único',
-        email: 'seu@email.com',
-        password1: 'Mínimo 8 caracteres',
-        password2: 'Repita a senha acima'
-    };
+    // Adiciona os gatilhos para a validação em tempo real
+    if (inputs.username) {
+        inputs.username.addEventListener('blur', () => validateField(inputs.username, 'username'));
+    }
+    if (inputs.email) {
+        inputs.email.addEventListener('blur', () => validateField(inputs.email, 'email'));
+    }
 
-    Object.entries(placeholders).forEach(([key, placeholder]) => {
-        const input = inputs[key];
-        if (input) {
-            input.addEventListener('focus', () => input.setAttribute('placeholder', placeholder));
-            input.addEventListener('blur', () => input.setAttribute('placeholder', ' '));
-        }
-    });
 
-    // Toggle de visibilidade da senha
     function setupPasswordToggle(toggleId, passwordInput) {
         const toggle = document.getElementById(toggleId);
         if (toggle && passwordInput) {
             toggle.addEventListener('click', function() {
                 const type = passwordInput.type === 'password' ? 'text' : 'password';
                 passwordInput.type = type;
-                
                 const icon = this.querySelector('i');
                 icon.classList.toggle('fa-eye');
                 icon.classList.toggle('fa-eye-slash');
@@ -746,7 +758,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupPasswordToggle('togglePassword1', inputs.password1);
     setupPasswordToggle('togglePassword2', inputs.password2);
 
-    // Verificador de força da senha
+    // Verificador de força da senha (LÓGICA CORRIGIDA)
     if (inputs.password1 && elements.passwordStrength) {
         inputs.password1.addEventListener('input', function() {
             const password = this.value;
@@ -755,49 +767,40 @@ document.addEventListener('DOMContentLoaded', function() {
                 elements.passwordStrength.classList.add('d-none');
                 return;
             }
-
             elements.passwordStrength.classList.remove('d-none');
 
-            // Calcular força da senha
             let score = 0;
-            const checks = {
-                length: password.length >= 8,
-                lowercase: /[a-z]/.test(password),
-                uppercase: /[A-Z]/.test(password),
-                numbers: /[0-9]/.test(password),
-                special: /[^a-zA-Z0-9]/.test(password)
-            };
+            if (password.length >= 8) score++;
+            if (/[a-z]/.test(password)) score++;
+            if (/[A-Z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^a-zA-Z0-9]/.test(password)) score++;
 
-            score = Object.values(checks).filter(Boolean).length;
-
-            // Atualizar barras visuais
             elements.strengthBars.className = 'strength-bars';
             elements.strengthText.className = 'strength-text';
 
-            if (score <= 1) {
+            if (score <= 2) {
                 elements.strengthBars.classList.add('weak');
                 elements.strengthText.classList.add('text-danger');
-                elements.strengthText.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>Muito fraca';
-            } else if (score <= 2) {
+                elements.strengthText.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>Fraca';
+            } else if (score === 3) {
                 elements.strengthBars.classList.add('medium');
                 elements.strengthText.classList.add('text-warning');
-                elements.strengthText.innerHTML = '<i class="fas fa-info-circle me-1"></i>Fraca';
-            } else if (score <= 4) {
-                elements.strengthBars.classList.add('strong');  
+                elements.strengthText.innerHTML = '<i class="fas fa-info-circle me-1"></i>Média'; // <-- CORRIGIDO
+            } else if (score === 4) {
+                elements.strengthBars.classList.add('strong');
                 elements.strengthText.classList.add('text-success');
-                elements.strengthText.innerHTML = '<i class="fas fa-check-circle me-1"></i>Boa';
+                elements.strengthText.innerHTML = '<i class="fas fa-check-circle me-1"></i>Boa'; // <-- CORRIGIDO
             } else {
                 elements.strengthBars.classList.add('very-strong');
                 elements.strengthText.classList.add('text-success');
-                elements.strengthText.innerHTML = '<i class="fas fa-shield-alt me-1"></i>Muito forte';
+                elements.strengthText.innerHTML = '<i class="fas fa-shield-alt me-1"></i>Forte'; // <-- CORRIGIDO
             }
         });
     }
 
-    // Verificar correspondência de senhas
     function checkPasswordMatch() {
         if (!inputs.password1 || !inputs.password2) return;
-
         const password1 = inputs.password1.value;
         const password2 = inputs.password2.value;
 
@@ -821,7 +824,6 @@ document.addEventListener('DOMContentLoaded', function() {
         inputs.password2.addEventListener('input', checkPasswordMatch);
     }
 
-    // Controle do botão de registro baseado nos termos
     if (elements.termsCheckbox && elements.registerButton) {
         elements.termsCheckbox.addEventListener('change', function() {
             elements.registerButton.disabled = !this.checked;

@@ -1,3 +1,5 @@
+# core/forms.py
+
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
@@ -9,8 +11,6 @@ from .models import CustomUser, RelatorioDesempenho
 
 class CustomUserCreationForm(UserCreationForm):
     """Formulário de criação de usuário customizado (CORRIGIDO)"""
-    # Não precisa redefinir username, password1, e password2.
-    # Apenas defina os campos extras que você quer no formulário.
     email = forms.EmailField(
         required=True,
         widget=forms.EmailInput(attrs={
@@ -19,7 +19,7 @@ class CustomUserCreationForm(UserCreationForm):
         })
     )
     first_name = forms.CharField(
-        max_length=150, # O padrão do AbstractUser é 150
+        max_length=150,
         required=True,
         label='Nome',
         widget=forms.TextInput(attrs={
@@ -28,7 +28,7 @@ class CustomUserCreationForm(UserCreationForm):
         })
     )
     last_name = forms.CharField(
-        max_length=150, # O padrão do AbstractUser é 150
+        max_length=150,
         required=True,
         label='Sobrenome',
         widget=forms.TextInput(attrs={
@@ -38,14 +38,23 @@ class CustomUserCreationForm(UserCreationForm):
     )
 
     class Meta(UserCreationForm.Meta):
-        # Herda da Meta da classe base
         model = CustomUser
-        # Adiciona os novos campos à lista de campos existentes
         fields = UserCreationForm.Meta.fields + ('first_name', 'last_name', 'email')
+
+    def clean_email(self):
+        """
+        Validação extra para garantir que o email não esteja em uso.
+        Permite uma mensagem de erro mais clara do que a padrão.
+        """
+        email = self.cleaned_data.get('email')
+        if email and CustomUser.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError(
+                "Este endereço de e-mail já está em uso. Por favor, utilize outro."
+            )
+        return email
 
 class CustomAuthenticationForm(AuthenticationForm):
     """Formulário de autenticação customizado (CORRIGIDO)"""
-    # A customização dos widgets está correta.
     username = forms.CharField(
         max_length=100,
         required=True,
@@ -65,10 +74,6 @@ class CustomAuthenticationForm(AuthenticationForm):
         })
     )
 
-    # REMOVA COMPLETAMENTE A CLASSE META DAQUI
-    # class Meta:
-    #     model = CustomUser
-    #     fields = ['username', 'password']
 
 class UserProfileForm(forms.ModelForm):
     """Formulário de perfil do usuário"""
@@ -116,5 +121,4 @@ class RelatorioDesempenhoForm(forms.ModelForm):
 
     class Meta:
         model = RelatorioDesempenho
-        # O professor e o aluno serão definidos na view, não no formulário
         fields = ['titulo', 'relato']

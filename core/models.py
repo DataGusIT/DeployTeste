@@ -83,6 +83,8 @@ class CustomUser(AbstractUser):  # Altere a herança
     # Adicione aqui APENAS os campos que não existem no AbstractUser
     is_admin = models.BooleanField(default=False)
     is_professor = models.BooleanField('É professor?', default=False)
+
+    email = models.EmailField('endereço de e-mail', unique=True) # <-- ALTERAÇÃO CRÍTICA
     
     # Não é mais necessário definir username, email, first_name, etc.
     # eles já vêm do AbstractUser.
