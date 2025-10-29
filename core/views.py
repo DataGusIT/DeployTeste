@@ -13,7 +13,7 @@ from .models import (
     Contato, Ferramenta, CustomUser, UserDownload, UserSavedFAQ, UserSavedContato, Aluno, RelatorioDesempenho, Turma
 )
 from django.conf import settings
-
+from django.contrib.auth import logout # Certifique-se de que 'logout' está importado
 
 from collections import defaultdict, OrderedDict
 from django.views.decorators.csrf import csrf_protect
@@ -1608,3 +1608,31 @@ def update_avatar(request):
         return JsonResponse({'success': False, 'error': 'JSON inválido.'}, status=400)
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+        # =============================================================================
+# NOVA VIEW PARA EXCLUSÃO DE CONTA
+# =============================================================================
+@login_required
+def delete_account_view(request):
+    """
+    Lida com a solicitação de exclusão de conta pelo próprio usuário.
+    GET: Mostra a página de confirmação.
+    POST: Exclui o usuário e seus dados associados.
+    """
+    if request.method == 'POST':
+        user = request.user
+        
+        # Faz logout do usuário antes de deletar para invalidar a sessão
+        logout(request)
+        
+        # Deleta o objeto do usuário do banco de dados
+        user.delete()
+        
+        # Envia uma mensagem de sucesso para a próxima página
+        messages.success(request, 'Sua conta foi excluída com sucesso. Sentiremos sua falta!')
+        
+        # Redireciona para a página inicial
+        return redirect('index')
+
+    # Se a requisição for GET, apenas renderiza a página de confirmação
+    return render(request, 'core/auth/delete_account_confirm.html')

@@ -43,6 +43,7 @@ urlpatterns += [
     path('contatos/<int:id>/', views.detalhes_contato, name='detalhes_contato'),
     path('salvar-contato/<int:contato_id>/', views.salvar_contato, name='salvar_contato'),
     path('remover-contato/<int:contato_id>/', views.remover_contato_salvo, name='remover_contato_salvo'),
+    path('perfil/excluir/', views.delete_account_view, name='delete_account'),
 ]
 
 # =============================================================================
