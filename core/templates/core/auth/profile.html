@@ -14,11 +14,13 @@
         </div>
         <div class="profile-info">
             <h1 class="profile-name">{{ user.get_full_name|default:user.username }}</h1>
-            <p class="profile-email">{{ user.email }}</p>
-            <span class="profile-join-date">
-                <i class="fas fa-calendar-alt"></i>
-                Membro desde {{ user.date_joined|date:"d/m/Y" }}
-            </span>
+            
+            <!-- ATUALIZADO: Container para garantir alinhamento e estilo consistentes -->
+            <div class="profile-meta-container">
+                <p class="profile-meta-item"><i class="fas fa-at"></i><span>{{ user.username }}</span></p>
+                <p class="profile-meta-item"><i class="fas fa-envelope"></i><span>{{ user.email }}</span></p>
+                <p class="profile-meta-item"><i class="fas fa-calendar-alt"></i><span>Membro desde {{ user.date_joined|date:"d/m/Y" }}</span></p>
+            </div>
         </div>
     </div>
 
@@ -26,8 +28,12 @@
     <div class="profile-tabs">
         <div class="tab-navigation">
             <button class="tab-btn active" data-tab="dados-pessoais">
-                <i class="fas fa-user"></i>
+                <i class="fas fa-user-edit"></i>
                 <span>Dados Pessoais</span>
+            </button>
+            <button class="tab-btn" data-tab="seguranca">
+                <i class="fas fa-shield-alt"></i>
+                <span>Segurança</span>
             </button>
             <button class="tab-btn" data-tab="duvidas-salvas">
                 <i class="fas fa-bookmark"></i>
@@ -39,11 +45,6 @@
                 <span>Contatos Salvos</span>
                 <span class="tab-counter">{{ contatos_salvos.count }}</span>
             </button>
-            <!-- <button class="tab-btn" data-tab="downloads">
-                <i class="fas fa-download"></i>
-                <span>Downloads</span>
-                <span class="tab-counter">{{ downloads.count }}</span>
-            </button> -->
         </div>
 
         <!-- Conteúdo das Tabs -->
@@ -55,25 +56,78 @@
                         <h2>Dados Pessoais</h2>
                         <p>Gerencie suas informações pessoais</p>
                     </div>
-                    <form method="post" class="profile-form">
+                    <form method="post" class="profile-form" action="{% url 'profile' %}">
                         {% csrf_token %}
+                        <div class="form-group">
+                            <label for="{{ profile_form.username.id_for_label }}">Nome de Usuário</label>
+                            {{ profile_form.username }}
+                            {% if profile_form.username.errors %}<div class="error-list">{{ profile_form.username.errors }}</div>{% endif %}
+                        </div>
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="{{ form.first_name.id_for_label }}">Nome</label>
-                                {{ form.first_name }}
+                                <label for="{{ profile_form.first_name.id_for_label }}">Nome</label>
+                                {{ profile_form.first_name }}
+                                {% if profile_form.first_name.errors %}<div class="error-list">{{ profile_form.first_name.errors }}</div>{% endif %}
                             </div>
                             <div class="form-group">
-                                <label for="{{ form.last_name.id_for_label }}">Sobrenome</label>
-                                {{ form.last_name }}
+                                <label for="{{ profile_form.last_name.id_for_label }}">Sobrenome</label>
+                                {{ profile_form.last_name }}
+                                {% if profile_form.last_name.errors %}<div class="error-list">{{ profile_form.last_name.errors }}</div>{% endif %}
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="{{ form.email.id_for_label }}">E-mail</label>
-                            {{ form.email }}
+                            <label for="{{ profile_form.email.id_for_label }}">E-mail</label>
+                            {{ profile_form.email }}
+                            {% if profile_form.email.errors %}<div class="error-list">{{ profile_form.email.errors }}</div>{% endif %}
                         </div>
-                        <button type="submit" class="btn-primary">
+                        <button type="submit" name="update_profile" class="btn-primary">
                             <i class="fas fa-save"></i>
                             Salvar Alterações
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Tab Segurança -->
+            <div class="tab-pane" id="seguranca">
+                <div class="content-card">
+                    <div class="card-header">
+                        <h2>Alterar Senha</h2>
+                        <p>Para sua segurança, escolha uma senha forte.</p>
+                    </div>
+                    <form method="post" class="profile-form" action="{% url 'profile' %}">
+                        {% csrf_token %}
+                        <!-- ATUALIZADO: Adicionado container e botão de toggle -->
+                        <div class="form-group">
+                            <label for="{{ password_form.old_password.id_for_label }}">Senha Atual</label>
+                            <div class="password-field">
+                                {{ password_form.old_password }}
+                                <button type="button" class="password-toggle" id="toggleOldPassword"><i class="fas fa-eye"></i></button>
+                            </div>
+                            {% if password_form.old_password.errors %}<div class="error-list">{{ password_form.old_password.errors }}</div>{% endif %}
+                        </div>
+                        <!-- ATUALIZADO: Adicionado container e botão de toggle -->
+                        <div class="form-group">
+                            <label for="{{ password_form.new_password1.id_for_label }}">Nova Senha</label>
+                             <div class="password-field">
+                                {{ password_form.new_password1 }}
+                                <button type="button" class="password-toggle" id="toggleNewPassword1"><i class="fas fa-eye"></i></button>
+                            </div>
+                            {% if password_form.new_password1.errors %}<div class="error-list">{{ password_form.new_password1.errors }}</div>{% endif %}
+                        </div>
+                        <!-- ATUALIZADO: Adicionado container e botão de toggle -->
+                        <div class="form-group">
+                            <label for="{{ password_form.new_password2.id_for_label }}">Confirmação da Nova Senha</label>
+                             <div class="password-field">
+                                {{ password_form.new_password2 }}
+                                <button type="button" class="password-toggle" id="toggleNewPassword2"><i class="fas fa-eye"></i></button>
+                            </div>
+                            {% if password_form.new_password2.errors %}<div class="error-list">{{ password_form.new_password2.errors }}</div>{% endif %}
+                        </div>
+                        {% if password_form.non_field_errors %}<div class="error-list non-field-errors">{{ password_form.non_field_errors }}</div>{% endif %}
+                        <button type="submit" name="change_password" class="btn-primary">
+                            <i class="fas fa-key"></i>
+                            Redefinir Senha
                         </button>
                     </form>
                 </div>
@@ -1356,6 +1410,79 @@
     transition: all 0.5s ease;
     animation: shrinkAndFade 0.5s ease-out forwards;
 }
+
+/* ATUALIZADO: Estilos para o cabeçalho do perfil */
+.profile-meta-container {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Alinha à esquerda */
+    gap: 0.5rem; /* Espaçamento entre os itens */
+}
+.profile-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+    color: var(--gray-600); /* Cor cinza mais clara */
+    margin: 0;
+}
+.profile-meta-item i {
+    color: var(--gray-500); /* Cor do ícone ainda mais sutil */
+    width: 20px;
+    text-align: center;
+}
+
+/* NOVO: Estilos para o campo de senha com toggle */
+.password-field {
+    position: relative;
+    width: 100%;
+}
+.password-toggle {
+    position: absolute;
+    right: 1px; /* Ajuste fino para encaixar na borda */
+    top: 1px;
+    bottom: 1px;
+    width: 40px; /* Largura do botão */
+    background: transparent;
+    border: none;
+    border-radius: 0 8px 8px 0; /* Arredonda cantos direitos */
+    color: var(--gray-500);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+.password-toggle:hover {
+    background-color: var(--gray-100);
+    color: var(--primary);
+}
+/* Ajusta o padding do input para não ficar embaixo do botão */
+.password-field input {
+    padding-right: 45px !important;
+}
+
+/* Estilos para as listas de erro do formulário */
+.error-list {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--danger);
+    text-align: left; /* Garante que o erro fique alinhado à esquerda */
+}
+.error-list ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.non-field-errors {
+    background-color: rgba(220, 53, 69, 0.1);
+    border: 1px solid var(--danger);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
 </style>
 {% endblock %}
 
@@ -1553,6 +1680,53 @@
             return cookieValue;
         }
 
+         /**
+        * Configura o botão de "olho" para um campo de senha.
+        * @param {string} toggleId O ID do botão.
+        * @param {string} passwordInputId O ID do campo de input da senha.
+        */
+        function setupPasswordToggle(toggleId, passwordInputId) {
+            const toggle = document.getElementById(toggleId);
+            const passwordInput = document.getElementById(passwordInputId);
+
+            if (toggle && passwordInput) {
+                toggle.addEventListener('click', function() {
+                    // Alterna o tipo do input
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    
+                    // Alterna o ícone
+                    const icon = this.querySelector('i');
+                    icon.classList.toggle('fa-eye');
+                    icon.classList.toggle('fa-eye-slash');
+                });
+            }
+        }
+
+        // Aplica a funcionalidade a todos os campos de senha
+        setupPasswordToggle('toggleOldPassword', '{{ password_form.old_password.id_for_label }}');
+        setupPasswordToggle('toggleNewPassword1', '{{ password_form.new_password1.id_for_label }}');
+        setupPasswordToggle('toggleNewPassword2', '{{ password_form.new_password2.id_for_label }}');
+
+
+        // Adiciona classes aos campos de senha para estilização geral
+        const passwordFields = document.querySelectorAll('#seguranca input[type="password"], #seguranca input[type="text"]');
+        passwordFields.forEach(field => {
+            // A classe é aplicada pelo Django Widget, mas garantimos aqui
+            if (!field.classList.contains('form-control')) {
+                field.classList.add('form-control');
+            }
+        });
+
+        // Lógica para ativar a aba correta se houver erro no formulário de senha
+        const passwordFormErrors = document.querySelector('#seguranca .error-list');
+        if (passwordFormErrors) {
+            document.querySelector('.tab-btn[data-tab="dados-pessoais"]').classList.remove('active');
+            document.querySelector('.tab-pane#dados-pessoais').classList.remove('active');
+            
+            document.querySelector('.tab-btn[data-tab="seguranca"]').classList.add('active');
+            document.querySelector('.tab-pane#seguranca').classList.add('active');
+        }
         // ===============================================
         // EVENT LISTENERS (ANEXO DE EVENTOS)
         // ===============================================

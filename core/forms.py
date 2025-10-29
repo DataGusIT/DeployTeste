@@ -76,7 +76,7 @@ class CustomAuthenticationForm(AuthenticationForm):
 
 
 class UserProfileForm(forms.ModelForm):
-    """Formulário de perfil do usuário"""
+    """Formulário de perfil do usuário (ATUALIZADO)"""
     first_name = forms.CharField(
         max_length=100, 
         required=True, 
@@ -93,10 +93,36 @@ class UserProfileForm(forms.ModelForm):
         required=True, 
         widget=forms.EmailInput(attrs={'class': 'form-control'})
     )
+    # NOVO CAMPO ADICIONADO
+    username = forms.CharField(
+        max_length=150,
+        required=True,
+        label='Nome de usuário',
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
 
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'email']
+        # ADICIONADO 'username' À LISTA DE CAMPOS
+        fields = ['username', 'first_name', 'last_name', 'email']
+
+    # =====================================================================
+    #  NOVO MÉTODO DE VALIDAÇÃO INTELIGENTE
+    # =====================================================================
+    def clean_username(self):
+        """
+        Verifica se o nome de usuário já existe, mas permite que o usuário
+        mantenha seu próprio nome de usuário atual.
+        """
+        username = self.cleaned_data.get('username')
+        
+        # Compara o novo username com o que já está no banco para este usuário.
+        # self.instance.pk se refere ao ID do usuário que está sendo editado.
+        # Se o username existe E pertence a um usuário DIFERENTE, então acusa o erro.
+        if CustomUser.objects.filter(username__iexact=username).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("Um usuário com este nome de usuário já existe.")
+            
+        return username
 
 # =============================================================================
 # NOVO FORMULÁRIO: RELATÓRIO DE DESEMPENHO

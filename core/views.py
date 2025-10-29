@@ -6,6 +6,8 @@ from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserProfileForm, RelatorioDesempenhoForm
 from django.db.models import Q
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 from .models import (
     FAQ, CategoriaFAQ, CategoriaContato, CategoriaFerramenta, 
     Contato, Ferramenta, CustomUser, UserDownload, UserSavedFAQ, UserSavedContato, Aluno, RelatorioDesempenho, Turma
@@ -935,39 +937,53 @@ def logout_view(request):
 
 @login_required
 def profile_view(request):
-    """Perfil do usuário com histórico de downloads, FAQs salvas e contatos salvos"""
-    # user agora É o CustomUser. Não precisamos de mais nada.
-    user = request.user 
+    """
+    Perfil do usuário com formulários para dados pessoais e alteração de senha.
+    (ATUALIZADO PARA GERENCIAR DOIS FORMULÁRIOS)
+    """
+    user = request.user
     
-    # Use 'user' (ou 'request.user') diretamente nas suas queries.
-    duvidas_salvas = UserSavedFAQ.objects.filter(
-        user=user
-    ).select_related('faq', 'faq__categoria').order_by('-data_salva')
-    
-    contatos_salvos = UserSavedContato.objects.filter(
-        user=user
-    ).select_related('contato', 'contato__categoria').order_by('-data_salva')
+    # Inicializa os dois formulários
+    profile_form = UserProfileForm(instance=user)
+    password_form = PasswordChangeForm(user)
 
+    if request.method == 'POST':
+        # Verifica qual formulário foi enviado
+        if 'update_profile' in request.POST:
+            profile_form = UserProfileForm(request.POST, instance=user)
+            if profile_form.is_valid():
+                profile_form.save()
+                messages.success(request, 'Seu perfil foi atualizado com sucesso!')
+                return redirect('profile')
+            else:
+                messages.error(request, 'Por favor, corrija os erros no formulário de dados pessoais.')
+        
+        elif 'change_password' in request.POST:
+            password_form = PasswordChangeForm(user, request.POST)
+            if password_form.is_valid():
+                user = password_form.save()
+                # Importante! Mantém o usuário logado após a troca de senha.
+                update_session_auth_hash(request, user)  
+                messages.success(request, 'Sua senha foi alterada com sucesso!')
+                return redirect('profile')
+            else:
+                messages.error(request, 'Por favor, corrija os erros no formulário de alteração de senha.')
+
+    # Lógica para buscar dados salvos (permanece a mesma)
+    duvidas_salvas = UserSavedFAQ.objects.filter(user=user).select_related('faq', 'faq__categoria').order_by('-data_salva')
+    contatos_salvos = UserSavedContato.objects.filter(user=user).select_related('contato', 'contato__categoria').order_by('-data_salva')
     downloads = UserDownload.objects.filter(user=user).select_related('ferramenta')
     
-    if request.method == 'POST':
-        # O formulário UserProfileForm já usa 'request.user' e está correto
-        form = UserProfileForm(request.POST, instance=user) 
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Perfil atualizado com sucesso!')
-            return redirect('profile')
-    else:
-        form = UserProfileForm(instance=user)
-    
-    return render(request, 'core/auth/profile.html', {
-        'form': form,
+    context = {
+        'title': 'Meu Perfil',
+        'profile_form': profile_form,
+        'password_form': password_form, # Passa o formulário de senha para o template
         'downloads': downloads,
         'duvidas_salvas': duvidas_salvas,
         'contatos_salvos': contatos_salvos,
-        'title': 'Meu Perfil'
-    })
-
+    }
+    
+    return render(request, 'core/auth/profile.html', context)
 
 # =============================================================================
 # VIEWS ADMINISTRATIVAS - DASHBOARD
