@@ -79,15 +79,28 @@ class CategoriaBase(models.Model):
 # MODELOS RELACIONADOS A USUÁRIOS
 # =============================================================================
 
-class CustomUser(AbstractUser):  # Altere a herança
-    # Adicione aqui APENAS os campos que não existem no AbstractUser
+# Função para gerar um avatar padrão para novos usuários
+def get_default_avatar(username):
+    return f'https://api.dicebear.com/8.x/bottts/svg?seed={username}'
+
+class CustomUser(AbstractUser):
+    email = models.EmailField('endereço de e-mail', unique=True)
+    
+    # NOVO CAMPO PARA O AVATAR
+    avatar_url = models.URLField(
+        max_length=512, 
+        blank=True, 
+        verbose_name='URL do Avatar'
+    )
+
     is_admin = models.BooleanField(default=False)
     is_professor = models.BooleanField('É professor?', default=False)
-
-    email = models.EmailField('endereço de e-mail', unique=True) # <-- ALTERAÇÃO CRÍTICA
     
-    # Não é mais necessário definir username, email, first_name, etc.
-    # eles já vêm do AbstractUser.
+    def save(self, *args, **kwargs):
+        # Se o usuário está sendo criado e não tem avatar, gera um padrão
+        if not self.pk and not self.avatar_url:
+            self.avatar_url = get_default_avatar(self.username)
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Usuário'

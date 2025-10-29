@@ -46,16 +46,21 @@ def _upload_to_supabase(file_obj, bucket_name, sub_folder=''):
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
-    # As suas configurações de listagem continuam as mesmas e estão corretas
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_admin', 'is_professor', 'is_staff')
+    # NOVO MÉTODO para exibir o avatar na lista
+    @admin.display(description='Avatar')
+    def display_avatar(self, obj):
+        if obj.avatar_url:
+            return format_html('<img src="{}" width="40" height="40" style="border-radius: 50%;" />', obj.avatar_url)
+        return "Nenhum"
+
+    # ADICIONADO 'display_avatar' para a lista e 'avatar_url' para o formulário
+    list_display = ('username', 'email', 'first_name', 'last_name', 'display_avatar', 'is_professor', 'is_staff')
     list_filter = ('is_admin', 'is_professor', 'is_staff', 'is_active')
     
-    # AQUI ESTÁ A CORREÇÃO:
-    # Em vez de herdar UserAdmin.fieldsets, nós os definimos do zero,
-    # adicionando nossos campos customizados no grupo que quisermos.
     fieldsets = (
         (None, {"fields": ("username", "password")}),
-        ("Informações Pessoais", {"fields": ("first_name", "last_name", "email")}),
+        # ADICIONADO 'avatar_url' aqui para que seja editável
+        ("Informações Pessoais", {"fields": ("first_name", "last_name", "email", "avatar_url")}),
         (
             "Permissões",
             {
@@ -68,7 +73,6 @@ class CustomUserAdmin(UserAdmin):
                 ),
             },
         ),
-        # Adicionamos nosso próprio grupo para os campos customizados
         ("Funções Customizadas", {"fields": ("is_admin", "is_professor")}),
         ("Datas Importantes", {"fields": ("last_login", "date_joined")}),
     )

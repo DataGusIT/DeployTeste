@@ -1580,3 +1580,31 @@ def validate_field_api(request):
         return JsonResponse({'error': 'JSON inválido.'}, status=400)
     except Exception:
         return JsonResponse({'error': 'Erro interno do servidor.'}, status=500)
+    
+# =============================================================================
+# NOVA VIEW DE API PARA ATUALIZAR O AVATAR
+# =============================================================================
+@login_required
+@require_POST
+def update_avatar(request):
+    """
+    Endpoint de API para o usuário logado atualizar sua URL de avatar.
+    """
+    try:
+        data = json.loads(request.body)
+        new_avatar_url = data.get('avatar_url')
+
+        if not new_avatar_url:
+            return JsonResponse({'success': False, 'error': 'URL do avatar ausente.'}, status=400)
+
+        # Atualiza o avatar do usuário logado
+        user = request.user
+        user.avatar_url = new_avatar_url
+        user.save(update_fields=['avatar_url'])
+
+        return JsonResponse({'success': True, 'new_avatar_url': new_avatar_url})
+
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'JSON inválido.'}, status=400)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)

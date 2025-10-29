@@ -44,6 +44,15 @@
         align-items: center;
         justify-content: center;
     }
+
+    /* NOVO: Estilo para a imagem de avatar do professor no relatório */
+    .author-avatar-img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover; /* Garante que a imagem preencha o círculo sem distorcer */
+        background-color: var(--primary-very-light); /* Cor de fundo caso a imagem falhe */
+    }
 </style>
 
 <section class="container py-5 animate-fade-up">
@@ -146,10 +155,13 @@
             <p class="testimonial-text mt-3" style="white-space: pre-wrap;">{{ relatorio.relato }}</p>
             <div class="testimonial-author">
                 <!-- ================================== -->
-                <!--       AVATAR CENTRALIZADO          -->
+                <!--   ATUALIZAÇÃO: ÍCONE PARA AVATAR   -->
                 <!-- ================================== -->
-                <div class="testimonial-avatar" style="background-color: var(--primary-very-light);">
-                    <i class="fas fa-user-tie" style="font-size: 22px; color: var(--primary);"></i>
+                <div class="testimonial-avatar">
+                    <!-- A tag <i> foi substituída pela tag <img> abaixo -->
+                    <img src="{{ relatorio.professor.avatar_url }}" 
+                         alt="Avatar de {{ relatorio.professor.username }}"
+                         class="author-avatar-img">
                 </div>
                 <div class="testimonial-info">
                     <h5>{{ relatorio.professor.get_full_name|default:relatorio.professor.username }}</h5>

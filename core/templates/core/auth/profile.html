@@ -8,9 +8,11 @@
     <!-- Header do Perfil -->
     <div class="profile-header">
         <div class="profile-avatar">
-            <div class="avatar-wrapper">
-                <i class="fas fa-user"></i>
-            </div>
+            <!-- AVATAR AGORA É UMA IMAGEM REAL -->
+            <img id="profileAvatarImg" src="{{ user.avatar_url }}" alt="Avatar de {{ user.username }}" class="avatar-image">
+            <button id="changeAvatarBtn" class="change-avatar-btn" title="Alterar Avatar">
+                <i class="fas fa-camera"></i>
+            </button>
         </div>
         <div class="profile-info">
             <h1 class="profile-name">{{ user.get_full_name|default:user.username }}</h1>
@@ -355,6 +357,30 @@
         </div>
     </div>
 </div>
+
+<!-- ================================================== -->
+<!--           NOVO MODAL DE SELEÇÃO DE AVATAR          -->
+<!-- ================================================== -->
+<div id="avatar-chooser-modal" class="avatar-modal-overlay">
+    <div class="avatar-modal-dialog">
+        <div class="avatar-modal-header">
+            <h3>Escolha seu novo avatar</h3>
+            <button id="closeAvatarModal" class="close-modal-btn">&times;</button>
+        </div>
+        <div class="avatar-modal-body">
+            <div id="avatarGrid" class="avatar-grid">
+                <!-- O JavaScript irá popular esta área -->
+                <div class="avatar-loader"></div>
+            </div>
+        </div>
+        <div class="avatar-modal-footer">
+            <button id="cancelAvatarChange" class="btn-secondary">Cancelar</button>
+            <button id="saveAvatarChange" class="btn-primary" disabled>
+                <i class="fas fa-save"></i> Salvar
+            </button>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_css %}
@@ -377,30 +403,141 @@
     border-bottom: 1px solid var(--gray-200);
 }
 
+/* ATUALIZADO: Estilos do Avatar no Header */
 .profile-avatar {
     position: relative;
-}
-
-.avatar-wrapper {
     width: 120px;
     height: 120px;
+}
+.avatar-image {
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    box-shadow: var(--card-shadow);
+    border: 4px solid white;
+    background-color: var(--gray-100); /* Cor de fundo enquanto a imagem carrega */
+    object-fit: cover;
+}
+.change-avatar-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 36px;
+    height: 36px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    border: 2px solid white;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: var(--card-shadow);
-    transition: var(--transition);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.change-avatar-btn:hover {
+    transform: scale(1.1);
+    background: var(--primary-dark);
 }
 
-.avatar-wrapper:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(106, 62, 161, 0.2);
+/* NOVO: Estilos do Modal de Seleção de Avatar */
+.avatar-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(28, 17, 41, 0.6);
+    backdrop-filter: blur(8px);
+    z-index: 3000;
+    display: none; /* Inicia escondido */
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
+.avatar-modal-overlay.show {
+    display: flex;
+    opacity: 1;
+}
+.avatar-modal-dialog {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    transform: scale(0.95);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+.avatar-modal-overlay.show .avatar-modal-dialog {
+    transform: scale(1);
+    opacity: 1;
+}
+.avatar-modal-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.avatar-modal-header h3 { margin: 0; font-size: 1.25rem; }
+.close-modal-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--gray-500);
+    cursor: pointer;
+}
+.avatar-modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 1rem;
+}
+.avatar-option {
+    cursor: pointer;
+    border-radius: 50%;
+    border: 4px solid transparent;
+    transition: all 0.2s ease;
+    padding: 4px; /* Espaçamento para a borda */
+}
+.avatar-option img {
+    width: 100%;
+    border-radius: 50%;
+    background: var(--gray-100);
+}
+.avatar-option:hover {
+    border-color: var(--primary-light);
+}
+.avatar-option.selected {
+    border-color: var(--primary);
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(106, 62, 161, 0.3);
+}
+.avatar-loader { /* Animação de carregamento */
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--gray-200);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 2rem auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-.avatar-wrapper i {
-    font-size: 3rem;
-    color: white;
+.avatar-modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
 }
 
 .profile-info h1 {
@@ -1772,6 +1909,115 @@
         });
         cancelBtn.addEventListener('click', hideConfirmationModal);
         modal.addEventListener('click', (e) => { if (e.target === modal) hideConfirmationModal(); });
+
+        // =========================================================
+        // NOVA LÓGICA PARA O SELETOR DE AVATAR
+        // =========================================================
+        const changeAvatarBtn = document.getElementById('changeAvatarBtn');
+        const avatarModal = document.getElementById('avatar-chooser-modal');
+        const closeModalBtn = document.getElementById('closeAvatarModal');
+        const cancelAvatarBtn = document.getElementById('cancelAvatarChange');
+        const saveAvatarBtn = document.getElementById('saveAvatarChange');
+        const avatarGrid = document.getElementById('avatarGrid');
+        const profileAvatarImg = document.getElementById('profileAvatarImg');
+
+        let selectedAvatarUrl = null;
+
+        // Lista de estilos de avatar do DiceBear que você quer oferecer
+        const avatarStyles = [
+            'adventurer', 'bottts', 'lorelei', 'pixel-art', 'initials', 
+            'micah', 'fun-emoji', 'identicon', 'notionists', 'rings'
+        ];
+
+        // Função para abrir o modal
+        function openAvatarModal() {
+            avatarModal.classList.add('show');
+            populateAvatarGrid();
+        }
+
+        // Função para fechar o modal
+        function closeAvatarModal() {
+            avatarModal.classList.remove('show');
+            avatarGrid.innerHTML = '<div class="avatar-loader"></div>'; // Limpa para a próxima vez
+            saveAvatarBtn.disabled = true;
+            selectedAvatarUrl = null;
+        }
+
+        // Função para popular o grid com as opções de avatares
+        function populateAvatarGrid() {
+            avatarGrid.innerHTML = ''; // Limpa o loader
+            const userSeed = '{{ user.username|escapejs }}'; // Semente baseada no usuário
+
+            avatarStyles.forEach(style => {
+                const avatarUrl = `https://api.dicebear.com/8.x/${style}/svg?seed=${userSeed}`;
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'avatar-option';
+                optionDiv.dataset.url = avatarUrl;
+                optionDiv.innerHTML = `<img src="${avatarUrl}" alt="Avatar no estilo ${style}" loading="lazy">`;
+                
+                optionDiv.addEventListener('click', () => {
+                    // Remove a seleção anterior
+                    document.querySelectorAll('.avatar-option.selected').forEach(el => el.classList.remove('selected'));
+                    // Adiciona seleção ao clicado
+                    optionDiv.classList.add('selected');
+                    selectedAvatarUrl = avatarUrl;
+                    saveAvatarBtn.disabled = false;
+                });
+                avatarGrid.appendChild(optionDiv);
+            });
+        }
+
+        // Função para salvar o novo avatar
+        async function handleSaveAvatar() {
+            if (!selectedAvatarUrl) return;
+
+            saveAvatarBtn.disabled = true;
+            saveAvatarBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+
+            try {
+                const response = await fetch('{% url "update_avatar" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ avatar_url: selectedAvatarUrl })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Atualiza a imagem no perfil instantaneamente
+                    profileAvatarImg.src = data.new_avatar_url; 
+                    // Você pode usar sua função de toast aqui, se tiver uma global
+                    // showToast('Sucesso!', 'Seu avatar foi atualizado.', 'success');
+                    closeAvatarModal();
+                } else {
+                    // showToast('Erro', data.error || 'Não foi possível salvar o avatar.', 'error');
+                    alert('Erro: ' + (data.error || 'Não foi possível salvar o avatar.'));
+                }
+
+            } catch (error) {
+                // showToast('Erro de Rede', 'Verifique sua conexão.', 'error');
+                alert('Erro de Rede: Verifique sua conexão.');
+            } finally {
+                saveAvatarBtn.innerHTML = '<i class="fas fa-save"></i> Salvar';
+            }
+        }
+
+        // Anexar eventos
+        if (changeAvatarBtn) changeAvatarBtn.addEventListener('click', openAvatarModal);
+        if (closeModalBtn) closeModalBtn.addEventListener('click', closeAvatarModal);
+        if (cancelAvatarBtn) cancelAvatarBtn.addEventListener('click', closeAvatarModal);
+        if (saveAvatarBtn) saveAvatarBtn.addEventListener('click', handleSaveAvatar);
+        // Fechar se clicar fora
+        if (avatarModal) {
+            avatarModal.addEventListener('click', (e) => {
+                if (e.target === avatarModal) {
+                    closeAvatarModal();
+                }
+            });
+        }
     });
 </script>
 {% endblock %}

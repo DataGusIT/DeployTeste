@@ -381,6 +381,22 @@
         .footer-links a:hover { color: var(--primary); }
         .footer-copyright { border-top: 1px solid #dee2e6; padding-top: 20px; font-size: 0.85rem; }
         .demo-content { height: 150vh; padding: 2rem; }
+
+        .nav-avatar-in-button {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 0.7rem; /* Espaçamento entre o avatar e o nome */
+            background-color: #f0f0f0; /* Cor de fundo enquanto a imagem carrega */
+        }
+
+        /* Ajuste fino no padding do botão para acomodar a imagem redonda */
+        @media (min-width: 992px) {
+            .nav-item.dropdown .dropdown-toggle { 
+                padding: 0.5rem 1rem !important; 
+            }
+        }
     </style>
     
     {% block extra_css %}{% endblock %}
@@ -396,11 +412,7 @@
                 </a>
                 
                 <button class="navbar-toggler" type="button" aria-label="Toggle navigation">
-                    <div class="hamburger">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
+                    <div class="hamburger"><span></span><span></span><span></span></div>
                 </button>
                 
                 <div class="collapse navbar-collapse" id="navbarNav">
@@ -413,21 +425,23 @@
                     <ul class="navbar-nav">
                         {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
+                            <!-- ===================================================== -->
+                            <!--      MODIFICAÇÃO: AVATAR SUBSTITUINDO O ÍCONE         -->
+                            <!-- ===================================================== -->
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user nav-icon"></i>{{ user.username }}
+                                <!-- O ícone <i class="fas fa-user nav-icon"></i> foi trocado pela imagem abaixo -->
+                                <img src="{{ user.avatar_url }}" alt="Avatar de {{ user.username }}" class="nav-avatar-in-button">
+                                <span>{{ user.username }}</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                {% comment %} Exibe o link do perfil apenas para usuários que NÃO são administradores {% endcomment %}
                                 {% if not user.is_staff %}
                                 <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-id-card"></i>Meu Perfil</a></li>
                                 {% endif %}
                                 
-                                {% comment %} CORREÇÃO: Verifica a existência de 'customuser' da forma correta para templates {% endcomment %}
                                 {% if user.is_professor %}
                                 <li><a class="dropdown-item" href="{% url 'area_professor' %}"><i class="fas fa-chalkboard-teacher"></i>Área do Professor</a></li>
                                 {% endif %}
                                 
-                                {% comment %} Exibe o link do Painel Admin apenas para administradores {% endcomment %}
                                 {% if user.is_staff %}
                                 <li><a class="dropdown-item" href="{% url 'admin:index' %}" target="_blank"><i class="fas fa-cogs"></i>Painel Admin</a></li>
                                 {% endif %}

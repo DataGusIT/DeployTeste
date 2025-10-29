@@ -156,10 +156,11 @@ urlpatterns += [
 ]
 
 # =============================================================================
-# NOVAS URLS: APIs DE CONSULTA DE CEP
+# NOVAS URLS: APIs
 # =============================================================================
 
 urlpatterns += [
     path('api/consulta-cep/<str:cep>/', views.consulta_cep_api, name='consulta_cep_api'),
     path('api/validate-field/', views.validate_field_api, name='validate_field_api'),
+    path('api/update-avatar/', views.update_avatar, name='update_avatar'),
 ]
